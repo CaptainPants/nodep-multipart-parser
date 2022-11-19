@@ -1,12 +1,42 @@
 import { isCRLF, isDoubleHyphen } from ".";
 import { ParseError } from "../..";
 
+/**
+  * Search for each instance of the boundary sequence.
+  */
+export function findBoundarySeparatedParts(boundaryCodes: number[], data: DataView): DataView[] {
+    const boundaryOffsets = findBoundaryOffsets(boundaryCodes, data);
+
+    if (boundaryOffsets.length == 0) {
+        return [];
+    }
+
+    const partViews: DataView[] = [];
+
+    for (let i = 1; i < boundaryOffsets.length; ++i) {
+        const startOffset = boundaryOffsets[i - 1];
+        const endOffset = boundaryOffsets[i];
+
+        const start = startOffset.end;
+        const end = endOffset.start;
+
+        const len = end - start;
+
+        const partView = new DataView(data.buffer, data.byteOffset + start, len);
+
+        partViews.push(partView);
+    }
+
+    return partViews;
+}
+
 export interface Boundary {
     start: number;
     end: number;
     length: number;
     isLast: boolean;
 }
+
 
 /**
   * https://www.rfc-editor.org/rfc/rfc2046#section-5.1.1

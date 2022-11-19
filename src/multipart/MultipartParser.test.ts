@@ -67,30 +67,3 @@ test2-1234
         expect(decoded).toEqual(expectedString);
     });
 });
-
-describe('findParts', () => {
-    test('test1', () => {
-        const boundary = '9051914041544843365972754266';
-
-        const dataview = asciiToDataViewForTesting(`
---9051914041544843365972754266
-Content-Disposition: form-data; name="file1"; filename="a.html"
-
-test1
---9051914041544843365972754266
-Content-Disposition: form-data; name="file2"; filename="b.html"
-
-test2
---9051914041544843365972754266--`); // string literals use \n
-
-        const result = __testing!.findParts(getCharCodesForString(boundary), dataview);
-
-        expect(result).toHaveLength(2);
-
-        const first = result[0]!;
-        expect(getAsciiStringFromDataView(first)).toEqual('Content-Disposition: form-data; name="file1"; filename="a.html"\r\n\r\ntest1');
-
-        const second = result[1]!;
-        expect(getAsciiStringFromDataView(second)).toEqual('Content-Disposition: form-data; name="file2"; filename="b.html"\r\n\r\ntest2');
-    });
-});

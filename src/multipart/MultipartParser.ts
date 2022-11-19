@@ -1,8 +1,6 @@
 import { ParseError } from '..';
-import { parseHeaders } from '../headers';
-import { findBoundaryOffsets, getAsciiStringFromDataView, getCharCodesForString, isDoubleCRLF } from './internal';
-
-// https://www.rfc-editor.org/rfc/rfc2046#section-5.1.7
+import { parseHeaders, isTextContentType } from '../headers';
+import { findBoundarySeparatedParts, getAsciiStringFromDataView, getCharCodesForString, isDoubleCRLF } from './internal';
 
 export interface MultipartResult {
     parts: MultipartPart[];
@@ -11,10 +9,17 @@ export interface MultipartResult {
 export interface MultipartPart {
     headers: { name: string; value: string }[];
     content: DataView;
+
+    contentType: string | undefined;
+    isTextType: boolean;
 }
 
+/**
+  * Parses a multipart body into usable segments.
+  * https://www.rfc-editor.org/rfc/rfc2046#section-5.1.7
+  */
 export class MultipartParser {
-    parse(
+    parseDataView(
         boundary: string,
         data: DataView
     ): MultipartResult {
@@ -24,7 +29,7 @@ export class MultipartParser {
         const boundaryCodes = getCharCodesForString(boundary);
 
         // Using the boundary string, break the data DataView into segments
-        const partViews = findParts(boundaryCodes, data);
+        const partViews = findBoundarySeparatedParts(boundaryCodes, data);
 
         for (let i = 0; i < partViews.length; ++i) {
             const current = partViews[i];
@@ -35,9 +40,16 @@ export class MultipartParser {
 
             const headersResult = parseHeaders({ headerString: headerString });
 
+            const contentTypeHeaderIndex = headersResult.headers.findIndex(x => x.name == 'content-type');
+
+            const contentType = contentTypeHeaderIndex >= 0 ? headersResult.headers[contentTypeHeaderIndex].value
+                : undefined;
+
             parts.push({
                 headers: headersResult.headers,
-                content: content
+                content: content,
+                contentType: contentType,
+                isTextType: isTextContentType(contentType)
             });
         }
 
@@ -47,6 +59,10 @@ export class MultipartParser {
     }
 }
 
+/**
+  * Find the first double CRLF in the data view. The section before is the headers, the 
+  * section after is the body. Converts the headers to string.
+  */
 function splitPartHeaderAndBody(dataview: DataView): { headers: string, content: DataView } {
     for (let i = 0; i < dataview.byteLength; ++i) {
         if (isDoubleCRLF(dataview, i)) {
@@ -74,33 +90,6 @@ function splitPartHeaderAndBody(dataview: DataView): { headers: string, content:
     throw new ParseError('No CR LF CR LF sequence found');
 }
 
-function findParts(boundaryCodes: number[], data: DataView): DataView[] {
-    const boundaryOffsets = findBoundaryOffsets(boundaryCodes, data);
-
-    if (boundaryOffsets.length == 0) {
-        return [];
-    }
-
-    const partViews: DataView[] = [];
-
-    for (let i = 1; i < boundaryOffsets.length; ++i) {
-        const startOffset = boundaryOffsets[i - 1];
-        const endOffset = boundaryOffsets[i];
-
-        const start = startOffset.end;
-        const end = endOffset.start;
-
-        const len = end - start;
-
-        const partView = new DataView(data.buffer, data.byteOffset + start, len);
-
-        partViews.push(partView);
-    }
-
-    return partViews;
-}
-
 export const __testing = process.env.NODE_ENV == 'test' ? {
-    splitPartHeaderAndBody,
-    findParts
+    splitPartHeaderAndBody
 } : void 0;

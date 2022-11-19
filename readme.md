@@ -11,15 +11,17 @@ This package includes several useful components:
 
 Example:
 ```typescript
-import { MultipartParser } from 'nodep-multipart-parser';
+import { MultipartParser, parseContentType } from 'nodep-multipart-parser';
 
-const contentType = 'multipart/form-data; boundary="example-boundary-1251436436"';
+const contentType = parseContentType('multipart/form-data; boundary="example-boundary-1251436436"');
 const content: ArrayBuffer = ...;
 
-const parser = new MultipartParser();
-const boundary = getBoundary(contentType);
+if (!contentType.boundary) {
+    throw new Error('No boundary provided.');
+}
 
-const result = parser.parse(new DataView(content));
+const parser = new MultipartParser();
+const result = parser.parseDataView(contentType.boundary, new DataView(content));
 
 let i = 0;
 

@@ -1,7 +1,10 @@
 import { ContentType, parseContentType } from ".";
 
-export function isTextMediaType(mediaType: string) {
-    if (mediaType.startsWith('text/')) {
+export function isTextMediaType(mediaType: string | undefined) {
+    if (mediaType === undefined) {
+        return false;
+    }
+    else if (mediaType.startsWith('text/')) {
         return true;
     }
     else if (mediaType.match(/^application\/(?:[^+]+\+)?(json|xml)/)) {
@@ -11,7 +14,8 @@ export function isTextMediaType(mediaType: string) {
     return false;
 }
 
-export function isTextContentType(contentType: string | ContentType) {
+export function isTextContentType(contentType: string | ContentType | undefined) {
+    if (contentType === undefined) return false;
     const contentTypeObj = typeof contentType == 'string' ? parseContentType(contentType) : contentType;
 
     return isTextMediaType(contentTypeObj.mediaType);
