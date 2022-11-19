@@ -1,6 +1,6 @@
 
 import { ParseError } from '..';
-import { HeaderParserState, readOneParameter, Parameters, processParametersIfPresent } from './internal';
+import { HeaderParserState, Parameters, processParametersIfPresent } from './internal';
 
 import { isFinished, readToken, consumeOptionalWhitespace, readOptionalToken, readQuoted } from './internal';
 

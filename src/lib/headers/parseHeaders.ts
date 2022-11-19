@@ -68,5 +68,5 @@ export function parseHeaders(params: ParseHeadersParameters): ParseHeadersResult
 
     return {
         headers: headers
-    }
+    };
 }

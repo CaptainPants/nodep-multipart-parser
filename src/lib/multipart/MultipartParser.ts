@@ -1,5 +1,5 @@
 import { ParseError } from '..';
-import { parseContentType, ContentType, parseHeaders } from '../headers';
+import { parseHeaders } from '../headers';
 import { findBoundaryOffsets, getAsciiStringFromDataView, getCharCodesForString, isDoubleCRLF } from './internal';
 
 // https://www.rfc-editor.org/rfc/rfc2046#section-5.1.7

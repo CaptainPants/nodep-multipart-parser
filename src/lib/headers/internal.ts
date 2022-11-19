@@ -109,7 +109,7 @@ export function readToNextLine(state: HeaderParserState) {
     }
 
     if (end === undefined) {
-        throw new ParseError("Unexpected.")
+        throw new ParseError("Unexpected.");
     }
 
     return state.string.substring(startIndex, end);

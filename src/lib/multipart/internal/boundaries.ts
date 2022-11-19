@@ -42,7 +42,7 @@ export function findBoundaryOffsets(boundary: number[], data: DataView): Boundar
 
 export function matchBoundary(boundary: number[], data: DataView, dataOffset: number): Boundary | undefined {
     if (dataOffset >= data.byteLength) {
-        throw new ParseError('dataOffset past end of DataView.')
+        throw new ParseError('dataOffset past end of DataView.');
     }
 
     const start = dataOffset;
