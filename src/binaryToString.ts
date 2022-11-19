@@ -1,19 +1,22 @@
 
 export function binaryToString(
-    binary: ArrayBuffer | DataView | Blob,
+    value: ArrayBuffer | DataView | Blob,
     encoding: string | undefined
 ): Promise<string> {
-    if (binary instanceof Blob) {
-        return blobToString(binary, encoding);
+    if (typeof value == 'string') {
+        return Promise.resolve(value);
+    }
+    else if (value instanceof Blob) {
+        return blobToString(value, encoding);
     }
     else {
         if (TextDecoder) {
             const decoder = new TextDecoder(encoding);
-            return Promise.resolve(decoder.decode(binary));
+            return Promise.resolve(decoder.decode(value));
         }
         else {
             // Basically IE11 here
-            return blobToString(new Blob([binary]), encoding);
+            return blobToString(new Blob([value]), encoding);
         }
     }
 }
