@@ -1,5 +1,5 @@
 
-export async function binaryToString(
+export function binaryToString(
     binary: ArrayBuffer | DataView | Blob,
     encoding: string | undefined
 ): Promise<string> {
@@ -9,19 +9,19 @@ export async function binaryToString(
     else {
         if (TextDecoder) {
             const decoder = new TextDecoder(encoding);
-            return decoder.decode(binary);
+            return Promise.resolve(decoder.decode(binary));
         }
         else {
             // Basically IE11 here
-            return await blobToString(new Blob([binary]), encoding);
+            return blobToString(new Blob([binary]), encoding);
         }
     }
 }
 
-async function blobToString(
+function blobToString(
     blob: Blob,
     encoding: string | undefined
-) {
+): Promise<string> {
     return new Promise<string>(
         (resolve, reject) => {
             const reader = new FileReader();

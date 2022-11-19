@@ -41,4 +41,4 @@ request.responseType = 'arraybuffer';
 const result: ArrayBuffer = request.response;
 ```
 
-In some cases you might have an API that sometimes returns binary data and sometimes text, or a multipart response that has text and binary parts. To extract text from the binary part you can use the method **binaryToString**. This method uses **TextDecoder** on supported browsers, and falls back to **FileReader.readAsText** to support older browsers (IE10 hopefully).
+In some cases you might have an API that sometimes returns binary data and sometimes text, or a multipart response that has text and binary parts. To extract text from the binary part you can use the method **binaryToString**. This method uses **TextDecoder** on supported browsers, and falls back to **FileReader.readAsText** to support older browsers (IE10 hopefully according to https://caniuse.com/mdn-api_filereader_readastext).
