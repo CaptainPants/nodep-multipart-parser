@@ -11,11 +11,11 @@
         "prepublish": "yarn build",
         "clean": "rm -rf ./dist",
         "build": "yarn run lint && yarn run test && yarn run clean && yarn run build:esm",
-        "build:esm": "tsc --project ./src/lib/tsconfig.json",
-        "build:cjs": "tsc --project ./src/lib/tsconfig.json --outDir ./dist/cjs --module commonjs",
-        "lint": "npx eslint src/lib/**/*.{ts,js}",
-        "lint-fix": "npx eslint src/lib/**/*.{ts,js} --fix",
-        "test": "jest --config ./src/lib/jest.config.js",
+        "build:esm": "tsc --project ./src/tsconfig.json",
+        "build:cjs": "tsc --project ./src/tsconfig.json --outDir ./dist/cjs --module commonjs",
+        "lint": "npx eslint src/**/*.{ts,js}",
+        "lint-fix": "npx eslint src/**/*.{ts,js} --fix",
+        "test": "jest --config ./src/jest.config.js",
         "verify": "yarn run lint && yarn run test && yarn run build:esm"
     },
     "dependencies": {
