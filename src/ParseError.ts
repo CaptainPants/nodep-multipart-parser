@@ -11,8 +11,8 @@ function hasCaptureStackTrace(errorConstructor: typeof Error): errorConstructor 
     return typeof (errorConstructor as ErrorConstructorOnChrome).captureStackTrace === 'function';
 }
 
-// Make sure that ErrorBase looks like it extends Error when internally this is actually achieved by manually setting
-// the prototype.
+// Make sure that ErrorBase looks like it extends Error when internally this is actually achieved by manually setting the prototype.
+export interface ParseError extends Error { }
 
 export class ParseError {
     constructor(message?: string) {
