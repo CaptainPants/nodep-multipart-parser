@@ -1,2 +1,2 @@
 
-export * from './MultipartParser';
+export { MultipartParser, MultipartPart, MultipartResult } from './MultipartParser';

@@ -1,5 +1,4 @@
 
-export { parseContentType } from "./parseContentType";
-export type { ContentType } from "./parseContentType";
-
-export { parseHeaders } from './parseHeaders';
+export * from './contentType';
+export * from "./parseContentType";
+export * from "./parseHeaders";
