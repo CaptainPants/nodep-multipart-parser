@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/index.ts"],
-  "sourcesContent": ["\nexport * from './headers';\nexport * from './multipart';\nexport * from './ParseError';"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AACA,oBAAc;AACd,oBAAc;AACd,oBAAc;",
-  "names": []
-}

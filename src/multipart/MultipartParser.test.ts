@@ -28,7 +28,7 @@ Content-Type: text/html
 
         const parser = new MultipartParser();
 
-        const result = parser.parse(boundary, dataview).parts;
+        const result = parser.parseDataView(boundary, dataview).parts;
 
         expect(result).toHaveLength(3);
         expect(result[0]!.headers).toHaveLength(1);
