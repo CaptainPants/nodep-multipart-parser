@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../src/headers/util.ts"],
-  "sourcesContent": ["import { ContentType, parseContentType } from \".\";\n\nexport function isTextMediaType(mediaType: string) {\n    if (mediaType.startsWith('text/')) {\n        return true;\n    }\n    else if (mediaType.match(/^application\\/(?:[^+]+\\+)?(json|xml)/)) {\n        return true;\n    }\n\n    return false;\n}\n\nexport function isTextContentType(contentType: string | ContentType) {\n    const contentTypeObj = typeof contentType == 'string' ? parseContentType(contentType) : contentType;\n\n    return isTextMediaType(contentTypeObj.mediaType);\n}"],
-  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA,eAA8C;AAEvC,yBAAyB,WAAmB;AAC/C,MAAI,UAAU,WAAW,UAAU;AAC/B,WAAO;AAAA,aAEF,UAAU,MAAM,yCAAyC;AAC9D,WAAO;AAAA;AAGX,SAAO;AAAA;AAGJ,2BAA2B,aAAmC;AACjE,QAAM,iBAAiB,OAAO,eAAe,WAAW,+BAAiB,eAAe;AAExF,SAAO,gBAAgB,eAAe;AAAA;",
-  "names": []
-}

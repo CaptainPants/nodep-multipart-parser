@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/binaryToString.ts"],
-  "sourcesContent": ["\nexport function binaryToString(\n    binary: ArrayBuffer | DataView | Blob,\n    encoding: string | undefined\n): Promise<string> {\n    if (binary instanceof Blob) {\n        return blobToString(binary, encoding);\n    }\n    else {\n        if (TextDecoder) {\n            const decoder = new TextDecoder(encoding);\n            return Promise.resolve(decoder.decode(binary));\n        }\n        else {\n            // Basically IE11 here\n            return blobToString(new Blob([binary]), encoding);\n        }\n    }\n}\n\nfunction blobToString(\n    blob: Blob,\n    encoding: string | undefined\n): Promise<string> {\n    return new Promise<string>(\n        (resolve, reject) => {\n            const reader = new FileReader();\n\n            reader.addEventListener('error', _ => reject(new Error('Failed to decode text.')));\n            reader.addEventListener('error', _ => resolve(reader.result as string));\n\n            reader.readAsText(blob, encoding);\n        }\n    );\n}\n"],
-  "mappings": ";;;;;;;AAAA;AAAA;AAAA;AACO,wBACH,QACA,UACe;AACf,MAAI,kBAAkB,MAAM;AACxB,WAAO,aAAa,QAAQ;AAAA,SAE3B;AACD,QAAI,aAAa;AACb,YAAM,UAAU,IAAI,YAAY;AAChC,aAAO,QAAQ,QAAQ,QAAQ,OAAO;AAAA,WAErC;AAED,aAAO,aAAa,IAAI,KAAK,CAAC,UAAU;AAAA;AAAA;AAAA;AAKpD,sBACI,MACA,UACe;AACf,SAAO,IAAI,QACP,CAAC,SAAS,WAAW;AACjB,UAAM,SAAS,IAAI;AAEnB,WAAO,iBAAiB,SAAS,OAAK,OAAO,IAAI,MAAM;AACvD,WAAO,iBAAiB,SAAS,OAAK,QAAQ,OAAO;AAErD,WAAO,WAAW,MAAM;AAAA;AAAA;",
-  "names": []
-}
