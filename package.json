@@ -1,5 +1,5 @@
 {
-    "name": "yarn",
+    "name": "zerodeps-multipart-parser",
     "version": "0.0.0",
     "type": "module",
     "description": "A zero dependency, high compatibility, multipart HTTP multipart content parser",
