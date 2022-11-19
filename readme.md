@@ -17,7 +17,7 @@ const contentType = 'multipart/form-data; boundary="example-boundary-1251436436"
 const content: ArrayBuffer = ...;
 
 const parser = new MultipartParser();
-const boundary = parser.getBoundaryStringFromContentType(contentType);
+const boundary = getBoundary(contentType);
 
 const result = parser.parse(new DataView(content));
 
