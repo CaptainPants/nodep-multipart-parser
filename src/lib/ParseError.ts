@@ -34,7 +34,7 @@ export class ParseError {
         });
 
         if (hasCaptureStackTrace(Error)) {
-            Error.captureStackTrace(this, this.constructor);
+            Error.captureStackTrace(this, this.constructor as new (...args: unknown[]) => unknown);
         }
     }
 }

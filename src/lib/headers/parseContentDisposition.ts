@@ -1,8 +1,7 @@
 
-import { ParseError } from '..';
 import { HeaderParserState, Parameters, processParametersIfPresent } from './internal';
 
-import { isFinished, readToken, consumeOptionalWhitespace, readOptionalToken, readQuoted } from './internal';
+import { readToken, consumeOptionalWhitespace, readOptionalToken, readQuoted } from './internal';
 
 // TODO: look at filename* in https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
 export interface ContentDisposition {

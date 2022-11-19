@@ -73,4 +73,4 @@ export function asciiToDataViewForTesting(content: string) {
     }
 
     return new DataView(new Uint8Array(temp).buffer);
-};
+}

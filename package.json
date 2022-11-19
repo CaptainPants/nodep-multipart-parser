@@ -15,21 +15,21 @@
         "preinstall": "npx only-allow yarn",
         "prepublish": "yarn build",
         "clean": "rm -rf ./dist",
-        "build": "yarn run verify && yarn run clean && yarn run build:esm && yarn run build:umd",
-        "build:esm": "tsc",
-        "build:umd": "tsc --outDir ./dist/cjs --module commonjs",
-        "lint": "npx eslint src/*.{ts,js}",
-        "lint-fix": "npx eslint src/*.{ts,js} --fix",
-        "test": "jest",
-        "verify": "yarn run lint && yarn run test && tsc"
+        "build": "yarn run verify && yarn run clean && yarn run build:esm && yarn run build:cjs",
+        "build:esm": "tsc --project ./src/lib/tsconfig.json",
+        "build:cjs": "tsc --project ./src/lib/tsconfig.json --outDir ./dist/cjs --module commonjs",
+        "lint": "npx eslint src/lib/**/*.{ts,js}",
+        "lint-fix": "npx eslint src/lib/**/*.{ts,js} --fix",
+        "test": "jest --config ./src/lib/jest.config.js",
+        "verify": "yarn run lint && yarn run test && yarn run build:esm"
     },
     "dependencies": {
-        "@types/node": "*"
     },
     "devDependencies": {
         "@babel/core": "^7.20.2",
         "@babel/preset-typescript": "^7.18.6",
         "@jest/globals": "^29.3.1",
+        "@types/node": "*",
         "@typescript-eslint/eslint-plugin": "^5.43.0",
         "@typescript-eslint/parser": "^5.43.0",
         "eslint": "^8.28.0",
