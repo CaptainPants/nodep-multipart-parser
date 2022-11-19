@@ -6,16 +6,11 @@
     "license": "MIT",
     "module": "./dist/esm/index.js",
     "types": "./dist/esm/index.d.ts",
-    "main": "./dist/cjs/index.js",
-    "exports": {
-        "import": "./dist/esm/index-module.js",
-        "require": "./dist/cjs/index-require.cjs"
-    },
     "scripts": {
         "preinstall": "npx only-allow yarn",
         "prepublish": "yarn build",
         "clean": "rm -rf ./dist",
-        "build": "yarn run verify && yarn run clean && yarn run build:esm && yarn run build:cjs",
+        "build": "yarn run lint && yarn run test && yarn run clean && yarn run build:esm",
         "build:esm": "tsc --project ./src/lib/tsconfig.json",
         "build:cjs": "tsc --project ./src/lib/tsconfig.json --outDir ./dist/cjs --module commonjs",
         "lint": "npx eslint src/lib/**/*.{ts,js}",
@@ -39,6 +34,7 @@
         "terser": "^5.15.1",
         "ts-jest": "^29.0.3",
         "typescript": "^4.9.3",
-        "typescript-language-server": "^0.11.2"
+        "typescript-language-server": "^0.11.2",
+        "yarn": "^1.22.19"
     }
 }
