@@ -1,21 +1,12 @@
 
 import { describe, expect, test } from '@jest/globals';
+import { getBoundary } from '..';
 import { asciiToDataViewForTesting, getAsciiStringFromDataView, getCharCodesForString } from './internal';
 import { MultipartParser, __testing } from "./MultipartParser";
 
 const cr = 13;
 const lf = 10;
 const hyphen = '-'.charCodeAt(0);
-
-describe('getBoundary', () => {
-    test('multipart/form-data; boundary="example1-2-3"', () => {
-        const parser = new MultipartParser();
-
-        const boundary = parser.getBoundaryStringFromContentType('multipart/form-data; boundary="example1-2-3"');
-
-        expect(boundary).toEqual('example1-2-3');
-    });
-});
 
 describe('parse', () => {
     test('example1', () => {

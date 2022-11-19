@@ -14,25 +14,6 @@ export interface MultipartPart {
 }
 
 export class MultipartParser {
-    getBoundaryStringFromContentType(contentType: string | ContentType) {
-        let contentTypeObject: ContentType;
-
-        try {
-            contentTypeObject = typeof contentType == 'object' ? contentType : parseContentType(contentType);
-        }
-        catch (ex) {
-            throw new ParseError(`Error parsing header. ${ex instanceof Error ? ex.message : ex}`);
-        }
-
-        const boundaryIndex = contentTypeObject.parameters.findIndex(item => item.name == 'boundary');
-        if (boundaryIndex < 0) {
-            throw new ParseError('Could not find boundary parameter.');
-        }
-        const boundary = contentTypeObject.parameters[boundaryIndex];
-
-        return boundary.value;
-    }
-
     parse(
         boundary: string,
         data: DataView

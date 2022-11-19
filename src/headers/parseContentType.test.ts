@@ -6,7 +6,7 @@ import { parseContentType, __testing } from './parseContentType';
 describe('getContentTypeParts', () => {
     test('image/png', () => {
         const res = parseContentType('image/png');
-        expect(res.mimeType).toEqual('image/png');
+        expect(res.mediaType).toEqual('image/png');
         expect(res.type).toEqual('image');
         expect(res.subtype).toEqual('png');
         expect(Object.keys(res.parameters).length === 0);
@@ -19,14 +19,14 @@ describe('getContentTypeParts', () => {
     test('text/json; encoding=utf-8', () => {
         const res = parseContentType('text/json; encoding=utf-8');
 
-        expect(res.mimeType).toEqual('text/json');
+        expect(res.mediaType).toEqual('text/json');
         expect(res.parameters).toEqual([{ name: "encoding", value: "utf-8" }]);
     });
 
     test('text/json; encoding=utf-8 ; boundary="ham sandwich \\"1\\" 1234 "', () => {
         const res = parseContentType('text/json; encoding=utf-8 ; boundary="ham sandwich \\"1\\" 1234 "');
 
-        expect(res.mimeType).toEqual('text/json');
+        expect(res.mediaType).toEqual('text/json');
         expect(res.parameters).toEqual([
             { name: "encoding", value: "utf-8" },
             { name: "boundary", value: "ham sandwich \"1\" 1234 " }
@@ -36,7 +36,7 @@ describe('getContentTypeParts', () => {
     test('text/json; encoding="utf-8"', () => {
         const res = parseContentType('text/json; encoding="utf-8"');
 
-        expect(res.mimeType).toEqual('text/json');
+        expect(res.mediaType).toEqual('text/json');
         expect(res.parameters).toEqual([{ name: "encoding", value: "utf-8" }]);
     });
 });

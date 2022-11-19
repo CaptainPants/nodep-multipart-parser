@@ -7,7 +7,7 @@ import { isFinished, readToken, consumeOptionalWhitespace, readOptionalToken, re
 export type Parameters = { name: string; value: string }[];
 
 export interface ContentType {
-    mimeType: string,
+    mediaType: string,
     type: string,
     subtype: string,
     parameters: Parameters
@@ -33,7 +33,7 @@ export function parseContentType(header: string): ContentType {
     const parameters = processParameters(state);
 
     return {
-        mimeType: type + '/' + subtype,
+        mediaType: type + '/' + subtype,
         type: type,
         subtype: subtype,
         parameters: parameters

@@ -1,7 +1,7 @@
 {
   "name": "yarn",
   "version": "0.1.0",
-    "type": "module",
+  "type": "module",
   "description": "A zero dependency, high compatibility, multipart HTTP multipart content parser",
   "license": "MIT",
   "scripts": {
@@ -12,7 +12,9 @@
     "test": "jest",
     "verify": "yarn run lint && tsc && yarn run test"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@types/node": "*"
+  },
   "devDependencies": {
     "@babel/core": "^7.20.2",
     "@babel/preset-typescript": "^7.18.6",
