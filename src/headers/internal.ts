@@ -200,3 +200,87 @@ export function readQuoted(state: HeaderParserState) {
     // Specifically replace \\ with \ and \" with ", but also anything else preceeded by a \
     return merged.replace(/\\(.)/g, '$1');
 }
+
+
+/**
+  * Refer to 'parameter' in https://datatracker.ietf.org/doc/html/rfc7231#section-3.1.1.1
+  */
+export function readOneParameter(state: HeaderParserState): { name: string, value: string } | undefined {
+    consumeOptionalWhitespace(state);
+
+    const parameterName = readOptionalToken(state);
+
+    if (!parameterName) {
+        if (isFinished(state)) {
+            return undefined;
+        }
+        else {
+            throw new ParseError(`Unexpected ${state.string[state.index]}, expecting a token.`);
+        }
+    }
+
+    // technically not allowed, but for tolerance sake
+    consumeOptionalWhitespace(state);
+
+    if (isFinished(state) || state.string[state.index] !== '=') {
+        throw new ParseError(`Unexpected ${state.string[state.index]}, expecting an equals sign.`);
+    }
+
+    // move past the =
+    ++state.index;
+
+    // technically not allowed, but for tolerance sake
+    consumeOptionalWhitespace(state);
+
+    if (isFinished(state)) {
+        throw new ParseError(`Unexpected EOF, expecting a token or quoted-string.`);
+    }
+
+    let value: string;
+    if (state.string[state.index] === '"') {
+        value = readQuoted(state);
+    }
+    else {
+        value = readToken(state);
+    }
+
+    return { name: parameterName, value: value };
+}
+
+export type Parameters = { name: string; value: string }[];
+
+export function processParametersIfPresent(state: HeaderParserState): Parameters {
+    const res: Parameters = [];
+
+    for (; ;) {
+        // sitting just after the previous parameter
+        consumeOptionalWhitespace(state);
+
+        if (isFinished(state)) {
+            break;
+        }
+
+        // there should be a ; between parameters
+        const semicolon = state.string[state.index];
+        if (semicolon !== ';') {
+            throw new ParseError(`Unexpected '${semicolon}' when expecting a semi-colon ';'.`);
+        }
+
+        // move past semicolon
+        ++state.index;
+
+        // then a parameter
+        const parameter = readOneParameter(state);
+
+        if (!parameter) {
+            if (!isFinished(state)) {
+                throw new ParseError(`Unexpected '${state.string[state.index]}' when expecting parameter or EOF.`);
+            }
+            break; // technically a violation of the standard but we'll allow it
+        }
+
+        res.push(parameter);
+    }
+
+    return res;
+}

@@ -12,6 +12,7 @@ function hasCaptureStackTrace(errorConstructor: typeof Error): errorConstructor 
 }
 
 // Make sure that ErrorBase looks like it extends Error when internally this is actually achieved by manually setting the prototype.
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ParseError extends Error { }
 
 export class ParseError {

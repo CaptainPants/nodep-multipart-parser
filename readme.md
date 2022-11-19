@@ -4,7 +4,7 @@ This package includes several useful components:
 * Function **binaryToString** to convert content in a **DataView** or **ArrayBuffer** back to a string based on encoding provided in a content-type header. This is useful when you have mixed texted and binary content in a multipart container, or your content will sometimes be binary and sometimes be text (XMLHttpRequest forces you to declare responseType before making the call).
 * Header processing utilities:
   * Function **parseHeaders** that can parse a header string like that returned from [XMLHttpRequest.getAllResponseHeaders()](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/getAllResponseHeaders), or from a part withing multi-part content.
-  * Function **getBoundary** to find the boundary string for use in parsing parts.
+  * Function **parseContentType** to extract components of the Content-Type header (charset and boundary).
   * Functions **isTextMediaType** and **isTextContentType** for detecting if response content is text.
   * Functions **getEncoding** to extract encoding from a content-type header.
 
