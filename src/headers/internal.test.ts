@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 
-import { isFinished, isAtCRLF, readToNextLine, readToken, consumeOptionalWhitespace, readQuoted } from './internal';
+import { isFinished, isAtCRLF, readToNextLine, readToken, consumeOptionalWhitespace, readQuoted, readOneParameter } from './internal';
 
 describe('isFinished', () => {
     test('false 1', () => {
@@ -67,5 +67,17 @@ describe('consumeOptionalWhitespace', () => {
 
         expect(state).toEqual({ index: 0, end: input.length, string: input });
         expect(state.string[state.index]).toEqual('w');
+    });
+});
+
+
+describe('readOneParameter', () => {
+    test('encoding=utf-8', () => {
+        const input = 'encoding=utf-8 ';
+        const parameters: { [key: string]: string } = {};
+        const res = readOneParameter({ index: 0, end: input.length, string: input });
+        const keys = Object.keys(parameters);
+
+        expect(res).toEqual({ name: "encoding", value: 'utf-8' });
     });
 });

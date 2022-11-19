@@ -15,7 +15,7 @@
         "preinstall": "npx only-allow yarn",
         "prepublish": "yarn build",
         "clean": "rm -rf ./dist",
-        "build": "yarn run clean && yarn run build:esm && yarn run build:umd",
+        "build": "yarn run verify && yarn run clean && yarn run build:esm && yarn run build:umd",
         "build:esm": "tsc",
         "build:umd": "tsc --outDir ./dist/cjs --module commonjs",
         "lint": "npx eslint src/*.{ts,js}",
