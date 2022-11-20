@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../src/headers/index.ts"],
-  "sourcesContent": ["\n\nexport * from \"./parseContentDisposition\";\nexport * from \"./parseContentType\";\nexport * from \"./parseHeaders\";\nexport * from './util';"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAEA,oBAAc;AACd,oBAAc;AACd,oBAAc;AACd,oBAAc;",
-  "names": []
-}
