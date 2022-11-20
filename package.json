@@ -7,7 +7,6 @@
     "module": "./dist/esm/index.js",
     "types": "./dist/esm/index.d.ts",
     "scripts": {
-        "preinstall": "npx only-allow yarn",
         "prepublish": "yarn build",
         "clean": "rm -rf ./dist",
         "build": "yarn run verify && yarn run clean && yarn run compile:esm",
