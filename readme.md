@@ -1,5 +1,9 @@
-# Zero-Dependency Multipart HTTP content parser
+# Zero-Dependency Multipart HTTP content parser (Alpha)
 See NPM package: [@captainpants/zerodeps-multipart-parser](https://www.npmjs.com/package/@captainpants/zerodeps-multipart-parser)
+
+**This is alpha software - feel free to try it, but it is buggy and subject to change.**
+
+----
 
 A Zero-dependency multipart HTTP content parser, with tools for conveniently switching between string and binary content with support for Internet Explorer 11.
 
