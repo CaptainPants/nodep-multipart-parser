@@ -1,8 +1,7 @@
 
 import { ParseError } from '..';
 import { HeaderParserState, Parameters, processParametersIfPresent } from './internal';
-
-import { isFinished, readToken, consumeOptionalWhitespace, readOptionalToken, readQuoted } from './internal';
+import { isFinished, readToken } from './internal';
 
 export interface ContentType {
     mediaType: string;
@@ -44,10 +43,3 @@ export function parseContentType(header: string): ContentType {
         charset: charsetIndex >= 0 ? parameters[charsetIndex].value.toLowerCase() : undefined
     };
 }
-
-export const __testing = process.env.NODE_ENV == 'test' ? {
-    consumeOptionalWhitespace,
-    readToken,
-    readOptionalToken,
-    readQuoted
-} : void 0;

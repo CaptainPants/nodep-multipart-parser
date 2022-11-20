@@ -1,7 +1,7 @@
 
 import { HeaderParserState, Parameters, processParametersIfPresent } from './internal';
 
-import { readToken, consumeOptionalWhitespace, readOptionalToken, readQuoted } from './internal';
+import { readToken } from './internal';
 
 // TODO: look at filename* in https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
 export interface ContentDisposition {
@@ -35,10 +35,3 @@ export function parseContentDisposition(header: string): ContentDisposition {
         filenameStar: filenameStarIndex >= 0 ? parameters[filenameStarIndex].value : undefined
     };
 }
-
-export const __testing = process.env.NODE_ENV == 'test' ? {
-    consumeOptionalWhitespace,
-    readToken,
-    readOptionalToken,
-    readQuoted
-} : void 0;

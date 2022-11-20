@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/multipart/internal/index.ts"],
+  "sourcesContent": ["\nexport * from './util';\nexport * from './boundaries';"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AACA,oBAAc;AACd,oBAAc;",
+  "names": []
+}

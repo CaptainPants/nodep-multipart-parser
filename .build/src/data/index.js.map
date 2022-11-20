@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../src/data/index.ts"],
+  "sourcesContent": ["\nexport * from './Data';"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AACA,oBAAc;",
+  "names": []
+}
