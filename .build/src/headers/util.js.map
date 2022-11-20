@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../src/headers/util.ts"],
+  "sourcesContent": ["\n\nexport function isTextMediaType(mediaType: string | undefined) {\n    if (mediaType === undefined) {\n        return false;\n    }\n    else if (mediaType.startsWith('text/')) {\n        return true;\n    }\n    else if (mediaType.match(/^application\\/(?:[^+]+\\+)?(json|xml)/)) {\n        return true;\n    }\n\n    return false;\n}\n\nexport function isMultipartMediaType(mediaType: string | undefined) {\n    if (mediaType === undefined) {\n        return false;\n    }\n\n    return mediaType.startsWith('multipart/');\n}"],
+  "mappings": ";;;;;;;AAAA;AAAA;AAAA;AAAA;AAEO,yBAAyB,WAA+B;AAC3D,MAAI,cAAc,QAAW;AACzB,WAAO;AAAA,aAEF,UAAU,WAAW,UAAU;AACpC,WAAO;AAAA,aAEF,UAAU,MAAM,yCAAyC;AAC9D,WAAO;AAAA;AAGX,SAAO;AAAA;AAGJ,8BAA8B,WAA+B;AAChE,MAAI,cAAc,QAAW;AACzB,WAAO;AAAA;AAGX,SAAO,UAAU,WAAW;AAAA;",
+  "names": []
+}

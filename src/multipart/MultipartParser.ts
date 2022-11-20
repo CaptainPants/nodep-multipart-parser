@@ -1,5 +1,5 @@
-import { ParseError } from '..';
-import { parseHeaders, isTextContentType } from '../headers';
+import { ParseError } from '../ParseError';
+import { parseHeaders, ContentType, ContentDisposition, parseContentType, parseContentDisposition } from '../headers';
 import { findBoundarySeparatedParts, getAsciiStringFromDataView, getCharCodesForString, isDoubleCRLF } from './internal';
 
 export interface MultipartResult {
@@ -9,9 +9,8 @@ export interface MultipartResult {
 export interface MultipartPart {
     headers: { name: string; value: string }[];
     content: DataView;
-
-    contentType: string | undefined;
-    isTextType: boolean;
+    contentType: ContentType | undefined;
+    contentDisposition: ContentDisposition | undefined;
 }
 
 /**
@@ -40,16 +39,19 @@ export class MultipartParser {
 
             const headersResult = parseHeaders({ headerString: headerString });
 
-            const contentTypeHeaderIndex = headersResult.headers.findIndex(x => x.name == 'content-type');
+            const contentTypeIndex = headersResult.headers.findIndex(x => x.name == 'content-type');
+            const contentDispositionIndex = headersResult.headers.findIndex(x => x.name == 'content-disposition');
 
-            const contentType = contentTypeHeaderIndex >= 0 ? headersResult.headers[contentTypeHeaderIndex].value
+            const contentType = contentTypeIndex >= 0 ? parseContentType(headersResult.headers[contentTypeIndex].value)
+                : undefined;
+            const contentDisposition = contentDispositionIndex >= 0 ? parseContentDisposition(headersResult.headers[contentDispositionIndex].value)
                 : undefined;
 
             parts.push({
                 headers: headersResult.headers,
                 content: content,
                 contentType: contentType,
-                isTextType: isTextContentType(contentType)
+                contentDisposition: contentDisposition
             });
         }
 

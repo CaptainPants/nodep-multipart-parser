@@ -1,4 +1,4 @@
-import { ContentType, parseContentType } from ".";
+
 
 export function isTextMediaType(mediaType: string | undefined) {
     if (mediaType === undefined) {
@@ -14,9 +14,10 @@ export function isTextMediaType(mediaType: string | undefined) {
     return false;
 }
 
-export function isTextContentType(contentType: string | ContentType | undefined) {
-    if (contentType === undefined) return false;
-    const contentTypeObj = typeof contentType == 'string' ? parseContentType(contentType) : contentType;
+export function isMultipartMediaType(mediaType: string | undefined) {
+    if (mediaType === undefined) {
+        return false;
+    }
 
-    return isTextMediaType(contentTypeObj.mediaType);
+    return mediaType.startsWith('multipart/');
 }

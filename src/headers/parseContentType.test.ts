@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
-import { ParseError } from '..';
+import { ParseError } from '../ParseError';
 
-import { parseContentType, __testing } from './parseContentType';
+import { parseContentType } from './parseContentType';
 
 describe('parseContentType', () => {
     test('image/png', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 
-import { parseContentDisposition, __testing } from './parseContentDisposition';
+import { parseContentDisposition } from './parseContentDisposition';
 
 describe('parseContentDisposition', () => {
     test('form-data', () => {

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../src/data/Data.test.ts"],
+  "sourcesContent": ["import { describe, test, expect } from \"@jest/globals\";\n\nimport { Data } from './Data';\n\ndescribe('string to binary and back', () => {\n    test('test1', async () => {\n        const inputs = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ'];\n\n        for (const input of inputs) {\n            const start = await new Data(input, undefined).arrayBuffer();\n            const returned = await (new Data(start.value, start.encoding)).string();\n            expect(start).toEqual(returned);\n        }\n    });\n});"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA,qBAAuC;AAEvC,kBAAqB;AAErB,6BAAS,6BAA6B,MAAM;AACxC,2BAAK,SAAS,YAAY;AACtB,UAAM,SAAS,CAAC;AAEhB,eAAW,SAAS,QAAQ;AACxB,YAAM,QAAQ,MAAM,IAAI,iBAAK,OAAO,QAAW;AAC/C,YAAM,WAAW,MAAO,IAAI,iBAAK,MAAM,OAAO,MAAM,UAAW;AAC/D,iCAAO,OAAO,QAAQ;AAAA;AAAA;AAAA;",
+  "names": []
+}
