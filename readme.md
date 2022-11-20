@@ -5,7 +5,7 @@ See NPM package: [@captainpants/zerodeps-multipart-parser](https://www.npmjs.com
 
 ----
 
-A Zero-dependency multipart HTTP content parser, with tools for conveniently switching between string and binary content with support for Internet Explorer 11.
+A Zero-dependency multipart HTTP content parser, with tools for conveniently switching between string and binary content. Supports back to Internet Explorer 11.
 
 This package includes several useful components:
 * Class **MultipartParser** which will take a **DataView** (wrapping an **ArrayBuffer**) and break it into parts according to a given boundary string.
