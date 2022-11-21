@@ -1,7 +1,5 @@
 
-import { HeaderParserState, Parameters, processParametersIfPresent } from './internal';
-
-import { readToken } from './internal';
+import { HeaderParserState, Parameters, processParametersIfPresent, readToken } from './internal.js';
 
 // TODO: look at filename* in https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
 export interface ContentDisposition {

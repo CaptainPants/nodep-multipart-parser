@@ -1,6 +1,6 @@
-import { ParseError } from '../ParseError';
-import { parseHeaders, ContentType, ContentDisposition, parseContentType, parseContentDisposition } from '../headers';
-import { findBoundarySeparatedParts, getAsciiStringFromDataView, getCharCodesForString, isDoubleCRLF } from './internal';
+import { ParseError } from '../ParseError.js';
+import { parseHeaders, ContentType, ContentDisposition, parseContentType, parseContentDisposition } from '../headers/index.js';
+import { findBoundarySeparatedParts, getAsciiStringFromDataView, getCharCodesForString, isDoubleCRLF } from './internal/index.js';
 
 export interface MultipartResult {
     parts: MultipartPart[];

@@ -1,5 +1,5 @@
 
-import { TextEncoder, TextDecoder } from 'util'
+import { TextEncoder, TextDecoder } from 'util';
 import { Blob } from 'buffer';
 
 global.TextEncoder = TextEncoder as any;

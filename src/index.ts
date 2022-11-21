@@ -1,6 +1,7 @@
 
-export * from './data';
-export * from './HttpContent';
-export * from './headers';
-export * from './multipart';
-export * from './ParseError';
+export * from './data/index.js';
+export * from './headers/index.js';
+export * from './multipart/index.js';
+
+export * from './HttpContent.js';
+export * from './ParseError.js';

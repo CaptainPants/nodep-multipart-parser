@@ -1,6 +1,6 @@
 
-import { ParseError } from '..';
-import { consumeOptionalWhitespace, readOptionalToken, isSpace, isFinished, readToNextLine, HeaderParserState } from './internal';
+import { ParseError } from '../ParseError.js';
+import { consumeOptionalWhitespace, readOptionalToken, isSpace, isFinished, readToNextLine, HeaderParserState } from './internal.js';
 
 export interface ParseHeadersParameters {
     headerString: string;
