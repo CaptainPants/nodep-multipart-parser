@@ -12,7 +12,7 @@
         }
     },
     "scripts": {
-        "prepublish": "yarn build",
+        "prepublishOnly": "yarn build",
         "clean": "npx rimraf ./dist",
         "build": "yarn run verify && yarn run clean && yarn run compile:esm",
         "compile": "yarn run clean && yarn run compile:esm",
