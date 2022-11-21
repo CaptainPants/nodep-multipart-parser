@@ -14,7 +14,7 @@ This package includes several useful components:
 * Header processing utilities:
   * Function **parseHeaders** that can parse a header string like that returned from [XMLHttpRequest.getAllResponseHeaders()](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/getAllResponseHeaders), or from a part withing multi-part content.
   * Function **parseContentType** and **parseContentDisposition** to extract components of the Content-Type and Content-Disposition headers (charset, boundary, name and filename).
-  * Functions **isTextMediaType** and **isMultipartMediaType** for detecting if response content is text.
+  * Functions **isTextMediaType** and **isMultipartMediaType** for detecting if response content is text or multipart respectively.
 
 Use HttpContent to get simplified access to XMLHttpResponse responses that may be multipart:
 ```typescript
