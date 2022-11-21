@@ -28,15 +28,29 @@ req.addEventListener("load", reqListener);
 req.open("GET", "http://www.example.org/example.txt");
 req.send();
 
-function reqListener() {
+async function reqListener() {
     // run the XML request and wait for result
     const content = HttpContent.fromXHRResponse(xhr);
 
     if (content instanceof MultipartHttpContent) {
         // This is multipart content
+        for (const part of content.parts) {
+            /*
+            Do something with the parts here
+            Each part is a SingularHttpContent and has a data property 
+            which internally is a DataView to the bytes of that segment
+            */
+        }
     }
     else if (content instanceof SingularHttpContent) {
         // Singular content
+
+        // get content as a string
+        const asString = await content.data.string(); 
+        // or in a binary format
+        const asBinary = await content.data.arrayBuffer();
+        const asBinary = await content.data.blob();
+        const asBinary = await content.data.dataView();
     }
     else {
         // Should not happen
@@ -68,3 +82,12 @@ for (const part of result.parts) {
 ```
 
 The **Data** class lets you conveniently switch data between binary structures and back and forth with string. For string to binary conversion we use TextEncoder/TextDecoder, falling back to FileReader/Blob constructor for IE11 and other browsers (Hopefully IE10 too according to https://caniuse.com/mdn-api_filereader_readastext).
+```typescript
+const data1 = new Data('Cheesecake');
+const asArrayBuffer1 = await data1.arrayBuffer();
+const asBlob1 = await data.blob();
+const asDataView1 = await data.dataView();
+
+const data2 = new Data(asArrayBuffer1.value, asArrayBuffer1.encoding);
+const asString2 = await data2.string();
+```
