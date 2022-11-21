@@ -55,6 +55,8 @@ export class Data {
             return { value: await blobToArrayBuffer(this.source), encoding: this.sourceEncoding };
         }
         else {
+            // String path
+            // Always utf-8 when converting from string to binary
             return { value: await stringToArrayBuffer(this.source), encoding: 'utf-8' };
         }
     }
