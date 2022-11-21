@@ -1,6 +1,10 @@
 
-
-//TODO doc comment that this is always to utf-8
+/**
+ * Convert from a string to an ArrayBuffer using UTF-8 encoding. Use TextEncoder 
+ * for preference, and fall back to blob constructor if necessary.
+ * @param value Input as a string
+ * @returns The string encoded as binary according to UTF-8
+ */
 export function stringToArrayBuffer(
     value: string
 ): Promise<ArrayBuffer> {
@@ -14,16 +18,46 @@ export function stringToArrayBuffer(
     }
 }
 
+/**
+ * Use the Blob constructor to convert from string to binary (
+ * https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob). This always uses 
+ * UTF-8 encoding. This primarily exists for IE11.
+ * @param value 
+ * @returns 
+ */
 export function expensiveCompatibleStringToArrayBuffer(value: string): Promise<ArrayBuffer> {
-    // MDN says the blob constructor uses utf-8 TODO: cite url
+    // MDN says the blob constructor uses utf-8
     return blobToArrayBuffer(new Blob([value]));
 }
 
-export function expensiveCompativalBlobSourceToString(value: ArrayBuffer | DataView, encoding: string | undefined) {
+/**
+ * Convert from an ArrayBuffer or DataView to string via the Blob constructor (
+ * https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob) and FileReader. 
+ * This _may_ support other encodings than UTF-8 but I wouldn't count on it.
+ * 
+ * This page has some good information on what browsers are supposed to support 
+ * https://stackoverflow.com/questions/40790042/filereader-which-encodings-are-supported
+ * @param value 
+ * @param encoding 
+ * @returns 
+ */
+export function expensiveCompativalBlobSourceToString(
+    value: ArrayBuffer | DataView, 
+    encoding: string | undefined
+) {
     return blobToString(new Blob([value]), encoding);
 }
 
-// TODO doc comment that this is always utf-8
+/**
+ * Wraps using FileReader to convert from Blob to a string in a promise. Supported
+ * encodings are not 100% clear.
+ * 
+ * This page has some good information on what browsers are supposed to support 
+ * https://stackoverflow.com/questions/40790042/filereader-which-encodings-are-supported
+ * @param blob 
+ * @param sourceEncoding 
+ * @returns 
+ */
 export function blobToString(
     blob: Blob,
     sourceEncoding: string | undefined
@@ -40,6 +74,11 @@ export function blobToString(
     );
 }
 
+/**
+ * Wraps using FileReader to convert from Blob to an ArrayBuffer.
+ * @param blob 
+ * @returns 
+ */
 export function blobToArrayBuffer(
     blob: Blob
 ) {

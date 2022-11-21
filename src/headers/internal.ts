@@ -249,6 +249,11 @@ export function readOneParameter(state: HeaderParserState): { name: string, valu
 
 export type Parameters = { name: string; value: string }[];
 
+/**
+ * TODO: currently does not support * parameters https://datatracker.ietf.org/doc/html/rfc5987
+ * @param state 
+ * @returns 
+ */
 export function processParametersIfPresent(state: HeaderParserState): Parameters {
     const res: Parameters = [];
 
