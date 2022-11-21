@@ -1,7 +1,7 @@
 
-import { ContentType, ContentDisposition, Header, parseHeaders, parseContentType, parseContentDisposition, isMultipartMediaType } from './headers';
-import { MultipartParser } from './multipart';
-import { Data, DataSource } from './data';
+import { ContentType, ContentDisposition, Header, parseHeaders, parseContentType, parseContentDisposition, isMultipartMediaType } from './headers/index.js';
+import { MultipartParser } from './multipart/index.js';
+import { Data, DataSource } from './data/index.js';
 
 export abstract class HttpContent {
     constructor(

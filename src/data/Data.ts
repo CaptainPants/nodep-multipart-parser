@@ -1,4 +1,4 @@
-import { blobToArrayBuffer, blobToString, expensiveCompativalBlobSourceToString, stringToArrayBuffer } from "./internal";
+import { blobToArrayBuffer, blobToString, expensiveCompativalBlobSourceToString, stringToArrayBuffer } from "./internal.js";
 
 export type DataSource = string | ArrayBuffer | DataView | Blob;
 

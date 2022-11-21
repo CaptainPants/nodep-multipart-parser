@@ -1,6 +1,6 @@
 
 
-export * from "./parseContentDisposition";
-export * from "./parseContentType";
-export * from "./parseHeaders";
-export * from './util';
+export * from "./parseContentDisposition.js";
+export * from "./parseContentType.js";
+export * from "./parseHeaders.js";
+export * from './util.js';

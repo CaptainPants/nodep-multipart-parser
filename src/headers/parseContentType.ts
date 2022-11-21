@@ -1,7 +1,6 @@
 
-import { ParseError } from '..';
-import { HeaderParserState, Parameters, processParametersIfPresent } from './internal';
-import { isFinished, readToken } from './internal';
+import { ParseError } from '../ParseError.js';
+import { HeaderParserState, Parameters, processParametersIfPresent, isFinished, readToken } from './internal.js';
 
 export interface ContentType {
     mediaType: string;

@@ -17,7 +17,7 @@
 // > obs-text       = %x80-FF
 // > delimiter      => any of "(),/:;<=>?@[\]{}
 
-import { ParseError } from "../ParseError";
+import { ParseError } from "../ParseError.js";
 
 export interface HeaderParserState {
     index: number;

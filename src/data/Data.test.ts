@@ -1,6 +1,6 @@
 import { describe, test, expect } from "@jest/globals";
 
-import { Data } from './Data';
+import { Data } from './Data.js';
 
 describe('string to binary and back', () => {
     test('test1', async () => {

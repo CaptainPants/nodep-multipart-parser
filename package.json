@@ -4,15 +4,20 @@
     "type": "module",
     "description": "A zero dependency, high compatibility, multipart HTTP multipart content parser",
     "license": "MIT",
-    "module": "./dist/esm/index.js",
+    "main": "./dist/esm/index.js",
     "types": "./dist/esm/index.d.ts",
+    "exports": {
+        ".": {
+            "default": "./dist/esm/index.js"
+        }
+    },
     "scripts": {
         "prepublish": "yarn build",
         "clean": "npx rimraf ./dist",
         "build": "yarn run verify && yarn run clean && yarn run compile:esm",
-        "compile": "yarn run compile:esm",
+        "compile": "yarn run clean && yarn run compile:esm",
         "compile:esm": "tsc --project ./src/tsconfig.json",
-        "compile:cjs": "tsc --project ./src/tsconfig.json --outDir ./dist/cjs --module commonjs",
+        "compile:cjs": "tsc --project ./src/tsconfig.json --outDir ./dist/cjs/ --module commonjs",
         "lint": "npx eslint src/**/*.{ts,js}",
         "lint-fix": "npx eslint src/**/*.{ts,js} --fix",
         "test": "jest --config ./src/jest.config.js",
@@ -33,6 +38,7 @@
         "rimraf": "^3.0.2",
         "terser": "^5.15.1",
         "ts-jest": "^29.0.3",
+        "ts-jest-resolver": "^2.0.0",
         "typescript": "^4.9.3",
         "typescript-language-server": "^0.11.2",
         "yarn": "^1.22.19"

@@ -1,2 +1,2 @@
 
-export { MultipartParser, MultipartPart, MultipartResult } from './MultipartParser';
+export { MultipartParser, MultipartPart, MultipartResult } from './MultipartParser.js';
