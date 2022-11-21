@@ -11,7 +11,9 @@ export abstract class HttpContent {
     ) {
     }
 
-    static async fromXHRResponse(xhr: XMLHttpRequest): Promise<HttpContent> {
+    static async fromXHRResponse(
+        xhr: XMLHttpRequest
+    ): Promise<MultipartHttpContent | SingularHttpContent> {
         const headers = parseHeaders({
             headerString: xhr.getAllResponseHeaders()
         }).headers;
@@ -19,7 +21,10 @@ export abstract class HttpContent {
         return HttpContent.from(headers, xhr.response);
     }
 
-    static async from(headers: Header[], content: DataSource) {
+    static async from(
+        headers: Header[], 
+        content: DataSource
+    ): Promise<MultipartHttpContent | SingularHttpContent> {
 
         const contentTypeIndex = headers.findIndex(x => x.name === 'content-type');
         const contentDispositionIndex = headers.findIndex(x => x.name === 'content-disposition');
