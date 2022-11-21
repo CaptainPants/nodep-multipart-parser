@@ -21,7 +21,8 @@
         "lint": "npx eslint src/**/*.{ts,js}",
         "lint-fix": "npx eslint src/**/*.{ts,js} --fix",
         "test": "jest --config ./src/jest.config.js",
-        "verify": "yarn run lint && yarn run test"
+        "verify": "yarn run lint && yarn run test",
+        "test-publish": "npm publish --dry-run"
     },
     "dependencies": {},
     "devDependencies": {
