@@ -10,17 +10,17 @@ A Zero-dependency multipart HTTP content parser, with tools for conveniently swi
 This package includes several useful components:
 * Class **MultipartParser** which will take a **DataView** (wrapping an **ArrayBuffer**) and break it into parts according to a given boundary string.
 * Simple interface to HTTP single part and multipart content via the **HttpContent** class.
-* Simple conversion between `string | Blob | ArrayBuffer | DataView` via the **Data** class.
+* Simple conversion between `string | Blob | ArrayBuffer | DataView` via the **Data** class. This class is similar to the modern **Response** class, but supports older browsers.
 * Header processing utilities:
   * Function **parseHeaders** that can parse a header string like that returned from [XMLHttpRequest.getAllResponseHeaders()](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/getAllResponseHeaders), or from a part withing multi-part content.
   * Function **parseContentType** and **parseContentDisposition** to extract components of the Content-Type and Content-Disposition headers (charset, boundary, name and filename).
   * Functions **isTextMediaType** and **isMultipartMediaType** for detecting if response content is text.
 
-Simplified access to XMLHttpResponse responses that may be multipart via **HttpContent**:
+Use HttpContent to get simplified access to XMLHttpResponse responses that may be multipart:
 ```typescript
 import { HttpContent, MultipartHttpContent, SingularHttpContent } from '@captainpants/zerodeps-multipart-parser';
 
-const xhr: XMLHttpRequest();
+const xhr = new XMLHttpRequest();
 // To handle multipart responses you will need to specify responseType = 'arraybuffer'
 xhr.responseType = 'arraybuffer';
 
@@ -36,10 +36,11 @@ async function reqListener() {
         // This is multipart content
         for (const part of content.parts) {
             /*
-            Do something with the parts here
-            Each part is a SingularHttpContent and has a data property 
-            which internally is a DataView to the bytes of that segment
+            Do something with the parts here.
+            Each part is a SingularHttpContent with a data (of type Data) property, 
+            which internally is a DataView to the bytes of that segment.
             */
+            const asString = await content.data.string();
         }
     }
     else if (content instanceof SingularHttpContent) {
