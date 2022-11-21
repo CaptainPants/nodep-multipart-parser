@@ -4,6 +4,11 @@
     "type": "module",
     "description": "A zero dependency, high compatibility, multipart HTTP multipart content parser",
     "license": "MIT",
+    "homepage": "https://github.com/CaptainPants/zerodeps-multipart-parser",
+    "bugs": {
+        "url": "https://github.com/CaptainPants/zerodeps-multipart-parser"
+    },
+    "keywords": "multipart parsing",
     "main": "./dist/esm/index.js",
     "types": "./dist/esm/index.d.ts",
     "exports": {
