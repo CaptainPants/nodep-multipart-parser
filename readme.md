@@ -82,12 +82,12 @@ for (const part of result.parts) {
 }
 ```
 
-The **Data** class lets you conveniently switch data between binary structures and back and forth with string. For string to binary conversion we use TextEncoder/TextDecoder, falling back to FileReader/Blob constructor for IE11 and other browsers (Hopefully IE10 too according to https://caniuse.com/mdn-api_filereader_readastext).
+The **Data** class lets you conveniently switch data between binary structures and back and forth with string. For string to binary conversion we use TextEncoder/TextDecoder, falling back to FileReader/Blob constructor for IE11 and other browsers (Hopefully IE10 too according to https://caniuse.com/mdn-api_filereader_readastext). Functions that give a binary result also include the text encoding if relevant (if converting from string or if the data was already binary encoded text with a known encoding).
 ```typescript
 const data1 = new Data('Cheesecake');
 const asArrayBuffer1 = await data1.arrayBuffer();
-const asBlob1 = await data.blob();
-const asDataView1 = await data.dataView();
+const asBlob1 = await data1.blob();
+const asDataView1 = await data1.dataView();
 
 const data2 = new Data(asArrayBuffer1.value, asArrayBuffer1.encoding);
 const asString2 = await data2.string();
