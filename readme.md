@@ -43,7 +43,7 @@ async function reqListener() {
             const asString = await content.data.string();
         }
     }
-    else if (content instanceof SingularHttpContent) {
+    else {
         // Singular content
 
         // get content as a string
@@ -52,9 +52,6 @@ async function reqListener() {
         const asBinary = await content.data.arrayBuffer();
         const asBinary = await content.data.blob();
         const asBinary = await content.data.dataView();
-    }
-    else {
-        // Should not happen
     }
 }
 ```
