@@ -1,8 +1,6 @@
-jest.config.js
 yarn-error.log
 replit.nix
 .cache
 .replit
 .config
-.eslintrc.json
 .upm
