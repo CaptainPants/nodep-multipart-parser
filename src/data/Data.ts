@@ -1,4 +1,4 @@
-import { blobToArrayBuffer, blobToString, expensiveCompativalBlobSourceToString, stringToArrayBuffer, isArrayBuffer } from "./internal.js";
+import { blobToArrayBufferUsingFileReader, blobToStringUsingFileReader, expensiveCompativalBlobSourceToString, stringToArrayBuffer, isArrayBuffer } from "./internal.js";
 
 export type DataSource = string | ArrayBuffer | DataView | Blob;
 
@@ -28,7 +28,7 @@ export class Data {
         }
         else if (this.source instanceof Blob) {
             // Binary to binary retains source encoding
-            return blobToString(this.source, this.sourceEncoding);
+            return blobToStringUsingFileReader(this.source, this.sourceEncoding);
         }
         else {
             if (typeof TextDecoder !== 'undefined') {
@@ -52,7 +52,7 @@ export class Data {
             return { value: target, encoding: this.sourceEncoding };
         }
         else if (this.source instanceof Blob) {
-            return { value: await blobToArrayBuffer(this.source), encoding: this.sourceEncoding };
+            return { value: await blobToArrayBufferUsingFileReader(this.source), encoding: this.sourceEncoding };
         }
         else {
             // String path
@@ -95,7 +95,7 @@ export class Data {
         }
         else if (this.source instanceof Blob) {
             // binary to binary retains source encoding
-            return { value: new DataView(await blobToArrayBuffer(this.source)), encoding: this.sourceEncoding };
+            return { value: new DataView(await blobToArrayBufferUsingFileReader(this.source)), encoding: this.sourceEncoding };
         }
         else {
             return { value: new DataView(await stringToArrayBuffer(this.source)), encoding: 'utf-8' };

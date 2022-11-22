@@ -34,7 +34,7 @@ export function stringToArrayBuffer(
  */
 export function expensiveCompatibleStringToArrayBuffer(value: string): Promise<ArrayBuffer> {
     // MDN says the blob constructor uses utf-8
-    return blobToArrayBuffer(new Blob([value]));
+    return blobToArrayBufferUsingFileReader(new Blob([value]));
 }
 
 /**
@@ -52,7 +52,7 @@ export function expensiveCompativalBlobSourceToString(
     value: ArrayBuffer | DataView, 
     encoding: string | undefined
 ) {
-    return blobToString(new Blob([value]), encoding);
+    return blobToStringUsingFileReader(new Blob([value]), encoding);
 }
 
 /**
@@ -65,7 +65,7 @@ export function expensiveCompativalBlobSourceToString(
  * @param sourceEncoding 
  * @returns 
  */
-export function blobToString(
+export function blobToStringUsingFileReader(
     blob: Blob,
     sourceEncoding: string | undefined
 ): Promise<string> {
@@ -86,7 +86,7 @@ export function blobToString(
  * @param blob 
  * @returns 
  */
-export function blobToArrayBuffer(
+export function blobToArrayBufferUsingFileReader(
     blob: Blob
 ) {
     return new Promise<ArrayBuffer>(
