@@ -1,4 +1,4 @@
-import { blobToArrayBuffer, blobToString, expensiveCompativalBlobSourceToString, stringToArrayBuffer } from "./internal.js";
+import { blobToArrayBuffer, blobToString, expensiveCompativalBlobSourceToString, stringToArrayBuffer, isArrayBuffer } from "./internal.js";
 
 export type DataSource = string | ArrayBuffer | DataView | Blob;
 
@@ -17,7 +17,7 @@ export class Data {
         public source: DataSource,
         public sourceEncoding?: string | undefined
     ) {
-        if (!(typeof source === 'string' || source instanceof DataView || source instanceof ArrayBuffer || source instanceof Blob)) {
+        if (!(typeof source === 'string' || source instanceof DataView || isArrayBuffer(source) || source instanceof Blob)) {
             throw new TypeError(`Unexpected data type ${source}.`);
         }
     }
@@ -70,6 +70,13 @@ export class Data {
             // Blob constructor always converts to utf-8
             // https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
             return Promise.resolve({ value: new Blob([this.source]), encoding: 'utf-8' });
+        }
+        else if (this.source instanceof DataView) {
+            // Using a DataView directly is failing in jest (zero length blob) so using a TypedArray instead to pass testing
+            // TODO: solve the issue in jest so we don't have to ship the workaround into production
+            // Its not a huge cost, but its super duper ugly
+            const asTypedArray = new Uint8Array(this.source.buffer, this.source.byteOffset, this.source.byteLength);
+            return Promise.resolve({ value: new Blob([asTypedArray]), encoding: 'utf-8' });
         }
         else {
             // Binary to binary retains source encoding

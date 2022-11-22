@@ -6,9 +6,15 @@ describe('string to binary and back', () => {
     test('test1', async () => {
         const inputs = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
 
+        console.log(new Blob([new Uint8Array(new ArrayBuffer(10))]));
+
         for (const input of inputs) {
-            const start = await new Data(input, undefined).arrayBuffer();
-            const returned = await new Data(start.value, start.encoding).string();
+            const a = await new Data(input, undefined).arrayBuffer();
+            const b = await new Data(a.value, a.encoding).dataView();
+            const c = await new Data(b.value, b.encoding).blob();
+            // Note that c was coming out as an empty blob so have had to add a step to switch from DataView to TypedArray on the way through
+
+            const returned = await new Data(c.value, c.encoding).string();
             expect(input).toEqual(returned);
         }
     });
