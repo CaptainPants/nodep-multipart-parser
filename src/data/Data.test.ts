@@ -6,7 +6,10 @@ describe('string to binary and back', () => {
     test('test1', async () => {
         const inputs = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
 
-        console.log(new Blob([new Uint8Array(new ArrayBuffer(10))]));
+        //This was returning a zero length blob
+        //console.log(new Blob([new DataView(new ArrayBuffer(10))]));
+        //vs this working as expected
+        //console.log(new Blob([new Uint8Array(new ArrayBuffer(10))]));
 
         for (const input of inputs) {
             const a = await new Data(input, undefined).arrayBuffer();
