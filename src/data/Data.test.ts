@@ -16,7 +16,6 @@ describe('string to binary and back', () => {
             const b = await new Data(a.value, a.encoding).dataView();
             const c = await new Data(b.value, b.encoding).blob();
             // Note that c was coming out as an empty blob so have had to add a step to switch from DataView to TypedArray on the way through
-
             const returned = await new Data(c.value, c.encoding).string();
             expect(input).toEqual(returned);
         }
