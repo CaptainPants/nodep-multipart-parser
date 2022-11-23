@@ -1,10 +1,15 @@
 
+
 import { TextEncoder as UtilTextEncoder, TextDecoder as UtilTextDecoder } from 'util';
-import { Blob as BufferBlob } from 'buffer';
-import EventEmitter from 'events';
 
 global.TextEncoder = UtilTextEncoder as any;
 global.TextDecoder = UtilTextDecoder as any;
+
+// Massive poly fills rewuired for testing under nodejs
+/*
+import { Blob as BufferBlob } from 'buffer';
+import EventEmitter from 'events';
+
 global.Blob = BufferBlob as any;
 
 class EventPoly {
@@ -209,3 +214,4 @@ class FileReaderPoly implements EventTarget {
 }
 
 global.FileReader = FileReaderPoly as any;
+*/

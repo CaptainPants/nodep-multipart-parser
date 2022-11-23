@@ -3,7 +3,7 @@
 export default {
     preset: 'ts-jest',
     resolver: "ts-jest-resolver",
-    testEnvironment: 'node',
+    testEnvironment: 'jsdom',
     setupFilesAfterEnv: ['./test/jest-setup.ts']
     //testEnvironment: "./jest-environment.js"
 };

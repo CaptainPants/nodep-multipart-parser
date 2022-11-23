@@ -72,11 +72,10 @@ export class Data {
             return Promise.resolve({ value: new Blob([this.source]), encoding: 'utf-8' });
         }
         else if (this.source instanceof DataView) {
-            // Using a DataView directly is failing in jest (zero length blob) so using a TypedArray instead to pass testing
-            // TODO: solve the issue in jest so we don't have to ship the workaround into production
-            // Its not a huge cost, but its super duper ugly
-            const asTypedArray = new Uint8Array(this.source.buffer, this.source.byteOffset, this.source.byteLength);
-            return Promise.resolve({ value: new Blob([asTypedArray]), encoding: 'utf-8' });
+            // Using a DataView directly was failing in jests node environment (zero length blob) so we were working around it by using a TypedArray instead to pass the test.
+            // const asTypedArray = new Uint8Array(this.source.buffer, this.source.byteOffset, this.source.byteLength);
+            // return Promise.resolve({ value: new Blob([asTypedArray]), encoding: 'utf-8' });
+            return Promise.resolve({ value: new Blob([this.source]), encoding: this.sourceEncoding });
         }
         else {
             // Binary to binary retains source encoding
@@ -85,7 +84,7 @@ export class Data {
     }
 
     public async dataView(): Promise<BinaryResult<DataView>> {
-        if (this.source instanceof ArrayBuffer) {
+        if (isArrayBuffer(this.source)) {
             // binary to binary retains source encoding
             return { value: new DataView(this.source), encoding: this.sourceEncoding };
         }
