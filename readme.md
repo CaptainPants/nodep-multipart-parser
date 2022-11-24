@@ -42,7 +42,7 @@ async function reqListener() {
             Each part is a SingularHttpContent with a data (of type Data) property, 
             which internally is a DataView to the bytes of that segment.
             */
-            const asString = await content.data.string();
+            const asString = await part.data.string();
         }
     }
     else {
