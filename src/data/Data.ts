@@ -1,4 +1,4 @@
-import { blobToArrayBufferUsingFileReader, blobToStringUsingFileReader, expensiveCompativalBlobSourceToString, stringToArrayBuffer, isArrayBuffer } from "./internal.js";
+import { blobToArrayBufferUsingFileReader, blobToStringUsingFileReader, expensiveCompatibleBlobSourceToString, stringToArrayBuffer, isArrayBuffer } from "./internal.js";
 
 export type DataSource = string | ArrayBuffer | DataView | Blob;
 
@@ -15,7 +15,8 @@ export type BinaryResult<T extends Blob | DataView | ArrayBuffer> = { value: T; 
 export class Data {
     constructor(
         public source: DataSource,
-        public sourceEncoding?: string | undefined
+        public sourceEncoding?: string | undefined,
+        public sourceMediaType?: string | undefined
     ) {
         if (!(typeof source === 'string' || source instanceof DataView || isArrayBuffer(source) || source instanceof Blob)) {
             throw new TypeError(`Unexpected data type ${source}.`);
@@ -36,7 +37,7 @@ export class Data {
             }
             else {
                 // Basically IE11 here
-                return expensiveCompativalBlobSourceToString(this.source, 'utf-8');
+                return expensiveCompatibleBlobSourceToString(this.source, 'utf-8');
             }
         }
     }
@@ -69,17 +70,17 @@ export class Data {
         else if (typeof this.source === 'string') {
             // Blob constructor always converts to utf-8
             // https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
-            return Promise.resolve({ value: new Blob([this.source]), encoding: 'utf-8' });
+            return Promise.resolve({ value: new Blob([this.source], { type: this.sourceMediaType }), encoding: 'utf-8' });
         }
         else if (this.source instanceof DataView) {
             // Using a DataView directly was failing in jests node environment (zero length blob) so we were working around it by using a TypedArray instead to pass the test.
             // const asTypedArray = new Uint8Array(this.source.buffer, this.source.byteOffset, this.source.byteLength);
             // return Promise.resolve({ value: new Blob([asTypedArray]), encoding: 'utf-8' });
-            return Promise.resolve({ value: new Blob([this.source]), encoding: this.sourceEncoding });
+            return Promise.resolve({ value: new Blob([this.source], { type: this.sourceMediaType }), encoding: this.sourceEncoding });
         }
         else {
             // Binary to binary retains source encoding
-            return Promise.resolve({ value: new Blob([this.source]), encoding: this.sourceEncoding });
+            return Promise.resolve({ value: new Blob([this.source], { type: this.sourceMediaType }), encoding: this.sourceEncoding });
         }
     }
 
