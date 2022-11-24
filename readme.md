@@ -1,7 +1,9 @@
-# Zero-Dependency Multipart HTTP content parser (Alpha)
+# Zero-Dependency Multipart HTTP content parser (Apha)
 See NPM package: [@captainpants/zerodeps-multipart-parser](https://www.npmjs.com/package/@captainpants/zerodeps-multipart-parser)
 
-**This is alpha software - feel free to try it, but it is buggy and subject to change.**
+**This is alpha software**
+
+We are mostly feature complete and API stable, except for * properties in headers. There is also more work to be done on testing.
 
 ----
 
