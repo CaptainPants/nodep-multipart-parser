@@ -49,9 +49,9 @@ async function reqListener() {
         // get content as a string
         const asString = await content.data.string(); 
         // or in a binary format
-        const asBinary = await content.data.arrayBuffer();
-        const asBinary = await content.data.blob();
-        const asBinary = await content.data.dataView();
+        const asBinary1 = await content.data.arrayBuffer();
+        const asBinary2 = await content.data.blob();
+        const asBinary3 = await content.data.dataView();
     }
 }
 ```
