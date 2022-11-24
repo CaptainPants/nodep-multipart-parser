@@ -36,7 +36,7 @@ export abstract class HttpContent {
             parseContentDisposition(headers[contentDispositionIndex].value) :
             undefined;
 
-        const data = new Data(content, contentType?.charset);
+        const data = new Data(content, contentType?.charset, contentType?.mediaType);
 
         if (isMultipartMediaType(contentType?.mediaType)) {
             const parser = new MultipartParser();

@@ -48,7 +48,7 @@ export function expensiveCompatibleStringToArrayBuffer(value: string): Promise<A
  * @param encoding 
  * @returns 
  */
-export function expensiveCompativalBlobSourceToString(
+export function expensiveCompatibleBlobSourceToString(
     value: ArrayBuffer | DataView, 
     encoding: string | undefined
 ) {
