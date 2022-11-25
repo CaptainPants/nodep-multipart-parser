@@ -1,4 +1,4 @@
-# Zero-Dependency Multipart HTTP content parser (Alpha)
+# Zero-Dependency Multipart HTTP Content Parser (Alpha)
 See NPM package: [@captainpants/zerodeps-multipart-parser](https://www.npmjs.com/package/@captainpants/zerodeps-multipart-parser)
 
 **This is alpha software**
@@ -7,14 +7,14 @@ We are mostly feature complete and API stable, except for * properties in header
 
 ----
 
-A Zero-dependency multipart HTTP content parser, with tools for conveniently switching between string and binary content. Supports back to Internet Explorer 11.
+A zero-dependency multipart HTTP content parser, with tools for conveniently switching between string and binary content. Supports back to Internet Explorer 11.
 
 This package includes several useful components:
 * Class **MultipartParser** which will take a **DataView** (wrapping an **ArrayBuffer**) and break it into parts according to a given boundary string.
-* Simple interface to HTTP single part and multipart content via the **HttpContent** class.
-* Simple conversion between `string | Blob | ArrayBuffer | DataView` via the **Data** class. This class is similar to the modern **Response** class, but supports older browsers.
+* Easy to use interface to HTTP single part and multipart content via the **HttpContent** class.
+* Easy conversion between `string | Blob | ArrayBuffer | DataView` via the **Data** class. This class is similar to the modern **Response** class, but supports older browsers.
 * Header processing utilities:
-  * Function **parseHeaders** that can parse a header string like that returned from [XMLHttpRequest.getAllResponseHeaders()](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/getAllResponseHeaders), or from a part withing multi-part content.
+  * Function **parseHeaders** that can parse a header string like that returned from [XMLHttpRequest.getAllResponseHeaders()](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/getAllResponseHeaders), or from a part within multi-part content.
   * Function **parseContentType** and **parseContentDisposition** to extract components of the Content-Type and Content-Disposition headers (charset, boundary, name and filename).
   * Functions **isTextMediaType** and **isMultipartMediaType** for detecting if response content is text or multipart respectively.
 
