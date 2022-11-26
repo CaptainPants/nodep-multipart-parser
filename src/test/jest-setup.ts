@@ -1,6 +1,7 @@
-
-
-import { TextEncoder as UtilTextEncoder, TextDecoder as UtilTextDecoder } from 'util';
+import {
+    TextEncoder as UtilTextEncoder,
+    TextDecoder as UtilTextDecoder,
+} from "util";
 
 global.TextEncoder = UtilTextEncoder as any;
 global.TextDecoder = UtilTextDecoder as any;

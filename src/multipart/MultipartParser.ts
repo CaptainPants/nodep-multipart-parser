@@ -1,6 +1,15 @@
-import { ParseError } from '../ParseError.js';
-import { parseHeaders, ContentType, ContentDisposition, parseContentType, parseContentDisposition } from '../headers/index.js';
-import { findBoundarySeparatedParts, getAsciiStringFromDataView, getCharCodesForString, isDoubleCRLF } from './internal/index.js';
+import { ParseError } from "../errors/index.js";
+import {
+    parseHeaders,
+    ContentType,
+    ContentDisposition
+} from "../headers/index.js";
+import {
+    findBoundarySeparatedParts,
+    getAsciiStringFromDataView,
+    getCharCodesForString,
+    isDoubleCRLF,
+} from "./internal/index.js";
 
 export interface MultipartResult {
     parts: MultipartPart[];
@@ -9,19 +18,14 @@ export interface MultipartResult {
 export interface MultipartPart {
     headers: { name: string; value: string }[];
     content: DataView;
-    contentType: ContentType | undefined;
-    contentDisposition: ContentDisposition | undefined;
 }
 
 /**
-  * Parses a multipart body into usable segments.
-  * https://www.rfc-editor.org/rfc/rfc2046#section-5.1.7
-  */
+ * Parses a multipart body into usable segments.
+ * https://www.rfc-editor.org/rfc/rfc2046#section-5.1.7
+ */
 export class MultipartParser {
-    parseDataView(
-        boundary: string,
-        data: DataView
-    ): MultipartResult {
+    parseDataView(boundary: string, data: DataView): MultipartResult {
         const parts: MultipartPart[] = [];
 
         // Get the equivelent ASCII values for the boundary string
@@ -33,39 +37,33 @@ export class MultipartParser {
         for (let i = 0; i < partViews.length; ++i) {
             const current = partViews[i];
 
-            // Each part has a header and a body, this splits them into a string for headers 
+            // Each part has a header and a body, this splits them into a string for headers
             // and a DataView for the body
-            const { headers: headerString, content } = splitPartHeaderAndBody(current);
+            const { headers: headerString, content } =
+                splitPartHeaderAndBody(current);
 
             const headersResult = parseHeaders({ headerString: headerString });
 
-            const contentTypeIndex = headersResult.headers.findIndex(x => x.name == 'content-type');
-            const contentDispositionIndex = headersResult.headers.findIndex(x => x.name == 'content-disposition');
-
-            const contentType = contentTypeIndex >= 0 ? parseContentType(headersResult.headers[contentTypeIndex].value)
-                : undefined;
-            const contentDisposition = contentDispositionIndex >= 0 ? parseContentDisposition(headersResult.headers[contentDispositionIndex].value)
-                : undefined;
-
             parts.push({
                 headers: headersResult.headers,
-                content: content,
-                contentType: contentType,
-                contentDisposition: contentDisposition
+                content: content
             });
         }
 
         return {
-            parts: parts
+            parts: parts,
         };
     }
 }
 
 /**
-  * Find the first double CRLF in the data view. The section before is the headers, the 
-  * section after is the body. Converts the headers to string.
-  */
-function splitPartHeaderAndBody(dataview: DataView): { headers: string, content: DataView } {
+ * Find the first double CRLF in the data view. The section before is the headers, the
+ * section after is the body. Converts the headers to string.
+ */
+function splitPartHeaderAndBody(dataview: DataView): {
+    headers: string;
+    content: DataView;
+} {
     for (let i = 0; i < dataview.byteLength; ++i) {
         if (isDoubleCRLF(dataview, i)) {
             const headerPart = new DataView(
@@ -89,9 +87,12 @@ function splitPartHeaderAndBody(dataview: DataView): { headers: string, content:
         }
     }
 
-    throw new ParseError('No CR LF CR LF sequence found');
+    throw new ParseError("No CR LF CR LF sequence found");
 }
 
-export const __testing = process.env.NODE_ENV == 'test' ? {
-    splitPartHeaderAndBody
-} : void 0;
+export const __testing =
+    process.env.NODE_ENV == "test"
+        ? {
+            splitPartHeaderAndBody,
+        }
+        : void 0;

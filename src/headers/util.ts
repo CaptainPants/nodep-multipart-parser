@@ -1,13 +1,9 @@
-
-
 export function isTextMediaType(mediaType: string | undefined) {
     if (mediaType === undefined) {
         return false;
-    }
-    else if (mediaType.startsWith('text/')) {
+    } else if (mediaType.startsWith("text/")) {
         return true;
-    }
-    else if (mediaType.match(/^application\/(?:[^+]+\+)?(json|xml)/)) {
+    } else if (mediaType.match(/^application\/(?:[^+]+\+)?(json|xml)/)) {
         return true;
     }
 
@@ -19,5 +15,5 @@ export function isMultipartMediaType(mediaType: string | undefined) {
         return false;
     }
 
-    return mediaType.startsWith('multipart/');
+    return mediaType.startsWith("multipart/");
 }

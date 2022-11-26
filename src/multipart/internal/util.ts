@@ -1,4 +1,4 @@
-import { ParseError } from "../../ParseError.js";
+import { ParseError } from "../../errors/index.js";
 
 export const chars = {
     cr: 13,

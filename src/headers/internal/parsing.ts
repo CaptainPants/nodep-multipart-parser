@@ -1,5 +1,3 @@
-
-
 // refer https://datatracker.ietf.org/doc/html/rfc7231#section-3.1.1.5
 // > media-type = type "/" subtype *( OWS ";" OWS parameter )
 // > parameter  = token "=" ( token / quoted-string )
@@ -17,7 +15,8 @@
 // > obs-text       = %x80-FF
 // > delimiter      => any of "(),/:;<=>?@[\]{}
 
-import { ParseError } from "../ParseError.js";
+import { ParseError } from "../../errors/ParseError.js";
+import { Parameter, Parameters } from "../types.js";
 
 export interface HeaderParserState {
     index: number;
@@ -34,7 +33,10 @@ export function isAtCRLF(state: HeaderParserState) {
         return false;
     }
 
-    return state.string[state.index] == '\r' && state.string[state.index + 1] == '\n';
+    return (
+        state.string[state.index] == "\r" &&
+        state.string[state.index + 1] == "\n"
+    );
 }
 
 const delimRegex = /^["(),/:;<=>?@[\]{}]$/;
@@ -44,36 +46,41 @@ export function isDelimiter(char: string | undefined) {
 }
 
 /**
-  * 
-  * > tchar          = "!" / "#" / "$" / "%" / "&" / "'" / "*"
-  * >                / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
-  * >                / DIGIT / ALPHA
-  * >                ; any VCHAR, except delimiters
-  */
+ *
+ * > tchar          = "!" / "#" / "$" / "%" / "&" / "'" / "*"
+ * >                / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
+ * >                / DIGIT / ALPHA
+ * >                ; any VCHAR, except delimiters
+ */
 export function isTCHAR(char: string | undefined) {
     if (!char) return false;
     return isVCHAR(char) && !isDelimiter(char);
 }
 
 /**
-  * Is a single character part of the visible subset of ASCII (33 -> 127)?
-  */
+ * Is a single character part of the visible subset of ASCII (33 -> 127)?
+ */
 export function isVCHAR(char: string | undefined) {
     if (!char) return false;
-    if (char.length != 1) throw new TypeError(`Expected a single character or undefined, found instead ${char}`);
+    if (char.length != 1)
+        throw new TypeError(
+            `Expected a single character or undefined, found instead ${char}`
+        );
     const codepoint = char.codePointAt(0);
-    return codepoint !== undefined
-        && codepoint >= 33 && codepoint < 127;
+    return codepoint !== undefined && codepoint >= 33 && codepoint < 127;
 }
 
 export function isSpace(char: string | undefined) {
-    if (char && char.length != 1) throw new TypeError(`Expected a single character or undefined, found instead ${char}`);
-    return char == ' ' || char == '\t';
+    if (char && char.length != 1)
+        throw new TypeError(
+            `Expected a single character or undefined, found instead ${char}`
+        );
+    return char == " " || char == "\t";
 }
 
 /**
-  * Consume any whitespace at the current index. Does nothing if the end has been reached.
-  */
+ * Consume any whitespace at the current index. Does nothing if the end has been reached.
+ */
 export function consumeOptionalWhitespace(state: HeaderParserState) {
     for (; ;) {
         if (state.index >= state.end) {
@@ -81,7 +88,7 @@ export function consumeOptionalWhitespace(state: HeaderParserState) {
         }
 
         const current = state.string[state.index];
-        if (current !== '\t' && current !== ' ') {
+        if (current !== "\t" && current !== " ") {
             return;
         }
 
@@ -99,8 +106,7 @@ export function readToNextLine(state: HeaderParserState) {
             end = state.index;
             state.index += 2;
             break;
-        }
-        else if (isFinished(state)) {
+        } else if (isFinished(state)) {
             end = state.index;
             break;
         }
@@ -119,16 +125,18 @@ export function readToken(state: HeaderParserState) {
     const token = readOptionalToken(state);
     if (!token) {
         if (isFinished(state)) {
-            throw new ParseError('Unexpected EOF, expected token.');
+            throw new ParseError("Unexpected EOF, expected token.");
         }
-        throw new ParseError(`Unexpected '${state.string[state.index]}', expected token.`);
+        throw new ParseError(
+            `Unexpected '${state.string[state.index]}', expected token.`
+        );
     }
     return token;
 }
 
 /**
-  * Read a token, returning undefined if the current character is not a valid TCHAR or the state is finished.
-  */
+ * Read a token, returning undefined if the current character is not a valid TCHAR or the state is finished.
+ */
 export function readOptionalToken(state: HeaderParserState) {
     if (state.index >= state.string.length) {
         return undefined;
@@ -146,7 +154,7 @@ export function readOptionalToken(state: HeaderParserState) {
         parts.push(char);
     }
 
-    return parts.length == 0 ? undefined : parts.join('');
+    return parts.length == 0 ? undefined : parts.join("");
 }
 
 /*
@@ -157,7 +165,9 @@ export function readQuoted(state: HeaderParserState) {
     // We are looking at the opening quote
 
     if (state.string[state.index] != '"') {
-        throw new ParseError(`Unexpected ${state.string[state.index]}, expected ".`);
+        throw new ParseError(
+            `Unexpected ${state.string[state.index]}, expected ".`
+        );
     }
 
     // move past the quotation mark
@@ -174,7 +184,7 @@ export function readQuoted(state: HeaderParserState) {
 
         // See 'quoted-pair' in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6
         // A double quote is allowed if preceeded by a \
-        if (current == '"' && state.string[state.index - 1] != '\\') {
+        if (current == '"' && state.string[state.index - 1] != "\\") {
             break;
         }
 
@@ -195,17 +205,18 @@ export function readQuoted(state: HeaderParserState) {
     // move past the end quotation mark
     ++state.index;
 
-    const merged = res.join('');
+    const merged = res.join("");
     // quoted pairs have a preceeding \, e.g. \"
     // Specifically replace \\ with \ and \" with ", but also anything else preceeded by a \
-    return merged.replace(/\\(.)/g, '$1');
+    return merged.replace(/\\(.)/g, "$1");
 }
 
-
 /**
-  * Refer to 'parameter' in https://datatracker.ietf.org/doc/html/rfc7231#section-3.1.1.1
-  */
-export function readOneParameter(state: HeaderParserState): { name: string, value: string } | undefined {
+ * Refer to 'parameter' in https://datatracker.ietf.org/doc/html/rfc7231#section-3.1.1.1
+ */
+export function readOneParameter(
+    state: HeaderParserState
+): Parameter | undefined {
     consumeOptionalWhitespace(state);
 
     const parameterName = readOptionalToken(state);
@@ -213,17 +224,20 @@ export function readOneParameter(state: HeaderParserState): { name: string, valu
     if (!parameterName) {
         if (isFinished(state)) {
             return undefined;
-        }
-        else {
-            throw new ParseError(`Unexpected ${state.string[state.index]}, expecting a token.`);
+        } else {
+            throw new ParseError(
+                `Unexpected ${state.string[state.index]}, expecting a token.`
+            );
         }
     }
 
     // technically not allowed, but for tolerance sake
     consumeOptionalWhitespace(state);
 
-    if (isFinished(state) || state.string[state.index] !== '=') {
-        throw new ParseError(`Unexpected ${state.string[state.index]}, expecting an equals sign.`);
+    if (isFinished(state) || state.string[state.index] !== "=") {
+        throw new ParseError(
+            `Unexpected ${state.string[state.index]}, expecting an equals sign.`
+        );
     }
 
     // move past the =
@@ -233,28 +247,29 @@ export function readOneParameter(state: HeaderParserState): { name: string, valu
     consumeOptionalWhitespace(state);
 
     if (isFinished(state)) {
-        throw new ParseError(`Unexpected EOF, expecting a token or quoted-string.`);
+        throw new ParseError(
+            `Unexpected EOF, expecting a token or quoted-string.`
+        );
     }
 
     let value: string;
     if (state.string[state.index] === '"') {
         value = readQuoted(state);
-    }
-    else {
+    } else {
         value = readToken(state);
     }
 
     return { name: parameterName, value: value };
 }
 
-export type Parameters = { name: string; value: string }[];
-
 /**
  * TODO: currently does not support * parameters https://datatracker.ietf.org/doc/html/rfc5987
- * @param state 
- * @returns 
+ * @param state
+ * @returns
  */
-export function processParametersIfPresent(state: HeaderParserState): Parameters {
+export function processParametersIfPresent(
+    state: HeaderParserState
+): Parameters {
     const res: Parameters = [];
 
     for (; ;) {
@@ -267,8 +282,10 @@ export function processParametersIfPresent(state: HeaderParserState): Parameters
 
         // there should be a ; between parameters
         const semicolon = state.string[state.index];
-        if (semicolon !== ';') {
-            throw new ParseError(`Unexpected '${semicolon}' when expecting a semi-colon ';'.`);
+        if (semicolon !== ";") {
+            throw new ParseError(
+                `Unexpected '${semicolon}' when expecting a semi-colon ';'.`
+            );
         }
 
         // move past semicolon
@@ -279,7 +296,10 @@ export function processParametersIfPresent(state: HeaderParserState): Parameters
 
         if (!parameter) {
             if (!isFinished(state)) {
-                throw new ParseError(`Unexpected '${state.string[state.index]}' when expecting parameter or EOF.`);
+                throw new ParseError(
+                    `Unexpected '${state.string[state.index]
+                    }' when expecting parameter or EOF.`
+                );
             }
             break; // technically a violation of the standard but we'll allow it
         }

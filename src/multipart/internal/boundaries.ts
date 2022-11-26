@@ -1,5 +1,5 @@
 import { isCRLF, isDoubleHyphen } from "./util.js";
-import { ParseError } from "../../ParseError.js";
+import { ParseError } from "../../errors/index.js";
 
 /**
   * Search for each instance of the boundary sequence.
