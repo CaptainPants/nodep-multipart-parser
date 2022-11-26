@@ -1,10 +1,10 @@
 import { describe, test, expect } from "@jest/globals";
 
-import { Data } from './Data.js';
+import { Data } from "./Data.js";
 
-describe('string to binary and back', () => {
-    test('test1', async () => {
-        const inputs = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+describe("string to binary and back", () => {
+    test("test1", async () => {
+        const inputs = ["ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
 
         //This was returning a zero length blob
         //console.log(new Blob([new DataView(new ArrayBuffer(10))]));

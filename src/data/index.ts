@@ -1,2 +1,1 @@
-
-export * from './Data.js';
+export * from "./Data.js";

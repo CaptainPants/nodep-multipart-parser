@@ -1,6 +1,5 @@
-
-import { ParseError } from '../ParseError.js';
-import { consumeOptionalWhitespace, readOptionalToken, isSpace, isFinished, readToNextLine, HeaderParserState } from './internal.js';
+import { ParseError } from "../errors/index.js";
+import { consumeOptionalWhitespace, HeaderParserState, isFinished, isSpace, readOptionalToken, readToNextLine } from "./internal/parsing.js";
 
 export interface ParseHeadersParameters {
     headerString: string;
@@ -10,19 +9,23 @@ export interface ParseHeadersResult {
     headers: Header[];
 }
 
-export interface Header { name: string, value: string }
-
+export interface Header {
+    name: string;
+    value: string;
+}
 
 /**
-  * Refer https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
-  */
-export function parseHeaders(params: ParseHeadersParameters): ParseHeadersResult {
-    const headerString = params.headerString ?? '';
+ * Refer https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
+ */
+export function parseHeaders(
+    params: ParseHeadersParameters
+): ParseHeadersResult {
+    const headerString = params.headerString ?? "";
 
     const state: HeaderParserState = {
         index: 0,
         end: headerString.length,
-        string: headerString
+        string: headerString,
     };
 
     const headers: Header[] = [];
@@ -39,7 +42,7 @@ export function parseHeaders(params: ParseHeadersParameters): ParseHeadersResult
         }
 
         const colon = state.string[state.index];
-        if (colon != ':') {
+        if (colon != ":") {
             throw new ParseError(`Expected :, found instead '${colon}'.`);
         }
 
@@ -48,16 +51,16 @@ export function parseHeaders(params: ParseHeadersParameters): ParseHeadersResult
 
         consumeOptionalWhitespace(state);
 
-        let value = '';
+        let value = "";
 
         if (!isFinished(state)) {
             value += readToNextLine(state);
 
             // handle obs-fold
             while (!isFinished(state) && isSpace(state.string[state.index])) {
-                // replace obs-fold newline with a single space per 
+                // replace obs-fold newline with a single space per
                 // https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.4
-                value += ' ';
+                value += " ";
 
                 value += readToNextLine(state);
             }
@@ -67,6 +70,6 @@ export function parseHeaders(params: ParseHeadersParameters): ParseHeadersResult
     }
 
     return {
-        headers: headers
+        headers: headers,
     };
 }
