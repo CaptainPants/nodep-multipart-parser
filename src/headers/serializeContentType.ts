@@ -1,4 +1,5 @@
-import { writeParameters } from "./internal/serializing.js";
+
+import { writeParameters } from "./internal/parameters.js";
 import { ContentType } from "./types.js";
 
 export function serializeContentType(contentType: ContentType) {
@@ -8,5 +9,5 @@ export function serializeContentType(contentType: ContentType) {
         res.push(writeParameters(contentType.parameters));
     }
 
-    return res.join('');
+    return res.join("");
 }

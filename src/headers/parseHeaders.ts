@@ -1,5 +1,7 @@
 import { ParseError } from "../errors/index.js";
-import { consumeOptionalWhitespace, HeaderParserState, isFinished, isSpace, readOptionalToken, readToNextLine } from "./internal/parsing.js";
+import { HeaderParserState } from "./internal/HeaderParserState.js";
+import { isFinished, isSpace } from "./internal/is.js";
+import { consumeOptionalWhitespace, readOptionalToken, readToNextLine } from "./internal/read.js";
 
 export interface ParseHeadersParameters {
     headerString: string;

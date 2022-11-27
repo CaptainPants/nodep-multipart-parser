@@ -1,5 +1,7 @@
 
-import { HeaderParserState, processParametersIfPresent, readToken } from "./internal/parsing.js";
+import { HeaderParserState } from "./internal/HeaderParserState.js";
+import { processParametersIfPresent } from "./internal/parameters.js";
+import { readToken } from "./internal/read.js";
 import { ContentDisposition } from "./types.js";
 
 export function parseContentDisposition(header: string): ContentDisposition {
@@ -15,6 +17,6 @@ export function parseContentDisposition(header: string): ContentDisposition {
 
     return {
         type: type,
-        parameters: parameters
+        parameters: parameters,
     };
 }

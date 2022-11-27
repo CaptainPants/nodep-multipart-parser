@@ -1,11 +1,4 @@
 /**
- * Unit testing with instanceof ArrayBuffer was failing due to oddities in the jest jsdom environment, so use this to duck tye instead. setBigUint64 is to differentiate from typed arrays.
- */
-export function isArrayBuffer(value: unknown): value is ArrayBuffer {
-    return String(value) === "[object ArrayBuffer]";
-}
-
-/**
  * Convert from a string to an ArrayBuffer using UTF-8 encoding. Use TextEncoder
  * for preference, and fall back to blob constructor if necessary.
  * @param value Input as a string

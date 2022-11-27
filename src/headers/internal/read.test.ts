@@ -1,44 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 
-import {
-    isFinished,
-    isAtCRLF,
-    readToNextLine,
-    readToken,
-    consumeOptionalWhitespace,
-    readQuoted,
-    readOneParameter,
-} from "./parsing.js";
-
-describe("isFinished", () => {
-    test("false 1", () => {
-        expect(
-            isFinished({ index: 0, end: 10, string: "abcdefghijk" })
-        ).toEqual(false);
-    });
-    test("true 1", () => {
-        expect(
-            isFinished({ index: 10, end: 10, string: "abcdefghijk" })
-        ).toEqual(true);
-    });
-    test("true 1", () => {
-        expect(
-            isFinished({ index: 11, end: 10, string: "abcdefghijk" })
-        ).toEqual(true);
-    });
-});
-
-describe("isAtCRLF", () => {
-    test("true 1", () => {
-        expect(isAtCRLF({ index: 0, end: 2, string: "\r\n" })).toEqual(true);
-    });
-    test("false 1", () => {
-        expect(isAtCRLF({ index: 1, end: 2, string: "\r\n" })).toEqual(false);
-    });
-    test("false 2", () => {
-        expect(isAtCRLF({ index: 0, end: 5, string: "abcde" })).toEqual(false);
-    });
-});
+import { consumeOptionalWhitespace, readQuoted, readToken, readToNextLine } from "./read.js";
 
 describe("readToNextLine", () => {
     test("test 1", () => {
@@ -88,17 +50,3 @@ describe("consumeOptionalWhitespace", () => {
     });
 });
 
-describe("readOneParameter", () => {
-    test("encoding=utf-8", () => {
-        const input = "encoding=utf-8 ";
-        const parameters: { [key: string]: string } = {};
-        const res = readOneParameter({
-            index: 0,
-            end: input.length,
-            string: input,
-        });
-        const keys = Object.keys(parameters);
-
-        expect(res).toEqual({ name: "encoding", value: "utf-8" });
-    });
-});

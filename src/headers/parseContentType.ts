@@ -1,5 +1,8 @@
 import { ParseError } from "../errors/index.js";
-import { HeaderParserState, isFinished, processParametersIfPresent, readToken } from "./internal/parsing.js";
+import { HeaderParserState } from "./internal/HeaderParserState.js";
+import { isFinished } from "./internal/is.js";
+import { processParametersIfPresent } from "./internal/parameters.js";
+import { readToken } from "./internal/read.js";
 import { ContentType } from "./types.js";
 
 export function parseContentType(header: string): ContentType {
@@ -26,6 +29,6 @@ export function parseContentType(header: string): ContentType {
     return {
         type: type,
         subtype: subtype,
-        parameters: parameters
+        parameters: parameters,
     };
 }
