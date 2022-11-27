@@ -3,7 +3,7 @@ import { HttpResponse } from "./types.js";
 
 export class HttpError extends ErrorBase {
     constructor(httpResponse: HttpResponse) {
-        super(`$Status ${httpResponse.status}: ${httpResponse.statusText}`);
+        super(`Status ${httpResponse.status}: ${httpResponse.statusText}`);
         this.httpResponse = httpResponse;
     }
 

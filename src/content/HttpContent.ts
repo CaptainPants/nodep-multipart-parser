@@ -1,5 +1,4 @@
 import {
-    ContentType,
     Header,
     parseHeaders,
     parseContentType,
@@ -33,14 +32,9 @@ export namespace HttpContent {
         headers: Header[],
         content: DataSource
     ): Promise<HttpContent> {
-
         const [charset, mediaType, boundary] = getCharsetAndMediaType(headers);
 
-        const data = new Data(
-            content,
-            charset,
-            mediaType
-        );
+        const data = new Data(content, charset, mediaType);
 
         if (isMultipartMediaType(mediaType)) {
             const parser = new MultipartParser();
@@ -57,7 +51,9 @@ export namespace HttpContent {
             return new MultipartHttpContent(
                 headers,
                 parsed.parts.map((part) => {
-                    const [partMediaType, partCharset,] = getCharsetAndMediaType(part.headers);
+                    const [partMediaType, partCharset] = getCharsetAndMediaType(
+                        part.headers
+                    );
 
                     return new SingularHttpContent(
                         part.headers,
@@ -66,32 +62,32 @@ export namespace HttpContent {
                 })
             );
         } else {
-            return new SingularHttpContent(
-                headers,
-                data
-            );
+            return new SingularHttpContent(headers, data);
         }
     }
 }
 
 export class SingularHttpContent {
-    constructor(
-        public headers: Header[],
-        public data: Data
-    ) {
-    }
+    constructor(public headers: Header[], public data: Data) {}
 }
 
 export class MultipartHttpContent {
     constructor(
         public headers: Header[],
         public parts: SingularHttpContent[]
-    ) {
-    }
+    ) {}
 }
 
-function getCharsetAndMediaType(headers: Header[]): [mediaType: string | undefined, charset: string | undefined, boundary: string | undefined] {
-    const contentTypeIndex = headers.findIndex(x => x.name.toLowerCase() == 'content-type');
+function getCharsetAndMediaType(
+    headers: Header[]
+): [
+    mediaType: string | undefined,
+    charset: string | undefined,
+    boundary: string | undefined
+] {
+    const contentTypeIndex = headers.findIndex(
+        (x) => x.name.toLowerCase() == "content-type"
+    );
 
     const contentType =
         contentTypeIndex >= 0
@@ -103,10 +99,12 @@ function getCharsetAndMediaType(headers: Header[]): [mediaType: string | undefin
     }
 
     const lookup: Record<string, string> = {};
-    contentType.parameters.forEach(x => lookup[x.name.toLowerCase()] = x.value);
+    contentType.parameters.forEach(
+        (x) => (lookup[x.name.toLowerCase()] = x.value)
+    );
 
-    const charset = lookup['charset'];
-    const boundary = lookup['boundary'];
+    const charset = lookup["charset"];
+    const boundary = lookup["boundary"];
 
     return [`${contentType.type}/${contentType.subtype}`, charset, boundary];
 }

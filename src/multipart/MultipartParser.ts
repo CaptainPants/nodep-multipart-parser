@@ -1,9 +1,5 @@
 import { ParseError } from "../errors/index.js";
-import {
-    parseHeaders,
-    ContentType,
-    ContentDisposition
-} from "../headers/index.js";
+import { parseHeaders } from "../headers/index.js";
 import {
     findBoundarySeparatedParts,
     getAsciiStringFromDataView,
@@ -46,7 +42,7 @@ export class MultipartParser {
 
             parts.push({
                 headers: headersResult.headers,
-                content: content
+                content: content,
             });
         }
 

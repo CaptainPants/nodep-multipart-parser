@@ -2,9 +2,10 @@ import {
     blobToArrayBufferUsingFileReader,
     blobToStringUsingFileReader,
     expensiveCompatibleBlobSourceToString,
-    stringToArrayBuffer,
-    isArrayBuffer,
+    stringToArrayBuffer
 } from "./internal.js";
+
+import { isArrayBuffer } from "../util/index.js";
 
 export type DataSource = string | ArrayBuffer | DataView | Blob | null;
 
