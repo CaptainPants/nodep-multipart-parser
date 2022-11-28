@@ -5,7 +5,7 @@ import { readOneParameter } from './parameters.js';
 
 describe("readOneParameter", () => {
     test("encoding=utf-8", () => {
-        const input = "encoding=utf-8 ";
+        const input = ";encoding=utf-8 ";
         const parameters: { [key: string]: string } = {};
         const state = new HeaderParserState(input);
         const res = readOneParameter(state);
@@ -14,8 +14,7 @@ describe("readOneParameter", () => {
     });
 
     test("boundary=\"ham sandwich\\\" test\"", () => {
-        const input = "boundary=\"ham sandwich\\\" test\"";
-        const parameters: { [key: string]: string } = {};
+        const input = ";boundary=\"ham sandwich\\\" test\"";
         const state = new HeaderParserState(input);
         const res = readOneParameter(state);
 

@@ -44,6 +44,10 @@ export class HeaderParserState {
         this.#index += distance;
     }
 
+    set(index: number) {
+        this.#index = index;
+    }
+
     hasRemaining(number: number) {
         return this.#index + number <= this.#end;
     }
