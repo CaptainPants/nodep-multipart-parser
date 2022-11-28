@@ -2,7 +2,7 @@ import {
     blobToArrayBufferUsingFileReader,
     blobToStringUsingFileReader,
     expensiveCompatibleBlobSourceToString,
-    stringToArrayBuffer
+    stringToArrayBuffer,
 } from "./internal.js";
 
 import { isArrayBuffer } from "../util/index.js";
