@@ -1,6 +1,11 @@
 export interface Parameter {
+    /**
+      * Note that if the name ends in * its considered 'extended'
+      */
     name: string;
     value: string;
+
+    language?: string;
 }
 
 export type Parameters = Parameter[];

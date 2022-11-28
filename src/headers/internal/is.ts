@@ -36,7 +36,7 @@ export function isVCHAR(char: string): char is string {
 export function isSPOrVTAB(char: string): char is ' ' | '\t' {
     if (char.length != 1) {
         throw new TypeError(
-            `Expected a single character or undefined, found instead ${char}`
+            `Expected a single character, found instead ${char}`
         );
     }
     return char == " " || char == "\t";
@@ -102,4 +102,23 @@ export function isQuoteSafe(char: string) {
     // qdtext         = HTAB / SP /%x21 / %x23-5B / %x5D-7E / obs-text
     // obs-text       = %x80-FF
     return char.match(quoteSafeRegex) !== null;
+}
+
+
+/**
+  * See https://datatracker.ietf.org/doc/html/rfc8187#section-3.2.1
+  * 
+  *      attr-char     = ALPHA / DIGIT
+  *                   / "!" / "#" / "$" / "&" / "+" / "-" / "."
+  *                   / "^" / "_" / "`" / "|" / "~"
+  *                   ; token except ( "*" / "'" / "%" )
+  */
+export function isAttrChar(char: string) {
+    if (char.length != 1) {
+        throw new TypeError(
+            `Expected a single character, found instead ${char}`
+        );
+    }
+
+    return isTCHAR(char) && (char != '*' && char != "'" && char != '%');
 }

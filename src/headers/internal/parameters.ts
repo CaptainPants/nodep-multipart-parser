@@ -5,7 +5,7 @@ import { HeaderParserState } from './HeaderParserState';
 import { readOptionalWhitespace } from './readOptionalWhitespace';
 import { readOptionalToken, readToken } from './readToken.js';
 import { readQuotedString } from './readQuotedString.js';
-import { isQuoteSafe } from './is.js';
+import { isAttrChar, isQuoteSafe } from './is.js';
 
 // Refer https://datatracker.ietf.org/doc/html/rfc8187#section-3.1
 // https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.6 references 8187
@@ -14,23 +14,27 @@ import { isQuoteSafe } from './is.js';
 // - https://datatracker.ietf.org/doc/html/rfc8187 obsoletes 5987
 // - https://datatracker.ietf.org/doc/html/rfc5987 adds ext-parameter to 2616
 // - https://datatracker.ietf.org/doc/html/rfc2616#section-3.6
-export function writeParameters(parameters: Parameters) {
+export function writeOneParameter(param: Parameter) {
     const res: string[] = [];
 
-    for (const param of parameters) {
-        if (param.name.length < 1) {
-            throw new Error('Expected header name to have at least once character.');
-        }
+    if (param.name.length < 1) {
+        throw new Error('Expected header name to have at least once character.');
+    }
 
-        const lastLetter = param.name[param.name.length - 1];
-        const isExtended = lastLetter == '*';
-        if (isExtended) {
-            // TODO: support extended parameters
-            throw new Error('Extended parameters are not yet supported');
-        }
+    const lastLetter = param.name[param.name.length - 1];
+    const isExtended = lastLetter == '*';
 
-        res.push('; ');
-        res.push(param.name);
+    res.push('; ');
+    res.push(param.name);
+    res.push('=');
+
+    if (isExtended) {
+        res.push("utf-8'");
+        if (param.language) res.push(param.language);
+        res.push("'");
+        res.push(encodeExtendedValue(param.value));
+    }
+    else {
         res.push('"');
 
         for (let i = 0; i < param.value.length; ++i) {
@@ -42,6 +46,55 @@ export function writeParameters(parameters: Parameters) {
             res.push(char);
         }
         res.push('"');
+    }
+
+    return res.join('');
+}
+
+export function encodeExtendedValue(value: string): string {
+    const res: string[] = [];
+
+    for (let i = 0; i < value.length; ++i) {
+        const current = value[i];
+
+        if (isAttrChar(current)) {
+            res.push(current);
+        }
+        else {
+            res.push(percentEncodeCharacter(current));
+        }
+    }
+
+    return res.join('');
+}
+
+const encoder = new TextEncoder();
+const buffer = new Uint8Array(new ArrayBuffer(4));
+
+// TODO: this doesn't work on IE11
+function percentEncodeCharacter(char: string): string {
+    const { read, written } = encoder.encodeInto(char, buffer);
+
+    if (read != 1 || typeof written === 'undefined') {
+        throw new Error('Unexpected');
+    }
+
+    const res: string[] = [];
+    for (let i = 0; i < written; ++i) {
+        const current = buffer[i];
+
+        res.push('%');
+        res.push(current.toString(16).toUpperCase())
+    }
+
+    return res.join('');
+}
+
+export function writeParameters(parameters: Parameters) {
+    const res: string[] = [];
+
+    for (const param of parameters) {
+        res.push(writeOneParameter(param));
     }
 
     return res.join('');
