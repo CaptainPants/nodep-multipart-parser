@@ -2,6 +2,9 @@ import { ParseError } from "../../index.js";
 import { HeaderParserState } from "./HeaderParserState.js";
 import { isTCHAR } from "./is.js";
 
+/**
+  * Refer to https://datatracker.ietf.org/doc/html/rfc2616#section-2.2
+  */
 export function readToken(state: HeaderParserState) {
     const token = readOptionalToken(state);
     if (!token) {
@@ -16,8 +19,9 @@ export function readToken(state: HeaderParserState) {
 }
 
 /**
- * Read a token, returning undefined if the current character is not a valid TCHAR or the state is finished.
- */
+  * Read a token, returning undefined if the current character is not a valid TCHAR or the state is finished.
+  * Refer to https://datatracker.ietf.org/doc/html/rfc2616#section-2.2
+  */
 export function readOptionalToken(state: HeaderParserState) {
     if (state.isFinished()) {
         return undefined;
@@ -25,10 +29,10 @@ export function readOptionalToken(state: HeaderParserState) {
 
     const parts: string[] = [];
 
-    for (; !state.isFinished(); state.moveNext()) {
+    for (; ; state.moveNext()) {
         const char = state.current();
 
-        if (!isTCHAR(char)) {
+        if (typeof char === 'undefined' || !isTCHAR(char)) {
             break;
         }
 

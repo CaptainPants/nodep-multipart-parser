@@ -2,27 +2,18 @@ import { Parameter } from '../types.js';
 import { ParseError } from '../../errors/index.js';
 import { Parameters } from '../types.js';
 import { HeaderParserState } from './HeaderParserState';
-import { consumeOptionalWhitespace } from './read';
+import { readOptionalWhitespace } from './readOptionalWhitespace';
 import { readOptionalToken, readToken } from './readToken.js';
 import { readQuotedString } from './readQuotedString.js';
+import { isQuoteSafe } from './is.js';
 
-
-// qdtext         = HTAB / SP /%x21 / %x23-5B / %x5D-7E / obs-text
-// obs-text       = %x80-FF
-const quoteSafeRegex = /^[\t \x21\x23-\x5B\x5D-\x7E\x80-\xFF]$/;
-
-export function isQuoteSafe(char: string) {
-    if (char.length != 1) throw new Error(`Expected a single character, found instead ${char}`);
-
-    // qdtext         = HTAB / SP /%x21 / %x23-5B / %x5D-7E / obs-text
-    // obs-text       = %x80-FF
-    return char.match(quoteSafeRegex) !== null;
-}
-
-/**
- * Refer to 'parameter' in https://datatracker.ietf.org/doc/html/rfc7231#section-3.1.1.1
- * TODO: add support for extended parameters https://datatracker.ietf.org/doc/html/rfc5987
- */
+// Refer https://datatracker.ietf.org/doc/html/rfc8187#section-3.1
+// https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.6 references 8187
+//
+// Older references:
+// - https://datatracker.ietf.org/doc/html/rfc8187 obsoletes 5987
+// - https://datatracker.ietf.org/doc/html/rfc5987 adds ext-parameter to 2616
+// - https://datatracker.ietf.org/doc/html/rfc2616#section-3.6
 export function writeParameters(parameters: Parameters) {
     const res: string[] = [];
 
@@ -41,7 +32,7 @@ export function writeParameters(parameters: Parameters) {
         res.push('; ');
         res.push(param.name);
         res.push('"');
-        // Definition of quoted-string here https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6
+
         for (let i = 0; i < param.value.length; ++i) {
             const char = param.value[i];
 
@@ -57,13 +48,31 @@ export function writeParameters(parameters: Parameters) {
 }
 
 /**
- * Refer to 'parameter' in https://datatracker.ietf.org/doc/html/rfc7231#section-3.1.1.1
- * TODO: add support for extended parameters https://datatracker.ietf.org/doc/html/rfc5987
- */
+  * https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.6
+  */
 export function readOneParameter(
     state: HeaderParserState
 ): Parameter | undefined {
-    consumeOptionalWhitespace(state);
+
+    // sitting just after the previous parameter
+    readOptionalWhitespace(state);
+
+    if (state.isFinished()) {
+        return undefined;
+    }
+
+    // there should be a ; between parameters
+    const semicolon = state.current();
+    if (semicolon !== ";") {
+        throw new ParseError(
+            `Unexpected '${semicolon}' when expecting a semi-colon ';'.`
+        );
+    }
+
+    // move past semicolon
+    state.moveNext();
+
+    readOptionalWhitespace(state);
 
     const parameterName = readOptionalToken(state);
 
@@ -82,8 +91,8 @@ export function readOneParameter(
         throw new ParseError("Unexpected extended parameter, this is not currently supported.");
     }
 
-    // technically not allowed, but for tolerance sake
-    consumeOptionalWhitespace(state);
+    // No whitespace is allowed
+    // https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.6
 
     if (state.isFinished() || state.current() !== "=") {
         throw new ParseError(
@@ -94,8 +103,8 @@ export function readOneParameter(
     // move past the =
     state.moveNext();
 
-    // technically not allowed, but for tolerance sake
-    consumeOptionalWhitespace(state);
+    // No whitespace is allowed
+    // https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.6
 
     if (state.isFinished()) {
         throw new ParseError(
@@ -124,23 +133,6 @@ export function processParametersIfPresent(
     const res: Parameters = [];
 
     for (; ;) {
-        // sitting just after the previous parameter
-        consumeOptionalWhitespace(state);
-
-        if (state.isFinished()) {
-            break;
-        }
-
-        // there should be a ; between parameters
-        const semicolon = state.current();
-        if (semicolon !== ";") {
-            throw new ParseError(
-                `Unexpected '${semicolon}' when expecting a semi-colon ';'.`
-            );
-        }
-
-        // move past semicolon
-        state.moveNext();
 
         // then a parameter
         const parameter = readOneParameter(state);

@@ -62,15 +62,16 @@ function splitPartHeaderAndBody(dataview: DataView): {
 } {
     for (let i = 0; i < dataview.byteLength; ++i) {
         if (isDoubleCRLF(dataview, i)) {
+            const startOfBodyPart = i + 4;
+
             const headerPart = new DataView(
                 dataview.buffer,
                 dataview.byteOffset,
-                i
+                startOfBodyPart
             );
 
             const headerString = getAsciiStringFromDataView(headerPart);
 
-            const startOfBodyPart = i + 4;
             const lengthOfBodyPart = dataview.byteLength - startOfBodyPart;
 
             const bodyPart = new DataView(

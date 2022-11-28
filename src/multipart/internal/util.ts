@@ -65,8 +65,6 @@ export function getAsciiStringFromDataView(dataview: DataView) {
 }
 
 export function asciiToDataViewForTesting(content: string) {
-    content = content.replace(/\n/g, '\r\n'); // javascript `` literal newlines are \n by itself
-
     const temp: number[] = [];
     for (let i = 0; i < content.length; ++i) {
         temp[i] = content.charCodeAt(i);

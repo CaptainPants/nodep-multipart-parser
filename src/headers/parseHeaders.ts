@@ -1,8 +1,8 @@
 import { ParseError } from "../errors/index.js";
 import { HeaderParserState } from "./internal/HeaderParserState.js";
-import { isSPOrVTAB } from "./internal/is.js";
-import { consumeOptionalWhitespace, readToNextLine } from "./internal/read.js";
-import { readOptionalToken } from "./internal/readToken.js";
+import { readFieldContent } from "./internal/readFieldContent.js";
+import { readOptionalWhitespace } from "./internal/readOptionalWhitespace.js";
+import { readToken } from "./internal/readToken.js";
 
 export interface ParseHeadersParameters {
     headerString: string;
@@ -21,36 +21,37 @@ export interface Header {
  * @summary Parses HTTP headers from a given string.
  *
  * @description
- * Refer https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
- * TODO: this isn't actually validating that values are ok
+ * See https://datatracker.ietf.org/doc/html/rfc9110#section-5 5.1 and 5.5
+ * Also https://datatracker.ietf.org/doc/html/rfc9112#section-2.1
  *
- * Syntax:
- *
- *     header-field   = field-name ":" OWS field-value OWS
- *     field-name     = token
- *     field-value    = *( field-content / obs-fold )
- *     field-content  = field-vchar [ 1*( SP / HTAB ) field-vchar ]
- *     field-vchar    = VCHAR / obs-text
- *     obs-fold       = CRLF 1*( SP / HTAB )
- *                    ; obsolete line folding
- *                    ; see Section 3.2.4 (https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.4)
+ *    HTTP-message   = start-line CRLF
+ *                     *( field-line CRLF )
+ *                     CRLF
+ *                     [ message-body ]
+ *    field-line     = field-name ":" OWS field-value OWS
+ *    field-name     = token
+ *    field-value    = *field-content
+ *    field-content  = field-vchar [ 1*( SP / HTAB / field-vchar ) field-vchar ]
+ *    field-vchar    = VCHAR / obs-text
+ *    obs-text       = %x80-FF
  */
 export function parseHeaders(
     params: ParseHeadersParameters
 ): ParseHeadersResult {
+
     const headerString = params.headerString ?? "";
 
     const state = new HeaderParserState(headerString);
 
     const headers: Header[] = [];
 
-    for (;;) {
-        // Header name
-        const headerName = readOptionalToken(state);
-
-        if (!headerName) {
-            break;
+    for (; ;) {
+        if (state.isAtCRLF() || state.isFinished()) {
+            break; // This is the end of the header block
         }
+
+        // Header name
+        const headerName = readToken(state);
 
         // Followed by a mandatory colon
         if (state.isFinished()) {
@@ -65,22 +66,18 @@ export function parseHeaders(
         // move past the :
         state.moveNext();
 
-        consumeOptionalWhitespace(state);
+        readOptionalWhitespace(state);
 
-        let value = "";
+        const value = readFieldContent(state);
 
-        if (!state.isFinished()) {
-            value += readToNextLine(state);
+        readOptionalWhitespace(state);
 
-            // Handle obs-fold (Obsolete field format that has a CRLF followed by a space)
-            while (!state.isFinished() && isSPOrVTAB(state.current())) {
-                // replace obs-fold newline with a single space per
-                // https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.4
-                value += " ";
-
-                value += readToNextLine(state);
-            }
+        if (!state.isAtCRLF()) {
+            throw new ParseError(`Expected CRLF, found instead ${state.current()}`);
         }
+
+        // Skip the CRLF
+        state.move(2);
 
         // Normalise headers to lower case
         //    "Each header field consists of a case-insensitive field name followed

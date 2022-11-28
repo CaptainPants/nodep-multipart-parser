@@ -7,15 +7,15 @@ describe('findBoundarySeparatedParts', () => {
     test('test1', () => {
         const boundary = '9051914041544843365972754266';
 
-        const dataview = asciiToDataViewForTesting(`
---9051914041544843365972754266
-Content-Disposition: form-data; name="file1"; filename="a.html"
-
-test1
---9051914041544843365972754266
-Content-Disposition: form-data; name="file2"; filename="b.html"
-
-test2
+        const dataview = asciiToDataViewForTesting(`\r
+--9051914041544843365972754266\r
+Content-Disposition: form-data; name="file1"; filename="a.html"\r
+\r
+test1\r
+--9051914041544843365972754266\r
+Content-Disposition: form-data; name="file2"; filename="b.html"\r
+\r
+test2\r
 --9051914041544843365972754266--`); // string literals use \n
 
         const result = findBoundarySeparatedParts(getCharCodesForString(boundary), dataview);
@@ -35,15 +35,15 @@ describe('findBoundaryOffsets', () => {
     test('test1', () => {
         const boundary = '9051914041544843365972754266';
 
-        const dataview = asciiToDataViewForTesting(`
---9051914041544843365972754266
-Content-Disposition: form-data; name="file1"; filename="a.html"
-
-test1
---9051914041544843365972754266
-Content-Disposition: form-data; name="file2"; filename="b.html"
-
-test2
+        const dataview = asciiToDataViewForTesting(`\r
+--9051914041544843365972754266\r
+Content-Disposition: form-data; name="file1"; filename="a.html"\r
+\r
+test1\r
+--9051914041544843365972754266\r
+Content-Disposition: form-data; name="file2"; filename="b.html"\r
+\r
+test2\r
 --9051914041544843365972754266--`); // string literals use \n
 
         const result = findBoundaryOffsets(getCharCodesForString(boundary), dataview);
