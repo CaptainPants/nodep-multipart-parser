@@ -1,27 +1,23 @@
 import { ParseError } from "../errors/index.js";
 import { HeaderParserState } from "./internal/HeaderParserState.js";
-import { isFinished } from "./internal/is.js";
 import { processParametersIfPresent } from "./internal/parameters.js";
-import { readToken } from "./internal/read.js";
+import { readToken } from "./internal/readToken.js";
 import { ContentType } from "./types.js";
 
 export function parseContentType(header: string): ContentType {
-    const state: HeaderParserState = {
-        index: 0,
-        end: header.length,
-        string: header,
-    };
+    const state = new HeaderParserState(header);
 
     const type: string = readToken(state);
-    if (isFinished(state)) {
+    if (state.isFinished()) {
         throw new ParseError("Unexpected EOF when expecting '/'.");
     }
-    if (state.string[state.index] != "/") {
+    if (state.current() != "/") {
         throw new ParseError(
-            `Unexpected '${state.string[state.index]}' when expecting '/'.`
+            `Unexpected '${state.current()}' when expecting '/'.`
         );
     }
-    ++state.index;
+    state.moveNext();
+
     const subtype: string = readToken(state);
 
     const parameters = processParametersIfPresent(state);

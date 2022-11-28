@@ -1,4 +1,3 @@
-
 import { HttpContent } from "../content/HttpContent.js";
 import { HttpError } from "./HttpError.js";
 import { HttpRequest, HttpResponse, HttpResponseDataType } from "./types.js";
@@ -14,7 +13,7 @@ export class HttpClient {
         const xhr = new XMLHttpRequest();
 
         if (request.abort) {
-            request.abort.addEventListener('abort', () => {
+            request.abort.addEventListener("abort", () => {
                 xhr.abort();
             });
         }
@@ -98,7 +97,7 @@ export class HttpClient {
             // load end. We're making sure that a load end with status of 0
             // throws a CancelledError anyway.
             xhr.addEventListener("abort", () => {
-                reject(new DOMException('Aborted', 'AbortError'));
+                reject(new DOMException("Aborted", "AbortError"));
             });
 
             openAndSend();

@@ -1,9 +1,8 @@
+import { test, expect } from "@jest/globals";
 
-import { test, expect } from '@jest/globals';
+import { isArrayBuffer } from "./index.js";
 
-import { isArrayBuffer } from './index.js';
-
-test('tests', () => {
+test("tests", () => {
     const arrayBuffer = new ArrayBuffer(100);
     const dataView = new DataView(arrayBuffer);
     const typedArray = new Uint8Array(arrayBuffer);

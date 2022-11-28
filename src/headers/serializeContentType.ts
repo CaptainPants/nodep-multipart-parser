@@ -1,4 +1,3 @@
-
 import { writeParameters } from "./internal/parameters.js";
 import { ContentType } from "./types.js";
 
