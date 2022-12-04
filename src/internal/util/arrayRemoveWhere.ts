@@ -1,11 +1,9 @@
-import { findIndex } from "./arrayFindIndex.js";
 
-
-export function arrayRemoveWhere<T>(items: T[], predicate: (item: T) => boolean) {
-    let index = findIndex(items, predicate);
-
-    while (index >= 0) {
-        items.splice(index, 1);
-        index = findIndex(items, predicate);
+export function arrayRemoveWhere<T>(items: T[], predicate: (item: T, index: number) => boolean) {
+    for (let i = items.length - 1; i >= 0; --i) {
+        if (predicate(items[i], i)) {
+            items.splice(i, 1);
+        }
     }
+    return items;
 }
