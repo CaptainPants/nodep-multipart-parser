@@ -15,10 +15,10 @@ For conversion we use TextEncoder/TextDecoder, falling back to FileReader/Blob c
 
 The constructor takes three parameters, of which two are optional:
 ```typescript
-constructor(content: string | Blob | ArrayBuffer | DataView, sourceEncoding?: string, sourceMimeType?: string);
+constructor(content: string | Blob | ArrayBuffer | DataView, sourceEncoding?: string, sourceMediaType?: string);
 ```
 
-Each of those parameter values are available as public properties. The value sourceEncoding is when the source data is encoded text, so that if/when read into a string it is decoded correctly. The sourceMimeType parameter only really applies when converting to a Blob, so that its 'type' is correctly set.
+Each of those parameter values are available as public properties. The value sourceEncoding is when the source data is encoded text, so that if/when read into a string it is decoded correctly. The sourceMediaType parameter only really applies when converting to a Blob, so that its 'type' is correctly set.
 
 There are 4 conversion methods:
 - `string(): Promise<string>`
@@ -47,7 +47,7 @@ const data2 = new Data(asArrayBuffer1.value, asArrayBuffer1.encoding);
 const asString2 = await data2.string();
 ```
 
-Importantly: the data will not be converted until needed, and will transparently convert without you having to worry about it very much - which makes dealing with the results of XMLHTTPRequest very easy.
+Importantly: the data will not be converted until needed, and will transparently convert without you having to worry about it very much - which makes dealing with the results of an XMLHttpRequest very easy.
 
 There is also the useful method:
 ```typescript

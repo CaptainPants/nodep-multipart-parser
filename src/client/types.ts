@@ -16,6 +16,7 @@ export interface HttpRequest {
     url: string;
 
     /**
+     * Content including headers to send as part of the request.
      * TODO: implement multipart writing
      */
     content?: SingularHttpContent;
@@ -36,6 +37,12 @@ export interface HttpRequest {
 
     timeout?: number;
 
+    /*
+     * If this callback returns true, then the result is considered 
+     * a success and the promise will return. If the result from 
+     * this callback is false, then the promise will reject with
+     * an HttpError.
+     */
     isValidStatus?: (statusCode: number) => boolean;
 }
 

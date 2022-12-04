@@ -12,6 +12,10 @@ export class HttpClient {
         // Refer to standard: https://xhr.spec.whatwg.org/
         const xhr = new XMLHttpRequest();
 
+        if (typeof request.timeout !== 'undefined') {
+            xhr.timeout = request.timeout;
+        }
+
         if (request.abort) {
             request.abort.addEventListener("abort", () => {
                 xhr.abort();
@@ -93,6 +97,7 @@ export class HttpClient {
             xhr.addEventListener("loadend", () => {
                 resolve(void 0);
             });
+
             // Wasn't immediately clear to me if this fires before or after
             // load end. We're making sure that a load end with status of 0
             // throws a CancelledError anyway.

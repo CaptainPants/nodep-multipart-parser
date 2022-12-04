@@ -4,7 +4,7 @@ HttpClient is a promise-based wrapper around XMLHttpRequest, using HttpContent t
 
 Using HttpContent with HttpClient:
 ```typescript
-import { HttpClient } from '@captainpants/zerodeps-multipart-parser';
+import { HttpClient, MultipartHttpResponse } from '@captainpants/zerodeps-multipart-parser';
 
 const client = new HttpClient();
 
@@ -35,7 +35,10 @@ export interface HttpRequest {
     method: string;
     url: string;
 
-    // We plan to implement support for Multipart requests in the future
+    /**
+     * Content including headers to send as part of the request.
+     * TODO: implement multipart writing
+     */
     content?: SingularHttpContent;
 
     onUploadProgress?: (evt: ProgressEvent) => void;
@@ -53,7 +56,13 @@ export interface HttpRequest {
     responseType?: 'text' | 'blob' | 'arraybuffer';
 
     timeout?: number;
-
+    
+    /*
+     * If this callback returns true, then the result is considered 
+     * a success and the promise will return. If the result from 
+     * this callback is false, then the promise will reject with
+     * an HttpError.
+     */
     isValidStatus?: (statusCode: number) => boolean;
 }
 ```
