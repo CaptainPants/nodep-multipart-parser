@@ -1,5 +1,3 @@
-
-
 /**
  * Wraps using FileReader to convert from Blob to a string in a promise. Supported
  * encodings are not 100% clear.

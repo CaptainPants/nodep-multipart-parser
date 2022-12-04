@@ -1,7 +1,7 @@
 export interface Parameter {
     /**
-      * Note that if the name ends in * its considered 'extended'
-      */
+     * Note that if the name ends in * its considered 'extended'
+     */
     name: string;
     value: string;
 

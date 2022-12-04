@@ -1,6 +1,5 @@
 import { blobToArrayBufferUsingFileReader } from "./blobToArrayBufferUsingFileReader.js";
 
-
 /**
  * Use the Blob constructor to convert from string to binary (
  * https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob). This always uses

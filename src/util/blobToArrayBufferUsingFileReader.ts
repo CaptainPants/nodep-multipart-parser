@@ -1,4 +1,3 @@
-
 /**
  * Wraps using FileReader to convert from Blob to an ArrayBuffer.
  * @param blob

@@ -1,4 +1,3 @@
-import { isSPOrVTAB } from "./is.js";
 
 export class HeaderParserState {
     constructor(

@@ -1,6 +1,5 @@
 import { blobToStringUsingFileReader } from "./blobToStringUsingFileReader.js";
 
-
 /**
  * Convert from an ArrayBuffer or DataView to string via the Blob constructor (
  * https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob) and FileReader.
