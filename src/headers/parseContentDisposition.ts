@@ -1,5 +1,5 @@
 import { HeaderParserState } from "./internal/HeaderParserState.js";
-import { processParametersIfPresent } from "./internal/parameters.js";
+import { processParametersIfPresent } from "./internal/parameters/readParameters.js";
 import { readToken } from "./internal/readToken.js";
 import { ContentDisposition } from "./types.js";
 

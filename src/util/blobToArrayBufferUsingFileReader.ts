@@ -9,7 +9,7 @@ export function blobToArrayBufferUsingFileReader(blob: Blob) {
         const reader = new FileReader();
 
         reader.addEventListener("error", (_) =>
-            reject(new Error("Failed to decode text."))
+            reject(new Error("Failed to read blob."))
         );
         reader.addEventListener("load", (_) =>
             resolve(reader.result as ArrayBuffer)

@@ -1,6 +1,6 @@
 import { ParseError } from "../errors/index.js";
 import { HeaderParserState } from "./internal/HeaderParserState.js";
-import { processParametersIfPresent } from "./internal/parameters.js";
+import { processParametersIfPresent } from "./internal/parameters/readParameters.js";
 import { readToken } from "./internal/readToken.js";
 import { ContentType } from "./types.js";
 
