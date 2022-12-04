@@ -148,7 +148,7 @@ function readExtendedValue(state: HeaderParserState): { value: string, language:
         charset: 'utf-8',
         language: language,
         value: partsOfValue.join('')
-    }
+    };
 }
 
 /**

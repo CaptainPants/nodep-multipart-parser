@@ -1,4 +1,3 @@
-
 import { blobToArrayBufferUsingFileReader } from "../util/blobToArrayBufferUsingFileReader.js";
 import { blobToStringUsingFileReader } from "../util/blobToStringUsingFileReader.js";
 import { expensiveCompatibleBlobSourceToString } from "../util/expensiveCompatibleBlobSourceToString.js";

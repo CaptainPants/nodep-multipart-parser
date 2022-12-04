@@ -9,7 +9,7 @@ describe("writeOneParameter", () => {
 
         const res = await writeOneParameter(param);
 
-        expect(res).toEqual('; filename="test.txt"')
+        expect(res).toEqual('; filename="test.txt"');
     });
 
     test("; filename*=utf-8'en'test.txt", async () => {
@@ -17,6 +17,6 @@ describe("writeOneParameter", () => {
 
         const res = await writeOneParameter(param);
 
-        expect(res).toEqual("; filename*=utf-8'en'%C2%A320.txt")
+        expect(res).toEqual("; filename*=utf-8'en'%C2%A320.txt");
     });
 });

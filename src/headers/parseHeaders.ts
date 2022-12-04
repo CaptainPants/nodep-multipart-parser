@@ -38,14 +38,13 @@ export interface Header {
 export function parseHeaders(
     params: ParseHeadersParameters
 ): ParseHeadersResult {
-
     const headerString = params.headerString ?? "";
 
     const state = new HeaderParserState(headerString);
 
     const headers: Header[] = [];
 
-    for (; ;) {
+    for (;;) {
         if (state.isAtCRLF() || state.isFinished()) {
             break; // This is the end of the header block
         }
@@ -73,7 +72,9 @@ export function parseHeaders(
         readOptionalWhitespace(state);
 
         if (!state.isAtCRLF()) {
-            throw new ParseError(`Expected CRLF, found instead ${state.current()}`);
+            throw new ParseError(
+                `Expected CRLF, found instead ${state.current()}`
+            );
         }
 
         // Skip the CRLF
