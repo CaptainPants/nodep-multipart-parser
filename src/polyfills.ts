@@ -70,11 +70,38 @@ export class AbortSignalPolyfill extends EventTarget {
     }
 }
 
-export const addPolyfills = {
+export const polyfills = {
     AbortController() {
         if (typeof AbortController === 'undefined') {
             window.AbortController = AbortControllerPolyfill;
             window.AbortSignal = AbortSignalPolyfill;
         }
+    },
+    arrayPrototypeMethods() {
+        if (typeof Array.prototype.find === 'undefined') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array prototype is not generic, so any is the easiest solution here
+            Array.prototype.find = function(predicate: (this: Array<any>, element: any, index: number, array: any[]) => boolean, thisArg?: any) {
+                const index = this.findIndex(predicate, thisArg);
+                if (index >= 0) return this[index];
+                return undefined;
+            };
+        }
+
+        if (typeof Array.prototype.findIndex === 'undefined') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array prototype is not generic, so any is the easiest solution here
+            Array.prototype.findIndex = function(predicate: (this: Array<any>, element: any, index: number, array: any[]) => boolean, thisArg?: any) {
+                for (let i = 0; i < this.length; ++i) {
+                    if (predicate.call(thisArg, this[i], i, this)) {
+                        return i;
+                    }
+                }
+
+                return -1;
+            };
+        }
+    },
+    all() {
+        this.AbortController();
+        this.arrayPrototypeMethods();
     }
 };
