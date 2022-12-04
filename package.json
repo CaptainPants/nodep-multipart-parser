@@ -6,6 +6,10 @@
     "license": "MIT",
     "homepage": "https://github.com/CaptainPants/zerodeps-multipart-parser",
     "bugs": {
+        "url": "https://github.com/CaptainPants/zerodeps-multipart-parser/issues"
+    },
+    "repository": {
+        "type": "git",
         "url": "https://github.com/CaptainPants/zerodeps-multipart-parser"
     },
     "keywords": "multipart parsing",
