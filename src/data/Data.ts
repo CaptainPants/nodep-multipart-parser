@@ -38,7 +38,18 @@ export class Data {
     }
 
     public isEmpty() {
-        return this.source === null;
+        if (this.source === null) {
+            return true;
+        }
+        else if (isArrayBuffer(this.source)) {
+            return this.source.byteLength === 0;
+        }
+        else if (this.source instanceof Blob) {
+            return this.source.size === 0;
+        }
+        else if (this.source instanceof DataView) {
+            return this.source.byteLength;
+        }
     }
 
     public string(): Promise<string> {
