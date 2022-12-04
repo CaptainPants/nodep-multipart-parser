@@ -37,6 +37,10 @@ export class Data {
         }
     }
 
+    public static empty(): Data {
+        return new Data(null);
+    }
+
     public isEmpty() {
         if (this.source === null) {
             return true;

@@ -73,8 +73,8 @@ export class SingularHttpContent {
     static empty(): SingularHttpContent {
         return new SingularHttpContent(
             [],
-            new Data(null)
-        )
+            Data.empty()
+        );
     }
 }
 
@@ -92,13 +92,13 @@ function getCharsetAndMediaType(
         charset: string | undefined,
         boundary: string | undefined
     ] {
-    const contentTypeIndex = headers.findIndex(
+    const contentTypeRaw = headers.find(
         (x) => x.name.toLowerCase() == "content-type"
-    );
+    )?.value;
 
     const contentType =
-        contentTypeIndex >= 0
-            ? parseContentType(headers[contentTypeIndex].value)
+        contentTypeRaw
+            ? parseContentType(contentTypeRaw)
             : undefined;
 
     if (!contentType) {
