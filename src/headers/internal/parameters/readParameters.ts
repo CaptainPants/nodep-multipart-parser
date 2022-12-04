@@ -1,4 +1,4 @@
-import { ParseError } from "../../../index.js";
+import { ParseError } from "../../../errors/ParseError.js";
 import { Parameter, Parameters } from "../../types.js";
 import { HeaderParserState } from "../HeaderParserState.js";
 import { isQuoteSafe } from "../is.js";

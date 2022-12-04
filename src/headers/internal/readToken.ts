@@ -1,4 +1,4 @@
-import { ParseError } from "../../index.js";
+import { ParseError } from "../../errors/ParseError.js";
 import { HeaderParserState } from "./HeaderParserState.js";
 import { isTCHAR } from "./is.js";
 

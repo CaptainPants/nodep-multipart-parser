@@ -68,23 +68,30 @@ export namespace HttpContent {
 }
 
 export class SingularHttpContent {
-    constructor(public headers: Header[], public data: Data) {}
+    constructor(public headers: Header[], public data: Data) { }
+
+    static empty(): SingularHttpContent {
+        return new SingularHttpContent(
+            [],
+            new Data(null)
+        )
+    }
 }
 
 export class MultipartHttpContent {
     constructor(
         public headers: Header[],
         public parts: SingularHttpContent[]
-    ) {}
+    ) { }
 }
 
 function getCharsetAndMediaType(
     headers: Header[]
 ): [
-    mediaType: string | undefined,
-    charset: string | undefined,
-    boundary: string | undefined
-] {
+        mediaType: string | undefined,
+        charset: string | undefined,
+        boundary: string | undefined
+    ] {
     const contentTypeIndex = headers.findIndex(
         (x) => x.name.toLowerCase() == "content-type"
     );

@@ -32,21 +32,24 @@ export class HttpClient {
             xhr.addEventListener("progress", request.onDownloadProgress);
         }
 
+        const responseType = request.responseType ?? 'arraybuffer';
+
         const data = await this.#prepareData(
             request.content,
-            request.responseType
+            responseType
         );
 
         await this.#wrapInPromise(xhr, () => {
             xhr.open(request.method, request.url);
 
-            for (const header of request.content.headers) {
-                xhr.setRequestHeader(header.name, header.value);
+            if (request.content) {
+                for (const header of request.content.headers) {
+                    xhr.setRequestHeader(header.name, header.value);
+                }
             }
 
             // TODO add content type header if not in headers list
-
-            xhr.responseType = request.responseType;
+            xhr.responseType = responseType;
 
             xhr.send(data);
         });
@@ -105,14 +108,14 @@ export class HttpClient {
     }
 
     async #prepareData(
-        content: SingularHttpContent,
+        content: SingularHttpContent | undefined,
         type: HttpResponseDataType
     ): Promise<Blob | ArrayBuffer | Blob | string | undefined> {
-        if (!content.data || content.data.isEmpty()) {
+        if (!content || !content.data || content.data.isEmpty()) {
             return undefined;
         }
 
-        // TODO: Multipart and optimisation to use FormData if not additional headers provided
+        // TODO: Multipart and optimisation to use FormData if no additional headers provided
         if (type === "text") {
             return await content.data.string();
         } else {

@@ -18,14 +18,21 @@ export interface HttpRequest {
     /**
      * TODO: implement multipart writing
      */
-    content: SingularHttpContent;
+    content?: SingularHttpContent;
 
     onUploadProgress?: (evt: ProgressEvent) => void;
     onDownloadProgress?: (evt: ProgressEvent) => void;
 
     abort?: AbortSignal;
 
-    responseType: HttpResponseDataType;
+    /**
+      * Recommend you use 'text' when you're expecting JSON/XML
+      * 'arraybuffer' when you expect multipart content
+      * 'blob' when you're downloading a file for the user
+      * These recommendations are for performance only as the 
+      * Data class will allow you to switch between fairly easily.
+      */
+    responseType?: HttpResponseDataType;
 
     timeout?: number;
 
