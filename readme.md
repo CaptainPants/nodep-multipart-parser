@@ -24,7 +24,7 @@ const response = await client.request({
     responseType: 'text' // or 'blob' or 'arraybuffer'
 });
 
-// now response is either a SingularHttpContaent or MultipartHttpContent, and you can check which with a simple instanceof check
+// now response is either a SingularHttpContent or MultipartHttpContent, and you can check which with a simple instanceof check
 
 if (response instanceof MultipartHttpResponse) {
     let i = 1;
