@@ -70,6 +70,17 @@ export class AbortSignalPolyfill extends EventTarget {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array prototype is not generic, so any is the easiest solution here
+export function Array$find(this: Array<any>, predicate: (element: any, index: number, array: any[]) => boolean, thisArg?: any) {
+    for (let i = 0; i < this.length; ++i) {
+        if (predicate.call(thisArg, this[i], i, this)) {
+            return this[i];
+        }
+    }
+
+    return undefined;
+}
+
 export const polyfills = {
     AbortController() {
         if (typeof AbortController === 'undefined') {
@@ -79,17 +90,7 @@ export const polyfills = {
     },
     arrayPrototypeMethods() {
         if (typeof Array.prototype.find === 'undefined') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array prototype is not generic, so any is the easiest solution here
-            Array.prototype.find = function(predicate: (this: Array<any>, element: any, index: number, array: any[]) => boolean, thisArg?: any) {
-
-                for (let i = 0; i < this.length; ++i) {
-                    if (predicate.call(thisArg, this[i], i, this)) {
-                        return this[i];
-                    }
-                }
-
-                return undefined;
-            };
+            Array.prototype.find = Array$find;
         }
     },
     all() {
