@@ -58,5 +58,4 @@ This package includes several useful components:
 * Convenient conversion between **string**, **Blob**, **ArrayBuffer**, and **DataView** via the [Data](/doc/data.md) class. This class is similar to the modern **Response** class, but supports older browsers.
 * Some [header utilities](/doc/headers.md) for dealing with raw headers, content-type and content-disposition headers (includind extended parameters).
 * A light-weight [HttpClient](/doc/client.md) that brings a promise-based interface and more comprehensive interfaces to HTTP content over the top of XMLHttpRequest.
-* An optional polyfill for AbortController - which is required if you are on a browser that doesn't support them and you want to be able to abort HTTP requests (call **polyfills.all()** to install it).
-
+* Optional [polyfill](/doc/polyfills.md) for AbortController to support aborting Http requests for HttpClient. _We recommend considering using core-js if appropriate to your use case, ast these polyfills are only intended to fill functionality required for this library._

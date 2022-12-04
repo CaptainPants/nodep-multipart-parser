@@ -26,12 +26,12 @@ export interface HttpRequest {
     abort?: AbortSignal;
 
     /**
-      * Recommend you use 'text' when you're expecting JSON/XML
-      * 'arraybuffer' when you expect multipart content
-      * 'blob' when you're downloading a file for the user
-      * These recommendations are for performance only as the 
-      * Data class will allow you to switch between fairly easily.
-      */
+     * Recommend you use 'text' when you're expecting JSON/XML
+     * 'arraybuffer' when you expect multipart content
+     * 'blob' when you're downloading a file for the user
+     * These recommendations are for performance only as the
+     * Data class will allow you to switch between fairly easily.
+     */
     responseType?: HttpResponseDataType;
 
     timeout?: number;
