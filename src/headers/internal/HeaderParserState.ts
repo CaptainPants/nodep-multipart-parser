@@ -61,25 +61,15 @@ export class HeaderParserState {
             return false;
         }
 
-        return (
-            this.string[this.#index] == "\r" &&
-            this.string[this.#index + 1] == "\n"
-        );
+        return this.string.substring(this.#index, this.#index + 2) == '\r\n';
     }
 
-    /**
-      * Is the parser currently looking at an obs-fold value: CRLF ( SP / VTAB )
-      */
-    isAtObsFold() {
-        if (!this.hasRemaining(3)) {
+    isAtUtf8() {
+        if (!this.hasRemaining(5)) {
             return false;
         }
 
-        return (
-            this.string[this.#index] == "\r" &&
-            this.string[this.#index + 1] == "\n" &&
-            isSPOrVTAB(this.string[this.#index + 2])
-        );
+        return this.string.substring(this.#index, this.#index + 5).toLowerCase() == 'utf-8';
     }
 }
 

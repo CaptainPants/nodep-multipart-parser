@@ -1,18 +1,13 @@
-import { ContentDisposition } from ".";
+import { writeParameters } from "./internal/parameters/writeParameters.js";
+import { ContentDisposition } from "./types.js";
 
-export function serializeContentDisposition(
+export async function serializeContentType(
     contentDisposition: ContentDisposition
-) {
+): Promise<string> {
     const res: string[] = [contentDisposition.type];
 
     if (contentDisposition.parameters) {
-        for (const param of contentDisposition.parameters) {
-            res.push(";");
-            res.push(param.name);
-            res.push('"');
-            res.push(encodeURIComponent(param.value));
-            res.push('"');
-        }
+        res.push(await writeParameters(contentDisposition.parameters));
     }
 
     return res.join("");

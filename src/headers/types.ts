@@ -6,6 +6,7 @@ export interface Parameter {
     value: string;
 
     language?: string;
+    charset?: string;
 }
 
 export type Parameters = Parameter[];
