@@ -7,7 +7,7 @@ The project has two key goals:
 - No runtime dependencies
 - Compatibility with IE11
 
-We hope to support as wide array of old browsers as posssible, but in reality as a small open source project our testing resources are limited. As such our main compatibility goal is continued support for IE11 which will hopefully bring along with it other legacy browser versions. We will accept tickets for old browsers where possible and see if there is a practical was to implement support.
+We hope to support as wide array of old browsers as possible, but in reality as a small open source project our testing resources are limited. As such our main compatibility goal is continued support for IE11 which will hopefully bring along with it other legacy browser versions. We will accept tickets for old browsers where possible and see if there is a practical was to implement support.
 
 Where possible we will use newer browser features to provider better performance.
 
@@ -53,10 +53,10 @@ To use our umd module you can access it from unpkg:
 
 
 This package includes several useful components:
-* Easy to use interface to HTTP single part and multipart content via the [HttpContent](./doc/content.md) class.
-* The underlying multipart parsing class [MultipartParser](./doc/multipart.md) which will take a **DataView** (wrapping an **ArrayBuffer**) and break it into parts according to a given boundary string.
-* Convenient conversion between **string**, **Blob**, **ArrayBuffer**, and **DataView** via the [Data](./doc/data.md) class. This class is similar to the modern **Response** class, but supports older browsers.
-* Some [header utilities](./doc/headers.md) for dealing with raw headers, content-type and content-disposition headers (includind extended parameters).
-* A light-weight [HttpClient](./doc/client.md) that brings a promise-based interface and more comprehensive interfaces to HTTP content over the top of XMLHttpRequest.
+* Easy to use interface to HTTP single part and multipart content via the [HttpContent](/doc/content.md) class.
+* The underlying multipart parsing class [MultipartParser](/doc/multipart.md) which will take a **DataView** (wrapping an **ArrayBuffer**) and break it into parts according to a given boundary string.
+* Convenient conversion between **string**, **Blob**, **ArrayBuffer**, and **DataView** via the [Data](/doc/data.md) class. This class is similar to the modern **Response** class, but supports older browsers.
+* Some [header utilities](/doc/headers.md) for dealing with raw headers, content-type and content-disposition headers (includind extended parameters).
+* A light-weight [HttpClient](/doc/client.md) that brings a promise-based interface and more comprehensive interfaces to HTTP content over the top of XMLHttpRequest.
 * An optional polyfill for AbortController - which is required if you are on a browser that doesn't support them and you want to be able to abort HTTP requests (call **polyfills.all()** to install it).
 
