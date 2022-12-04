@@ -2,7 +2,7 @@ import { HttpContent } from "../content/HttpContent.js";
 import { HttpError } from "./HttpError.js";
 import { HttpRequest, HttpResponse, HttpResponseDataType } from "./types.js";
 import { SingularHttpContent } from "../content/index.js";
-import { isArrayBuffer } from "../util/index.js";
+import { isArrayBuffer } from "../internal/util/isArrayBuffer.js";
 
 /**
  * Nice promise-based interface to XMLHttpRequest. Tries to hide all the weirdness.
@@ -32,14 +32,11 @@ export class HttpClient {
             xhr.addEventListener("progress", request.onDownloadProgress);
         }
 
-        const responseType = request.responseType ?? 'arraybuffer';
+        const responseType = request.responseType ?? "arraybuffer";
 
-        const data = await this.#prepareData(
-            request.content,
-            responseType
-        );
+        const data = await this._prepareData(request.content, responseType);
 
-        await this.#wrapInPromise(xhr, () => {
+        await this._wrapInPromise(xhr, () => {
             xhr.open(request.method, request.url);
 
             if (request.content) {
@@ -91,7 +88,7 @@ export class HttpClient {
      * resolves if the request ended properly, rejects with a DOMException AbortError
      * if it was aborted.
      */
-    #wrapInPromise(xhr: XMLHttpRequest, openAndSend: () => void) {
+    _wrapInPromise(xhr: XMLHttpRequest, openAndSend: () => void) {
         return new Promise((resolve, reject) => {
             xhr.addEventListener("loadend", () => {
                 resolve(void 0);
@@ -107,7 +104,7 @@ export class HttpClient {
         });
     }
 
-    async #prepareData(
+    async _prepareData(
         content: SingularHttpContent | undefined,
         type: HttpResponseDataType
     ): Promise<Blob | ArrayBuffer | Blob | string | undefined> {

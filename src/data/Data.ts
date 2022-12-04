@@ -1,8 +1,8 @@
-import { blobToArrayBufferUsingFileReader } from "../util/blobToArrayBufferUsingFileReader.js";
-import { blobToStringUsingFileReader } from "../util/blobToStringUsingFileReader.js";
-import { expensiveCompatibleBlobSourceToString } from "../util/expensiveCompatibleBlobSourceToString.js";
-import { isArrayBuffer } from "../util/index.js";
-import { stringToArrayBuffer } from "../util/stringToArrayBuffer.js";
+import { blobToArrayBufferUsingFileReader } from "../internal/util/blobToArrayBufferUsingFileReader.js";
+import { blobToStringUsingFileReader } from "../internal/util/blobToStringUsingFileReader.js";
+import { expensiveCompatibleBlobSourceToString } from "../internal/util/expensiveCompatibleBlobSourceToString.js";
+import { isArrayBuffer } from "../internal/util/isArrayBuffer.js";
+import { stringToArrayBuffer } from "../internal/util/stringToArrayBuffer.js";
 
 export type DataSource = string | ArrayBuffer | DataView | Blob | null;
 
@@ -44,14 +44,11 @@ export class Data {
     public isEmpty() {
         if (this.source === null) {
             return true;
-        }
-        else if (isArrayBuffer(this.source)) {
+        } else if (isArrayBuffer(this.source)) {
             return this.source.byteLength === 0;
-        }
-        else if (this.source instanceof Blob) {
+        } else if (this.source instanceof Blob) {
             return this.source.size === 0;
-        }
-        else if (this.source instanceof DataView) {
+        } else if (this.source instanceof DataView) {
             return this.source.byteLength;
         }
     }

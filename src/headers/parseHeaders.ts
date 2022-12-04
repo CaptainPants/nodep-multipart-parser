@@ -45,7 +45,7 @@ export function parseHeaders(
     const headers: Header[] = [];
 
     for (;;) {
-        if (state.isAtCRLF() || state.isFinished()) {
+        if (state.isAt("\r\n") || state.isFinished()) {
             break; // This is the end of the header block
         }
 
@@ -71,7 +71,7 @@ export function parseHeaders(
 
         readOptionalWhitespace(state);
 
-        if (!state.isAtCRLF()) {
+        if (!state.isAt("\r\n")) {
             throw new ParseError(
                 `Expected CRLF, found instead ${state.current()}`
             );

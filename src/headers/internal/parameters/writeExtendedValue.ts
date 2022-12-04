@@ -1,4 +1,4 @@
-import { blobToArrayBufferUsingFileReader } from "../../../util/blobToArrayBufferUsingFileReader.js";
+import { blobToArrayBufferUsingFileReader } from "../../../internal/util/blobToArrayBufferUsingFileReader.js";
 import { isAttrChar } from "../is.js";
 
 export async function writeExtendedValue(value: string): Promise<string> {

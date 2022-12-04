@@ -25,18 +25,18 @@ describe("isFinished", () => {
     });
 });
 
-describe("isAtCRLF", () => {
+describe("isAt", () => {
     test("true 1", () => {
         const state = new HeaderParserState("\r\n");
-        expect(state.isAtCRLF()).toEqual(true);
+        expect(state.isAt("\r\n")).toEqual(true);
     });
     test("false 1", () => {
         const state = new HeaderParserState("\r\n");
         state.move(1);
-        expect(state.isAtCRLF()).toEqual(false);
+        expect(state.isAt("\r\n")).toEqual(false);
     });
     test("false 2", () => {
         const state = new HeaderParserState("abcde");
-        expect(state.isAtCRLF()).toEqual(false);
+        expect(state.isAt("\r\n")).toEqual(false);
     });
 });

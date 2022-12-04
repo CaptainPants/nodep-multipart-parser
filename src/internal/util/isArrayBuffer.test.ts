@@ -1,6 +1,6 @@
 import { test, expect } from "@jest/globals";
 
-import { isArrayBuffer } from "./index.js";
+import { isArrayBuffer } from "./isArrayBuffer.js";
 
 test("tests", () => {
     const arrayBuffer = new ArrayBuffer(100);

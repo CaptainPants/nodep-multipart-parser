@@ -95,7 +95,7 @@ export function readOneParameter(
   */
 function readExtendedValue(state: HeaderParserState): { value: string, language: string, charset: string } {
     // 'charset', current this MUST be utf-8 with possibility for future charsets
-    if (!state.isAtUtf8()) {
+    if (!state.isAt('utf-8')) {
         throw new Error(`Unexpected ${state.current()}, expected token utf-8.`);
     }
     state.move(5);

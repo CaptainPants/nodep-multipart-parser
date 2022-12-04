@@ -6,6 +6,7 @@ import {
 } from "../headers/index.js";
 import { MultipartParser } from "../multipart/index.js";
 import { Data, DataSource } from "../data/index.js";
+import { arrayFind } from "../internal/util/arrayFind.js";
 
 export type HttpContent = MultipartHttpContent | SingularHttpContent;
 
@@ -68,13 +69,10 @@ export namespace HttpContent {
 }
 
 export class SingularHttpContent {
-    constructor(public headers: Header[], public data: Data) { }
+    constructor(public headers: Header[], public data: Data) {}
 
     static empty(): SingularHttpContent {
-        return new SingularHttpContent(
-            [],
-            Data.empty()
-        );
+        return new SingularHttpContent([], Data.empty());
     }
 }
 
@@ -82,24 +80,24 @@ export class MultipartHttpContent {
     constructor(
         public headers: Header[],
         public parts: SingularHttpContent[]
-    ) { }
+    ) {}
 }
 
 function getCharsetAndMediaType(
     headers: Header[]
 ): [
-        mediaType: string | undefined,
-        charset: string | undefined,
-        boundary: string | undefined
-    ] {
-    const contentTypeRaw = headers.find(
+    mediaType: string | undefined,
+    charset: string | undefined,
+    boundary: string | undefined
+] {
+    const contentTypeRaw = arrayFind(
+        headers,
         (x) => x.name.toLowerCase() == "content-type"
     )?.value;
 
-    const contentType =
-        contentTypeRaw
-            ? parseContentType(contentTypeRaw)
-            : undefined;
+    const contentType = contentTypeRaw
+        ? parseContentType(contentTypeRaw)
+        : undefined;
 
     if (!contentType) {
         return [undefined, undefined, undefined];
