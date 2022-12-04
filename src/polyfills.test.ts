@@ -6,13 +6,13 @@ import { AbortControllerPolyfill } from './polyfills.js';
 test('AbortControllerPolyfill', () => {
     const controller = new AbortControllerPolyfill();
 
-    expect(controller.signal.aborted).toBe(false);
+    expect(controller.signal.aborted).toStrictEqual(false);
 
     controller.signal.throwIfAborted();
 
     controller.abort();
 
-    expect(controller.signal.aborted).toBe(true);
+    expect(controller.signal.aborted).toStrictEqual(true);
 
     expect(() => {
         controller.signal.throwIfAborted();
