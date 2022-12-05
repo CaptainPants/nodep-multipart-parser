@@ -36,14 +36,14 @@ interface Handler {
 
 interface Handlers {
     capturing: Handler[];
-    nonCapturing: Handler[];
+    bubbling: Handler[];
 }
 
 // IE doesn't support AbortController at all
 // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener there is a bunch of 
 // options that we are supposed to consider
 export class EventTargetPolyfill implements EventTarget {
-    private _eventTarget_byType: Map<string, Handlers> = new Map();
+    private __EventTarget_private_byType: Map<string, Handlers> = new Map();
 
     addEventListener(
         type: string,
@@ -57,16 +57,16 @@ export class EventTargetPolyfill implements EventTarget {
 
         const resolvedOptions = resolveAddEventListenerOptions(options);
 
-        let handlers = this._eventTarget_byType.get(type);
+        let handlers = this.__EventTarget_private_byType.get(type);
         if (!handlers) {
             handlers = {
                 capturing: [],
-                nonCapturing: []
+                bubbling: []
             };
-            this._eventTarget_byType.set(type, handlers);
+            this.__EventTarget_private_byType.set(type, handlers);
         }
 
-        const list = resolvedOptions.capture ? handlers.capturing : handlers.nonCapturing;
+        const list = resolvedOptions.capture ? handlers.capturing : handlers.bubbling;
 
         const foundExisting = arrayFind(list, x => x.callback === callback);
         if (foundExisting) {
@@ -96,20 +96,20 @@ export class EventTargetPolyfill implements EventTarget {
             return;
         }
 
-        const handlers = this._eventTarget_byType.get(type);
+        const handlers = this.__EventTarget_private_byType.get(type);
         if (!handlers) {
             return;
         }
 
         const resolvedOptions = resolveEventListenerOptions(options);
 
-        const list = resolvedOptions.capture ? handlers.capturing : handlers.nonCapturing;
+        const list = resolvedOptions.capture ? handlers.capturing : handlers.bubbling;
 
         arrayRemoveWhere(list, x => x.callback === callback);
     }
 
     dispatchEvent(event: Event): boolean {
-        const handlers = this._eventTarget_byType.get(event.type);
+        const handlers = this.__EventTarget_private_byType.get(event.type);
 
         if (!handlers) {
             return false;
@@ -128,7 +128,7 @@ export class EventTargetPolyfill implements EventTarget {
             }
         });
 
-        handlers.nonCapturing.forEach(item => {
+        handlers.bubbling.forEach(item => {
             if (typeof item.callback === 'function') {
                 item.callback(event);
             }
@@ -162,9 +162,9 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
         super();
     }
 
-    _aborted = false;
+    __AbortSignalPolyfill_private_aborted = false;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- The standard specifies any
-    _reason: any = undefined;
+    __AbortSignalPolyfill_private_abortReason: any = undefined;
 
     /**
       * This should be private but there is no other way in userland to trigger the signal, so
@@ -172,14 +172,14 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
       */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- The standard specifies any
     public _abort(reason: any) {
-        if (this._aborted) return;
+        if (this.__AbortSignalPolyfill_private_aborted) return;
 
-        this._aborted = true;
+        this.__AbortSignalPolyfill_private_aborted = true;
 
         if (reason === undefined) {
             reason = new DOMException('Aborted', 'AbortError');
         }
-        this._reason = reason;
+        this.__AbortSignalPolyfill_private_abortReason = reason;
 
         const evt = new Event('aborted');
         this.dispatchEvent(evt);
@@ -189,15 +189,15 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
     }
 
     throwIfAborted() {
-        if (this._aborted) {
+        if (this.__AbortSignalPolyfill_private_aborted) {
             throw this.reason;
         }
     }
 
     public onabort: ((evt: Event) => void) | null = null;
 
-    public get aborted() { return this._aborted; }
-    public get reason() { return this._reason; }
+    public get aborted() { return this.__AbortSignalPolyfill_private_aborted; }
+    public get reason() { return this.__AbortSignalPolyfill_private_abortReason; }
 
     public static abort(): AbortSignal {
         const res = new AbortControllerPolyfill();
@@ -223,6 +223,11 @@ export const polyfills = {
         if (typeof AbortController === 'undefined') {
             window.AbortController = AbortControllerPolyfill;
             window.AbortSignal = AbortSignalPolyfill;
+        }
+    },
+    EventTarget() {
+        if (typeof EventTarget === 'undefined') {
+            window.EventTarget = EventTargetPolyfill;
         }
     }
 };

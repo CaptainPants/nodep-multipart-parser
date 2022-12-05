@@ -80,7 +80,7 @@ export class Data {
     }
 
     public async arrayBuffer(): Promise<BinaryResult<ArrayBuffer>> {
-        if (this.source instanceof ArrayBuffer) {
+        if (isArrayBuffer(this.source)) {
             return { value: this.source, encoding: this.sourceEncoding };
         } else if (this.source instanceof DataView) {
             const target = new ArrayBuffer(this.source.byteLength);
