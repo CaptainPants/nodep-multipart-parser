@@ -45,7 +45,7 @@ interface Handlers {
 export class EventTargetPolyfill implements EventTarget {
     private __EventTarget_private_byType: Map<string, Handlers> = new Map();
 
-    addEventListener(
+    public addEventListener(
         type: string,
         callback: EventListenerOrEventListenerObject | null,
         options?: boolean | AddEventListenerOptions
@@ -86,7 +86,7 @@ export class EventTargetPolyfill implements EventTarget {
         }
     }
 
-    removeEventListener(
+    public removeEventListener(
         type: string,
         callback: EventListenerOrEventListenerObject | null,
         options?: boolean | EventListenerOptions
@@ -108,7 +108,7 @@ export class EventTargetPolyfill implements EventTarget {
         arrayRemoveWhere(list, x => x.callback === callback);
     }
 
-    dispatchEvent(event: Event): boolean {
+    public dispatchEvent(event: Event): boolean {
         const handlers = this.__EventTarget_private_byType.get(event.type);
 
         if (!handlers) {
@@ -162,7 +162,7 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
         super();
     }
 
-    __AbortSignalPolyfill_private_aborted = false;
+    private __AbortSignalPolyfill_private_aborted = false;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- The standard specifies any
     __AbortSignalPolyfill_private_abortReason: any = undefined;
 
@@ -188,7 +188,7 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
         }
     }
 
-    throwIfAborted() {
+    public throwIfAborted() {
         if (this.__AbortSignalPolyfill_private_aborted) {
             throw this.reason;
         }
