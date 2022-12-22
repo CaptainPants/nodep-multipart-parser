@@ -4,17 +4,17 @@ The HttpContent classes provide simplified access to single and multi-part HTTP 
 
 Using HttpContent with HttpClient:
 ```typescript
-import { HttpClient } from '@captainpants/zerodeps-multipart-parser';
+import { HttpClient, MultipartHttpResponse } from '@captainpants/zerodeps-multipart-parser';
 
 const client = new HttpClient();
 
 const response = await client.request({
     method: 'GET',
     url: 'https://google.com',
-    responseType: 'text' // or 'blob' or 'arraybuffer'
+    responseType: 'arraybuffer' // 'text' or 'blob' or 'arraybuffer'
 });
 
-// now response is either a SingularHttpContaent or MultipartHttpContent, and you can check which with a simple instanceof check
+// now response is either a SingularHttpContent or MultipartHttpContent, and you can check which with a simple instanceof check, or check for the presence of the 'parts' property
 
 if (response instanceof MultipartHttpResponse) {
     let i = 1;

@@ -86,8 +86,8 @@ export class MultipartHttpContent {
 function getCharsetAndMediaType(
     headers: Header[]
 ): [
-    mediaType: string | undefined,
     charset: string | undefined,
+    mediaType: string | undefined,
     boundary: string | undefined
 ] {
     const contentTypeRaw = arrayFind(
@@ -111,5 +111,5 @@ function getCharsetAndMediaType(
     const charset = lookup["charset"];
     const boundary = lookup["boundary"];
 
-    return [`${contentType.type}/${contentType.subtype}`, charset, boundary];
+    return [charset, `${contentType.type}/${contentType.subtype}`, boundary];
 }
