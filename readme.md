@@ -4,7 +4,7 @@ See NPM package: [@captainpants/zerodeps-multipart-parser](https://www.npmjs.com
 This project's focus is a parser for multi-part HTTP content coming from XMLHttpRequest responses.
 
 Project goals:
-- Make it easy to parse multi-part HTTP resopnses
+- Make it easy to parse multi-part HTTP responses
 - No runtime dependencies
 - Compatibility with IE11
 
@@ -32,10 +32,10 @@ const client = new HttpClient();
 const response = await client.request({
     method: 'GET',
     url: 'https://google.com',
-    responseType: 'text' // or 'blob' or 'arraybuffer'
+    responseType: 'arraybuffer' // 'text' or 'blob' or 'arraybuffer'
 });
 
-// now response is either a SingularHttpContent or MultipartHttpContent, and you can check which with a simple instanceof check
+// now response is either a SingularHttpContent or MultipartHttpContent, and you can check which with a simple instanceof check, or check for the presence of the 'parts' property
 
 if (response instanceof MultipartHttpResponse) {
     let i = 1;
