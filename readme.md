@@ -1,11 +1,22 @@
 # Zero-Dependency High-Compatibility Multipart HTTP Parser and Toolkit (Alpha)
 See NPM package: [@captainpants/zerodeps-multipart-parser](https://www.npmjs.com/package/@captainpants/zerodeps-multipart-parser)
 
-The library provides a number of tools to make dealing with HTTP data simpler, including: HTTP requests with promises, multipart HTTP content as objects and the Data class that makes it easy to get between text and binary data structures. 
+This project's focus is a parser for multi-part HTTP content coming from XMLHttpRequest responses.
 
-The project has two key goals:
+Project goals:
+- Make it easy to parse multi-part HTTP resopnses
 - No runtime dependencies
 - Compatibility with IE11
+
+As a natural progression from this, this library also provides a number of tools to make dealing with HTTP data simpler, including: 
+* Easy to use interface to HTTP single part and multipart content via the [HttpContent](doc/content.md) class.
+* The multipart parsing class [MultipartParser](doc/multipart.md) which will take a **DataView** (wrapping an **ArrayBuffer**) and break it into parts according to a given boundary string.
+* Convenient conversion between **string**, **Blob**, **ArrayBuffer**, and **DataView** via the [Data](doc/data.md) class. This class is similar to the modern **Response** class, but supports older browsers.
+* Some [header utilities](doc/headers.md) for dealing with raw headers, content-type and content-disposition headers (including extended parameters).
+* A light-weight [HttpClient](doc/httpclient.md) that brings a promise-based interface and more comprehensive interfaces to HTTP content over the top of XMLHttpRequest.
+* Optional [polyfill](doc/polyfills.md) for AbortController to support aborting Http requests for HttpClient. _We recommend considering using core-js if appropriate to your use case, as these polyfills are only intended to fill functionality required for this library._
+
+
 
 We hope to support as wide array of old browsers as possible, but in reality as a small open source project our testing resources are limited. As such our main compatibility goal is continued support for IE11 which will hopefully bring along with it other legacy browser versions. We will accept tickets for old browsers where possible and see if there is a practical was to implement support.
 
@@ -48,14 +59,3 @@ You can find us on npm: [@captainpants/zerodeps-multipart-parser](https://www.np
 To use our umd module you can access it from unpkg:
 - https://unpkg.com/@captainpants/zerodeps-multipart-parser@latest/dist/umd/zerodeps-multipart-parser.js
 - And minified https://unpkg.com/@captainpants/zerodeps-multipart-parser@latest/dist/umd/zerodeps-multipart-parser.min.js
-
-# Components
-
-
-This package includes several useful components:
-* Easy to use interface to HTTP single part and multipart content via the [HttpContent](doc/content.md) class.
-* The underlying multipart parsing class [MultipartParser](doc/multipart.md) which will take a **DataView** (wrapping an **ArrayBuffer**) and break it into parts according to a given boundary string.
-* Convenient conversion between **string**, **Blob**, **ArrayBuffer**, and **DataView** via the [Data](doc/data.md) class. This class is similar to the modern **Response** class, but supports older browsers.
-* Some [header utilities](doc/headers.md) for dealing with raw headers, content-type and content-disposition headers (including extended parameters).
-* A light-weight [HttpClient](doc/httpclient.md) that brings a promise-based interface and more comprehensive interfaces to HTTP content over the top of XMLHttpRequest.
-* Optional [polyfill](doc/polyfills.md) for AbortController to support aborting Http requests for HttpClient. _We recommend considering using core-js if appropriate to your use case, as these polyfills are only intended to fill functionality required for this library._
