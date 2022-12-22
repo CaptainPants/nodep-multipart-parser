@@ -1,16 +1,11 @@
 
 import { HttpClient, type SingularHttpContent } from '@captainpants/zerodeps-multipart-parser';
-import { type ActionFunction } from "@remix-run/node";
-
-export const action: ActionFunction = ({ request }) => {
-    return new Response('Example text');
-};
 
 export default function Index() {
     const onClick = async () => {
         try{
             const client = new HttpClient();
-            const response = await client.request({ method: 'POST', url: '/test' });
+            const response = await client.request({ method: 'POST', url: '/test/test1' });
             const asText = await (response.content as SingularHttpContent).data.string();
             console.warn(`Response received: ${asText}`);
         }
