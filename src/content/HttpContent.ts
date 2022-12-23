@@ -1,12 +1,13 @@
+import { Data, type DataSource } from "../data/Data.js";
 import {
-    Header,
-    parseHeaders,
-    parseContentType,
+    type Header,
     isMultipartMediaType,
+    parseHeaders,
 } from "../headers/index.js";
-import { MultipartParser } from "../multipart/index.js";
-import { Data, DataSource } from "../data/index.js";
-import { arrayFind } from "../internal/util/arrayFind.js";
+import { MultipartParser } from "../multipart/MultipartParser.js";
+import { getCharsetAndMediaType } from "./internal/getCharsetAndMediaType.js";
+import { MultipartHttpContent } from "./MultipartHttpContent.js";
+import { SingularHttpContent } from "./SingularHttpContent.js";
 
 export type HttpContent = MultipartHttpContent | SingularHttpContent;
 
@@ -66,56 +67,4 @@ export namespace HttpContent {
             return new SingularHttpContent(headers, data);
         }
     }
-}
-
-export function isMultipartContent(
-    content: HttpContent
-): content is MultipartHttpContent {
-    return Boolean((content as MultipartHttpContent).parts);
-}
-
-export class SingularHttpContent {
-    constructor(public headers: Header[], public data: Data) {}
-
-    static empty(): SingularHttpContent {
-        return new SingularHttpContent([], Data.empty());
-    }
-}
-
-export class MultipartHttpContent {
-    constructor(
-        public headers: Header[],
-        public parts: SingularHttpContent[]
-    ) {}
-}
-
-function getCharsetAndMediaType(
-    headers: Header[]
-): [
-    charset: string | undefined,
-    mediaType: string | undefined,
-    boundary: string | undefined
-] {
-    const contentTypeRaw = arrayFind(
-        headers,
-        (x) => x.name.toLowerCase() == "content-type"
-    )?.value;
-
-    const contentType = contentTypeRaw
-        ? parseContentType(contentTypeRaw)
-        : undefined;
-
-    if (!contentType) {
-        return [undefined, undefined, undefined];
-    }
-
-    const lookup: Record<string, string> = {};
-    contentType.parameters.forEach(
-        (x) => (lookup[x.name.toLowerCase()] = x.value)
-    );
-
-    const charset = lookup["charset"];
-    const boundary = lookup["boundary"];
-
-    return [charset, `${contentType.type}/${contentType.subtype}`, boundary];
 }

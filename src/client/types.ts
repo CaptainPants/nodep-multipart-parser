@@ -41,6 +41,10 @@ export interface HttpRequest {
      * an HttpError.
      */
     isValidStatus?: (statusCode: number) => boolean;
+
+    optimisations?: {
+        formData: boolean;
+    }
 }
 
 export interface HttpResponse {

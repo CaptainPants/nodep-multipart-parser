@@ -7,7 +7,8 @@ import {
     serializeContentType,
 } from "../headers/index.js";
 import { generateBoundaryString } from "../internal/util/generateBoundaryString.js";
-import { MultipartHttpContent, SingularHttpContent } from "./HttpContent.js";
+import { MultipartHttpContent } from "./MultipartHttpContent.js";
+import { SingularHttpContent } from "./SingularHttpContent.js";
 
 export interface MultipartBuilderPart {
     content: DataSource | Data;
