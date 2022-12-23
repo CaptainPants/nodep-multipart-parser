@@ -7,8 +7,7 @@ describe('findBoundarySeparatedParts', () => {
     test('test1', () => {
         const boundary = '9051914041544843365972754266';
 
-        const dataview = asciiToDataViewForTesting(`\r
---9051914041544843365972754266\r
+        const dataview = asciiToDataViewForTesting(`--9051914041544843365972754266\r
 Content-Disposition: form-data; name="file1"; filename="a.html"\r
 \r
 test1\r
@@ -35,8 +34,7 @@ describe('findBoundaryOffsets', () => {
     test('test1', () => {
         const boundary = '9051914041544843365972754266';
 
-        const dataview = asciiToDataViewForTesting(`\r
---9051914041544843365972754266\r
+        const dataview = asciiToDataViewForTesting(`--9051914041544843365972754266\r
 Content-Disposition: form-data; name="file1"; filename="a.html"\r
 \r
 test1\r
@@ -49,9 +47,9 @@ test2\r
         const result = findBoundaryOffsets(getCharCodesForString(boundary), dataview);
 
         expect(result).toEqual([
-            { start: 0, end: 34, length: 34, isLast: false },
-            { start: 106, end: 140, length: 34, isLast: false },
-            { start: 212, end: 246, length: 34, isLast: true }
+            { start: 0, end: 32, length: 32, isLast: false },
+            { start: 104, end: 138, length: 34, isLast: false },
+            { start: 210, end: 244, length: 34, isLast: true }
         ]);
     });
 });

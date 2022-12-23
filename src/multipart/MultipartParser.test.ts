@@ -6,8 +6,7 @@ describe("parse", () => {
     test("example1", () => {
         const boundary = "9051914041544843365972754266";
 
-        const dataview = asciiToDataViewForTesting(`\r
---9051914041544843365972754266\r
+        const dataview = asciiToDataViewForTesting(`--9051914041544843365972754266\r
 Content-Disposition: form-data; name="text"\r
 \r
 text default\r
