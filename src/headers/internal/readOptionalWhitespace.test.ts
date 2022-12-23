@@ -18,8 +18,11 @@ describe("readOptionalWhitespace", () => {
         const state = new HeaderParserState(input);
         readOptionalWhitespace(state);
 
-        expect(state.toObject()).toEqual({ index: 0, end: input.length, string: input });
+        expect(state.toObject()).toEqual({
+            index: 0,
+            end: input.length,
+            string: input,
+        });
         expect(state.current()).toEqual("w");
     });
 });
-

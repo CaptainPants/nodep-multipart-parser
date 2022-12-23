@@ -1,13 +1,20 @@
 import { describe, expect, test } from "@jest/globals";
-import { asciiToDataViewForTesting, chars, findBoundaryOffsets, findBoundarySeparatedParts, getAsciiStringFromDataView, getCharCodesForString, matchBoundary } from ".";
+import {
+    asciiToDataViewForTesting,
+    chars,
+    findBoundaryOffsets,
+    findBoundarySeparatedParts,
+    getAsciiStringFromDataView,
+    getCharCodesForString,
+    matchBoundary,
+} from ".";
 
+describe("findBoundarySeparatedParts", () => {
+    test("test1", () => {
+        const boundary = "9051914041544843365972754266";
 
-
-describe('findBoundarySeparatedParts', () => {
-    test('test1', () => {
-        const boundary = '9051914041544843365972754266';
-
-        const dataview = asciiToDataViewForTesting(`--9051914041544843365972754266\r
+        const dataview =
+            asciiToDataViewForTesting(`--9051914041544843365972754266\r
 Content-Disposition: form-data; name="file1"; filename="a.html"\r
 \r
 test1\r
@@ -17,24 +24,31 @@ Content-Disposition: form-data; name="file2"; filename="b.html"\r
 test2\r
 --9051914041544843365972754266--`); // string literals use \n
 
-        const result = findBoundarySeparatedParts(getCharCodesForString(boundary), dataview);
+        const result = findBoundarySeparatedParts(
+            getCharCodesForString(boundary),
+            dataview
+        );
 
         expect(result).toHaveLength(2);
 
         const first = result[0]!;
-        expect(getAsciiStringFromDataView(first)).toEqual('Content-Disposition: form-data; name="file1"; filename="a.html"\r\n\r\ntest1');
+        expect(getAsciiStringFromDataView(first)).toEqual(
+            'Content-Disposition: form-data; name="file1"; filename="a.html"\r\n\r\ntest1'
+        );
 
         const second = result[1]!;
-        expect(getAsciiStringFromDataView(second)).toEqual('Content-Disposition: form-data; name="file2"; filename="b.html"\r\n\r\ntest2');
+        expect(getAsciiStringFromDataView(second)).toEqual(
+            'Content-Disposition: form-data; name="file2"; filename="b.html"\r\n\r\ntest2'
+        );
     });
 });
 
+describe("findBoundaryOffsets", () => {
+    test("test1", () => {
+        const boundary = "9051914041544843365972754266";
 
-describe('findBoundaryOffsets', () => {
-    test('test1', () => {
-        const boundary = '9051914041544843365972754266';
-
-        const dataview = asciiToDataViewForTesting(`--9051914041544843365972754266\r
+        const dataview =
+            asciiToDataViewForTesting(`--9051914041544843365972754266\r
 Content-Disposition: form-data; name="file1"; filename="a.html"\r
 \r
 test1\r
@@ -44,25 +58,28 @@ Content-Disposition: form-data; name="file2"; filename="b.html"\r
 test2\r
 --9051914041544843365972754266--`); // string literals use \n
 
-        const result = findBoundaryOffsets(getCharCodesForString(boundary), dataview);
+        const result = findBoundaryOffsets(
+            getCharCodesForString(boundary),
+            dataview
+        );
 
         expect(result).toEqual([
             { start: 0, end: 32, length: 32, isLast: false },
             { start: 104, end: 138, length: 34, isLast: false },
-            { start: 210, end: 244, length: 34, isLast: true }
+            { start: 210, end: 244, length: 34, isLast: true },
         ]);
     });
 });
 
-describe('getCharCodes', () => {
-    test('abcdefg', () => {
-        const codes = getCharCodesForString('abcdefg');
+describe("getCharCodes", () => {
+    test("abcdefg", () => {
+        const codes = getCharCodesForString("abcdefg");
         expect(codes).toEqual([97, 98, 99, 100, 101, 102, 103]);
     });
 });
 
-describe('matchBoundary', () => {
-    test('\\r\\n--a\\r\\n--aabcdefg', () => {
+describe("matchBoundary", () => {
+    test("\\r\\n--a\\r\\n--aabcdefg", () => {
         // aabcdefg
         const bytes = [
             chars.cr,
@@ -82,14 +99,14 @@ describe('matchBoundary', () => {
             102, // g
             103, // h
             chars.cr,
-            chars.lf
+            chars.lf,
         ];
 
         const buffer = new ArrayBuffer(bytes.length);
         const uint8 = new Uint8Array(buffer);
         uint8.set(bytes, 0);
 
-        const boundary = getCharCodesForString('abcdefg');
+        const boundary = getCharCodesForString("abcdefg");
 
         const data = new DataView(buffer);
         const res1 = matchBoundary(boundary, data, 0);

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { HeaderParserState } from './HeaderParserState.js';
-import { readToken } from './readToken.js';
+import { HeaderParserState } from "./HeaderParserState.js";
+import { readToken } from "./readToken.js";
 
 describe("readToken", () => {
     test("encoding=utf-8", () => {
