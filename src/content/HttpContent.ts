@@ -68,6 +68,12 @@ export namespace HttpContent {
     }
 }
 
+export function isMultipartContent(
+    content: HttpContent
+): content is MultipartHttpContent {
+    return Boolean((content as MultipartHttpContent).parts);
+}
+
 export class SingularHttpContent {
     constructor(public headers: Header[], public data: Data) {}
 

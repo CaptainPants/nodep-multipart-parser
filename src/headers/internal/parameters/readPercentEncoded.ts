@@ -2,10 +2,12 @@ import { HeaderParserState } from "../HeaderParserState.js";
 
 const percentEncoded = /^%([0-9A-F]{2})$/i;
 
-export function readPercentEncoded(state: HeaderParserState): string | undefined {
+export function readPercentEncoded(
+    state: HeaderParserState
+): string | undefined {
     const res: string[] = [];
 
-    for (; ;) {
+    for (;;) {
         if (state.hasRemaining(3)) {
             const index = state.index();
             const next3 = state.string.substring(index, index + 3);
@@ -24,7 +26,7 @@ export function readPercentEncoded(state: HeaderParserState): string | undefined
         return undefined;
     }
 
-    const encoded = res.join('');
+    const encoded = res.join("");
 
     // Relying on this to do our % decoding
     const value = decodeURIComponent(encoded);

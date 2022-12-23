@@ -1,9 +1,8 @@
+import { expect, test, describe } from "@jest/globals";
 
-import { expect, test, describe } from '@jest/globals';
+import { AbortControllerPolyfill } from "./polyfills.js";
 
-import { AbortControllerPolyfill } from './polyfills.js';
-
-test('AbortControllerPolyfill', () => {
+test("AbortControllerPolyfill", () => {
     const controller = new AbortControllerPolyfill();
 
     expect(controller.signal.aborted).toStrictEqual(false);
@@ -16,5 +15,5 @@ test('AbortControllerPolyfill', () => {
 
     expect(() => {
         controller.signal.throwIfAborted();
-    }).toThrowError(new DOMException('Aborted', 'AbortError'));
+    }).toThrowError(new DOMException("Aborted", "AbortError"));
 });

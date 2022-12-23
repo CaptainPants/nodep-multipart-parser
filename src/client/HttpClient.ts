@@ -1,8 +1,11 @@
-import { HttpContent } from "../content/HttpContent.js";
+import { HttpContent, isMultipartContent } from "../content/HttpContent.js";
 import { HttpError } from "./HttpError.js";
 import { HttpRequest, HttpResponse, HttpResponseDataType } from "./types.js";
-import { SingularHttpContent } from "../content/index.js";
 import { isArrayBuffer } from "../internal/util/isArrayBuffer.js";
+import { generateBoundaryString } from "../internal/util/generateBoundaryString.js";
+import { serializeContentType } from "../headers/serializeContentType.js";
+import { parseContentType } from "../headers/parseContentType.js";
+import { ContentType } from "../headers/types.js";
 
 /**
  * Nice promise-based interface to XMLHttpRequest. Tries to hide all the weirdness.
@@ -12,7 +15,7 @@ export class HttpClient {
         // Refer to standard: https://xhr.spec.whatwg.org/
         const xhr = new XMLHttpRequest();
 
-        if (typeof request.timeout !== 'undefined') {
+        if (typeof request.timeout !== "undefined") {
             xhr.timeout = request.timeout;
         }
 
@@ -38,14 +41,30 @@ export class HttpClient {
 
         const responseType = request.responseType ?? "arraybuffer";
 
-        const data = await this._prepareData(request.content, responseType);
+        const { data, contentType } = await this._prepareData(
+            request.content,
+            responseType
+        );
+
+        const contentTypeString = contentType
+            ? await serializeContentType(contentType)
+            : undefined;
 
         await this._wrapInPromise(xhr, () => {
             xhr.open(request.method, request.url);
 
             if (request.content) {
                 for (const header of request.content.headers) {
+                    // Skip content-type as it has special handling to cater to multi-part content
+                    if (header.name == "content-type") {
+                        continue;
+                    }
+
                     xhr.setRequestHeader(header.name, header.value);
+                }
+
+                if (contentTypeString) {
+                    xhr.setRequestHeader("content-type", contentTypeString);
                 }
             }
 
@@ -105,30 +124,79 @@ export class HttpClient {
                 reject(new DOMException("Aborted", "AbortError"));
             });
 
+            // Do not await this as it will deadlock
             openAndSend();
         });
     }
 
     async _prepareData(
-        content: SingularHttpContent | undefined,
+        content: HttpContent | undefined,
         type: HttpResponseDataType
-    ): Promise<Blob | ArrayBuffer | Blob | string | undefined> {
-        if (!content || !content.data || content.data.isEmpty()) {
-            return undefined;
+    ): Promise<{
+        data: Blob | ArrayBuffer | Blob | string | undefined;
+        contentType?: ContentType;
+    }> {
+        if (!content) {
+            return { data: undefined };
         }
 
-        // TODO: Multipart and optimisation to use FormData if no additional headers provided
-        if (type === "text") {
-            return await content.data.string();
-        } else {
-            if (
-                content.data.source instanceof Blob ||
-                isArrayBuffer(content.data.source)
-            ) {
-                return content.data.source;
+        const contentTypeString = content.headers.find(
+            (x) => x.name == "content-type"
+        )?.value;
+        let contentType: ContentType | undefined;
+        if (contentTypeString) {
+            contentType = parseContentType(contentTypeString);
+        }
+
+        let data: Blob | ArrayBuffer | Blob | string | undefined;
+
+        if (isMultipartContent(content)) {
+            // Ensure that we have a boundary string
+            let boundary: string;
+
+            if (contentType) {
+                const foundBoundary = contentType.parameters.find(
+                    (x) => x.name == "boundary"
+                )?.value;
+                if (foundBoundary) {
+                    boundary = foundBoundary;
+                } else {
+                    boundary = generateBoundaryString();
+                }
+                contentType.parameters.push({
+                    name: "boundary",
+                    value: boundary,
+                });
             } else {
-                return (await content.data.arrayBuffer()).value;
+                boundary = generateBoundaryString();
+                contentType = {
+                    type: "multipart",
+                    subtype: "form-data",
+                    parameters: [{ name: "boundary", value: boundary }],
+                };
+            }
+
+            // Now serialize the content to a single array buffer, or a FormData if we can check for that case and optimise
+            throw "Not implemented";
+        } else {
+            if (!content.data || content.data.isEmpty()) {
+                data = undefined;
+            }
+
+            if (type === "text") {
+                data = await content.data.string();
+            } else {
+                if (
+                    content.data.source instanceof Blob ||
+                    isArrayBuffer(content.data.source)
+                ) {
+                    data = content.data.source;
+                } else {
+                    data = (await content.data.arrayBuffer()).value;
+                }
             }
         }
+
+        return { data, contentType };
     }
 }
