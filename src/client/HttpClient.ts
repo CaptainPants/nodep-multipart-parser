@@ -143,42 +143,21 @@ export class HttpClient {
         const contentTypeString = content.headers.find(
             (x) => x.name == "content-type"
         )?.value;
-        let contentType: ContentType | undefined;
+        let foundContentType: ContentType | undefined;
         if (contentTypeString) {
-            contentType = parseContentType(contentTypeString);
+            foundContentType = parseContentType(contentTypeString);
         }
-
-        let data: Blob | ArrayBuffer | Blob | string | undefined;
 
         if (isMultipartContent(content)) {
             // Ensure that we have a boundary string
-            let boundary: string;
-
-            if (contentType) {
-                const foundBoundary = contentType.parameters.find(
-                    (x) => x.name == "boundary"
-                )?.value;
-                if (foundBoundary) {
-                    boundary = foundBoundary;
-                } else {
-                    boundary = generateBoundaryString();
-                }
-                contentType.parameters.push({
-                    name: "boundary",
-                    value: boundary,
-                });
-            } else {
-                boundary = generateBoundaryString();
-                contentType = {
-                    type: "multipart",
-                    subtype: "form-data",
-                    parameters: [{ name: "boundary", value: boundary }],
-                };
-            }
+            const { contentType, boundary } =
+                prepareContentTypeForMultipart(foundContentType);
 
             // Now serialize the content to a single array buffer, or a FormData if we can check for that case and optimise
             throw "Not implemented";
         } else {
+            let data: Blob | ArrayBuffer | Blob | string | undefined;
+
             if (!content.data || content.data.isEmpty()) {
                 data = undefined;
             }
@@ -195,8 +174,45 @@ export class HttpClient {
                     data = (await content.data.arrayBuffer()).value;
                 }
             }
+
+            return { data, contentType: foundContentType };
+        }
+    }
+}
+
+function prepareContentTypeForMultipart(originalContentType?: ContentType): {
+    contentType: ContentType;
+    boundary: string;
+} {
+    let boundary: string;
+    let resultContentType: ContentType;
+
+    if (originalContentType) {
+        const foundBoundary = originalContentType.parameters.find(
+            (x) => x.name == "boundary"
+        )?.value;
+        if (foundBoundary) {
+            boundary = foundBoundary;
+        } else {
+            boundary = generateBoundaryString();
         }
 
-        return { data, contentType };
+        // Copy existing content-type and add the new boundary to it
+        resultContentType = {
+            ...originalContentType,
+            parameters: originalContentType.parameters.concat({
+                name: "boundary",
+                value: boundary,
+            }),
+        };
+    } else {
+        boundary = generateBoundaryString();
+        resultContentType = {
+            type: "multipart",
+            subtype: "form-data",
+            parameters: [{ name: "boundary", value: boundary }],
+        };
     }
+
+    return { contentType: resultContentType, boundary };
 }
