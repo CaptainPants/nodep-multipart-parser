@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import { asciiToDataViewForTesting } from "./internal";
-import { MultipartParser, __testing } from "./MultipartParser";
+import { MultipartParser } from "./MultipartParser";
 
 describe("parse", () => {
     test("example1", () => {

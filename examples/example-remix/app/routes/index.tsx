@@ -1,7 +1,6 @@
 
 import { Data, HttpClient, SingularHttpContent, isMultipartContent, MultipartBuilder } from '@captainpants/zerodeps-multipart-parser';
 import { type ReactNode, useState } from 'react';
-import { isArrayBuffer } from 'util/types';
 
 type Test = (log: (...message: unknown[]) => void) => Promise<void>;
 
@@ -61,7 +60,7 @@ const tests: Record<string, Test> = {
         }
 
         // Note that if you don't specify, HttpClient will use responseType 'arraybuffer' so this should be internally an arraybuffer
-        if (!isArrayBuffer(response.content.data.source)) {
+        if (!(response.content.data.source instanceof ArrayBuffer)) {
             throw new Error('Expected an array buffer respponse');
         }
 
@@ -88,7 +87,9 @@ const tests: Record<string, Test> = {
             name: 'test2'
         });
 
-        const response = await client.request({ method: 'POST', url: `/test/echo`, content: await builder.build() });
+        const content = await builder.build();
+
+        const response = await client.request({ method: 'POST', url: `/test/receive-formdata`, content: content });
 
         log(response.status);
     }

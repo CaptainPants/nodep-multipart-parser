@@ -1,3 +1,10 @@
+
+
+export interface Header {
+    name: string;
+    value: string;
+}
+
 export interface Parameter {
     /**
      * Note that if the name ends in * its considered 'extended'
