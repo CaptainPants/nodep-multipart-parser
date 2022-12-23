@@ -31,6 +31,9 @@ export function findBoundarySeparatedParts(boundaryCodes: number[], data: DataVi
 }
 
 export interface Boundary {
+    /**
+     * Note that for the first boundary this will point to the boundary directly, and for subsequent instances it will point to the preceeding CRLF.
+     */
     start: number;
     end: number;
     length: number;
@@ -77,18 +80,24 @@ export function matchBoundary(boundary: number[], data: DataView, dataOffset: nu
 
     const start = dataOffset;
 
-    // expected CR LF
-    if (!isCRLF(data, dataOffset)) {
+    // expected CR LF or at start
+    if(dataOffset == 0){
+        // at start
+    }
+    else if (isCRLF(data, dataOffset)) {
+        dataOffset += 2;
+    }
+    else {
         return undefined;
     }
 
     // expecting '-' '-'
-    if (!isDoubleHyphen(data, dataOffset + 2)) {
+    if (!isDoubleHyphen(data, dataOffset)) {
         return undefined;
     }
 
     // CR LF '-' '-'
-    dataOffset += 4;
+    dataOffset += 2;
 
     for (let i = 0; i < boundary.length; ++i) {
         if (i >= data.byteLength) {
