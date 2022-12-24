@@ -6,7 +6,7 @@
   
     "configurations": [
       {
-        "command": "npm run dev",
+        "command": "yarn run dev",
         "name": "Remix example",
         "request": "launch",
         "type": "node-terminal",
