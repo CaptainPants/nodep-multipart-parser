@@ -23,7 +23,7 @@
     "scripts": {
         "prepublishOnly": "yarn build",
         "clean": "npx rimraf ./dist && npx rimraf ./temp",
-        "build": "yarn run verify && yarn run clean && yarn run compile && yarn run rollup && yarn run rollup-minify",
+        "build": "yarn run verify && yarn run compile && yarn run rollup && yarn run rollup-minify",
         "rollup": "npx rollup --file ./dist/umd/zerodeps-multipart-parser.js --format umd --name zerodepsMultipartParser --sourcemap --input ./temp/umd/index.js --context this",
         "rollup-minify": "npx rollup --file ./dist/umd/zerodeps-multipart-parser.min.js --format umd --name zerodepsMultipartParser --sourcemap --input ./temp/umd/index.js --plugin @lopatnov/rollup-plugin-uglify --context this",
         "compile": "yarn run clean && yarn run compile:esm && yarn compile:umd",

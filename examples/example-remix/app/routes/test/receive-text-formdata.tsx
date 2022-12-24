@@ -7,8 +7,19 @@ export const action: ActionFunction = async ({ request }) => {
         unstable_createMemoryUploadHandler() // <-- we'll look at this deeper next
     );
 
+    const resultArray: { name: string, value: string}[] = [];
+
+    for (const [name, content] of formData.entries()) {
+        if (typeof content === 'string') {
+            return { name: name, content: content };
+        }
+        else {
+            return { name: name, content: await (new Response(content).text()) };
+        }
+    }
+    
     const result = {
-        count: formData.values.length,
+        parts: resultArray
     };
 
     return new Response(JSON.stringify(result), { status: 200, headers: { "content-type": "application/json" } });

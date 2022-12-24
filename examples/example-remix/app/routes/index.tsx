@@ -12,6 +12,8 @@ const tests: Record<string, Test> = {
 
         const response = await client.request({ method: 'POST', url: `/test/generate-text-form-data?parts=${numberOfParts}&content=Sample-{0}` });
         
+        log(response.status);
+        
         if (!isMultipartContent(response.content)) {
             throw new Error('Unexpected single part response');
         }
@@ -38,7 +40,7 @@ const tests: Record<string, Test> = {
     uploadTextSinglepart: async (log) => {
         const client = new HttpClient();
 
-        const input = 'The quick brown fox jumped over the lazy dog';
+        const input = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
 
         const requestContent = new SingularHttpContent(
             [{
@@ -46,7 +48,7 @@ const tests: Record<string, Test> = {
                 value: 'text/plain'
             }],
             new Data(
-                'The quick brown fox jumped over the lazy dog', 
+                input, 
                 undefined,
                 // This isn't read unless converted to Blob
                 'text/plain'
@@ -55,6 +57,8 @@ const tests: Record<string, Test> = {
 
         const response = await client.request({ method: 'POST', url: `/test/echo`, content: requestContent });
         
+        log(response.status);
+
         if (isMultipartContent(response.content)){
             throw new Error('Unexpected multi-part response');
         }
@@ -75,7 +79,7 @@ const tests: Record<string, Test> = {
     uploadTextMultipart: async (log) => {
         const client = new HttpClient();
 
-        const input = 'The quick brown fox jumped over the lazy dog';
+        const input = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
 
         const builder = new MultipartBuilder();
         builder.add({ 
@@ -89,9 +93,21 @@ const tests: Record<string, Test> = {
 
         const content = await builder.build();
 
-        const response = await client.request({ method: 'POST', url: `/test/receive-formdata`, content: content });
+        const response = await client.request({ method: 'POST', url: `/test/receive-text-formdata`, content: content });
 
-        log(response.status);
+        if (isMultipartContent(response.content)) {
+            throw new Error('Unexpected multipart data.');
+        }
+
+        const responseContent = await response.content.data.string();
+
+        log(response.status, ' ', responseContent);
+
+        const expected = JSON.stringify({ parts: [{ name: 'test1', content: input }, { name: 'test2', content: input }] });
+
+        if (responseContent !== expected) {
+            throw new Error(`Unexpected response ${responseContent} expected ${expected}.`);
+        }
     }
 };
 
