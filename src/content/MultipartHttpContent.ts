@@ -54,10 +54,14 @@ export class MultipartHttpContent {
 
         for (const part of this.parts) {
             const content = await part.data.dataView();
-            const [type, subtype] = part.data.sourceMediaType?.split("/") ?? [
-                "text",
-                "plain",
-            ]; // TODO: not sure if text/plain is a sensible default, but oh well
+
+            const isText =
+                typeof part.data.source === "string" ||
+                typeof part.data.sourceEncoding !== "undefined";
+
+            const [type, subtype] =
+                part.data.sourceMediaType?.split("/") ??
+                (isText ? ["text", "plain"] : ["application", "x-unknown"]);
 
             let headers = part.headers;
 
@@ -149,6 +153,9 @@ function getNameAndFilenameFromPart(part: SingularHttpContent) {
         parsed.parameters,
         (x) => x.lowerCaseName === "name"
     )?.value;
+
+    // filename* is considered higher priority, but we're supposed to allow fallback
+    // as not everything supports extended parameters
     const filename =
         arrayFind(parsed.parameters, (x) => x.lowerCaseName === "filename*")
             ?.value ??
