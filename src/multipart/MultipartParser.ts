@@ -1,4 +1,4 @@
-import { parseHeaders } from "../headers/index.js";
+import { Header, parseHeaders } from "../headers/index.js";
 import {
     findBoundarySeparatedParts,
     getCharCodesForString,
@@ -10,7 +10,7 @@ export interface MultipartResult {
 }
 
 export interface MultipartPart {
-    headers: { name: string; value: string }[];
+    headers: Header[];
     content: DataView;
 }
 

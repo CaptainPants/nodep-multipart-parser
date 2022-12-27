@@ -12,7 +12,10 @@ export function isDelimiter(char: string | undefined): char is string {
  * >                ; any VCHAR, except delimiters
  */
 export function isTCHAR(char: string): char is string {
-    if (!char) return false;
+    if (char.length != 1)
+        throw new TypeError(
+            `Expected a single character or undefined, found instead ${char}`
+        );
     return isVCHAR(char) && !isDelimiter(char);
 }
 
@@ -20,7 +23,6 @@ export function isTCHAR(char: string): char is string {
  * Is a single character part of the visible subset of ASCII (33 -> 127)?
  */
 export function isVCHAR(char: string): char is string {
-    if (!char) return false;
     if (char.length != 1)
         throw new TypeError(
             `Expected a single character or undefined, found instead ${char}`

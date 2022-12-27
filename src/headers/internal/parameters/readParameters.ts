@@ -1,5 +1,6 @@
 import { ParseError } from "../../../errors/ParseError.js";
-import { Parameter, Parameters } from "../../types.js";
+import { Parameter } from "../../Parameter.js";
+import { Parameters } from "../../types.js";
 import { HeaderParserState } from "../HeaderParserState.js";
 import { isQuoteSafe } from "../is.js";
 import { readOptionalWhitespace } from "../readOptionalWhitespace.js";
@@ -73,12 +74,7 @@ export function readOneParameter(
     if (isExtended) {
         const { value, language, charset } = readExtendedValue(state);
 
-        return {
-            name: parameterName,
-            value: value,
-            language: language,
-            charset: charset,
-        };
+        return new Parameter(parameterName, value, language, charset);
     } else {
         let value: string;
 
@@ -88,7 +84,7 @@ export function readOneParameter(
             value = readToken(state);
         }
 
-        return { name: parameterName, value: value };
+        return new Parameter(parameterName, value);
     }
 }
 

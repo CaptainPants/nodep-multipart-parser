@@ -37,6 +37,10 @@ export class Data {
         }
     }
 
+    /**
+     * Creates an empty Data object, where the source is null and .isEmpty() returns true.
+     * @returns
+     */
     public static empty(): Data {
         return new Data(null);
     }
@@ -110,10 +114,17 @@ export class Data {
         }
     }
 
-    public blob(): Promise<BinaryResult<Blob>> {
+    /**
+     * Note that if the source is already a blob the mediatype will not be updated.
+     * @param mediaType
+     * @returns
+     */
+    public blob(mediaType?: string): Promise<BinaryResult<Blob>> {
         if (this.source === null) {
             return Promise.resolve({
-                value: new Blob([]),
+                value: new Blob([], {
+                    type: this.sourceMediaType ?? mediaType,
+                }),
                 encoding: undefined,
             });
         } else if (this.source instanceof Blob) {
@@ -126,7 +137,9 @@ export class Data {
             // Blob constructor always converts to utf-8
             // https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
             return Promise.resolve({
-                value: new Blob([this.source], { type: this.sourceMediaType }),
+                value: new Blob([this.source], {
+                    type: this.sourceMediaType ?? mediaType,
+                }),
                 encoding: "utf-8",
             });
         } else if (this.source instanceof DataView) {
@@ -134,7 +147,9 @@ export class Data {
             // const asTypedArray = new Uint8Array(this.source.buffer, this.source.byteOffset, this.source.byteLength);
             // return Promise.resolve({ value: new Blob([asTypedArray]), encoding: 'utf-8' });
             return Promise.resolve({
-                value: new Blob([this.source], { type: this.sourceMediaType }),
+                value: new Blob([this.source], {
+                    type: this.sourceMediaType ?? mediaType,
+                }),
                 encoding: this.sourceEncoding,
             });
         } else {
@@ -175,5 +190,35 @@ export class Data {
                 encoding: "utf-8",
             };
         }
+    }
+
+    public static async isSame(a: Data, b: Data): Promise<boolean> {
+        if (typeof a.source === "string" || typeof b.source === "string") {
+            return (await a.string()) == (await b.string());
+        }
+
+        if (a.binaryLength != b.binaryLength) return false;
+
+        const aDataView = (await a.dataView()).value;
+        const bDataView = (await b.dataView()).value;
+
+        if (aDataView.byteLength != bDataView.byteLength) return false;
+
+        for (let i = 0; i < aDataView.byteLength; ++i) {
+            if (aDataView.getUint8(i) !== bDataView.getUint8(i)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public get binaryLength(): number | undefined {
+        if (typeof this.source === "string") return undefined;
+
+        if (this.source === null) return 0;
+        if (this.source instanceof Blob) return this.source.size;
+        if (isArrayBuffer(this.source)) return this.source.byteLength;
+        if (this.source instanceof DataView) return this.source.byteLength;
     }
 }

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
+import { Parameter } from "./Parameter";
 
 import { parseContentDisposition } from "./parseContentDisposition";
 
@@ -24,8 +25,8 @@ describe("parseContentDisposition", () => {
 
         expect(res.type).toEqual("form-data");
         expect(res.parameters).toEqual([
-            { name: "name", value: "example-name-1" },
-            { name: "filename", value: "example-filename-1" },
+            new Parameter("name", "example-name-1"),
+            new Parameter("filename", "example-filename-1"),
         ]);
     });
 });
