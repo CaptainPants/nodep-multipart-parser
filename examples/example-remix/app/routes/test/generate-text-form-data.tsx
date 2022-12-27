@@ -8,7 +8,7 @@ export const action: ActionFunction = async ({ request }) => {
     const content = url.searchParams.get('content') ?? 'x-{0}';
 
     const formData = new FormData();
-    for (let i = 0; i < count; ++i){
+    for (let i = 0; i < count; ++i) {
         formData.append(`part ${i}`, content.replace("{0}", String(i)));
     }
     

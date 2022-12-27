@@ -1,7 +1,7 @@
 
 import { Data, HttpClient, SingularHttpContent, isMultipartContent, MultipartBuilder, Header } from '@captainpants/zerodeps-multipart-parser';
 import { type ReactNode, useState } from 'react';
-import { parseContentDisposition } from '../../../../dist/esm';
+import { generateArrayBuffer } from '~/util/generateArrayBuffer';
 
 type Test = (log: (...message: unknown[]) => void) => Promise<void>;
 
@@ -86,16 +86,19 @@ const tests: Record<string, Test> = {
     uploadTextMultipart: async (log) => {
         const client = new HttpClient();
 
-        const input = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
+        const inputString = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
+        const inputArray = generateArrayBuffer(1024);
 
         const builder = new MultipartBuilder();
         builder.add({ 
-            content: input + ' 1',
-            name: 'test1'
+            content: inputString,
+            name: 'test1',
+            filename: 'test1.txt'
         });
         builder.add({ 
-            content: input + ' 2',
-            name: 'test2'
+            content: inputArray,
+            name: 'test2',
+            filename: 'test2.bin'
         });
 
         const content = await builder.build();
@@ -114,11 +117,11 @@ const tests: Record<string, Test> = {
 
         const entries = [...response.content.entries()];
 
-        assert(entries[0].name == 'test2', `Incorrect content-disposition on part 1 - ${entries[0].name}`);
-        assert(entries[1].name == 'test1', `Incorrect content-disposition on part 2 - ${entries[1].name}`);
+        assert(entries[0].name == 'test2', `Incorrect content-disposition on part 0 - ${entries[0].name}`);
+        assert(await Data.isSame(entries[0].data, new Data(inputArray)), `Mismatched content in part 0`);
 
-        assert(await Data.isSame(entries[0].data, new Data(input + ' 2')), `Mismatched content in part 0`);
-        assert(await Data.isSame(entries[1].data, new Data(input + ' 1')), `Mismatched content in part 0`);
+        assert(entries[1].name == 'test1', `Incorrect content-disposition on part 1 - ${entries[1].name}`);
+        assert(await Data.isSame(entries[1].data, new Data(inputString)), `Mismatched content in part 1`);
     }
 };
 
