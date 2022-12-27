@@ -3,6 +3,7 @@ import {
     ContentDisposition,
     ContentType,
     Header,
+    Parameter,
     serializeContentDisposition,
     serializeContentType,
 } from "../headers/index.js";
@@ -79,51 +80,48 @@ export class MultipartBuilder {
             ._input) {
             const partHeaders: Header[] = [];
 
-            if (name || filename) {
-                const contentDisposition: ContentDisposition = {
-                    type: "attachment",
-                    parameters: [],
-                };
+            const contentDisposition: ContentDisposition = {
+                type: "form-data",
+                parameters: [],
+            };
 
+            if (name || filename) {
                 if (name) {
-                    contentDisposition.parameters.push({
-                        name: "name",
-                        value: name,
-                    });
+                    contentDisposition.parameters.push(
+                        new Parameter("name", name)
+                    );
                 }
                 if (filename) {
-                    contentDisposition.parameters.push({
-                        name: "filename",
-                        value: filename,
-                    });
+                    contentDisposition.parameters.push(
+                        new Parameter("filename", filename)
+                    );
                 }
-
-                partHeaders.push({
-                    name: "content-disposition",
-                    value: await serializeContentDisposition(
-                        contentDisposition
-                    ),
-                });
             }
 
+            partHeaders.push(
+                new Header(
+                    "Content-Disposition",
+                    await serializeContentDisposition(contentDisposition)
+                )
+            );
+
             if (typeof size !== "undefined") {
-                partHeaders.push({
-                    name: "content-length",
-                    value: String(size),
-                });
+                partHeaders.push(new Header("Content-Length", String(size)));
             }
 
             if (mediaType) {
                 const [type, subtype] = mediaType.split("/");
 
-                partHeaders.push({
-                    name: "content-type",
-                    value: await serializeContentType({
-                        type,
-                        subtype,
-                        parameters: [],
-                    }),
-                });
+                partHeaders.push(
+                    new Header(
+                        "Content-Type",
+                        await serializeContentType({
+                            type,
+                            subtype,
+                            parameters: [],
+                        })
+                    )
+                );
             }
 
             parts.push({
@@ -137,15 +135,15 @@ export class MultipartBuilder {
         const contentType: ContentType = {
             type: "multipart",
             subtype: "form-data",
-            parameters: [{ name: "boundary", value: boundaryString }],
+            parameters: [new Parameter("boundary", boundaryString)],
         };
 
         const result = new MultipartHttpContent(
             [
-                {
-                    name: "content-type",
-                    value: await serializeContentType(contentType),
-                },
+                new Header(
+                    "Content-Type",
+                    await serializeContentType(contentType)
+                ),
             ],
             parts
         );

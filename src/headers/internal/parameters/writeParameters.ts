@@ -1,5 +1,7 @@
-import { Parameter, Parameters } from "../../types.js";
-import { isQuoteSafe } from "../is.js";
+import { stringFind } from "../../../internal/util/stringFind.js";
+import { Parameter } from "../../Parameter.js";
+import { Parameters } from "../../types.js";
+import { isQuoteSafe, isTCHAR } from "../is.js";
 import { writeExtendedValue } from "./writeExtendedValue.js";
 
 // Refer https://datatracker.ietf.org/doc/html/rfc8187#section-3.1
@@ -27,17 +29,24 @@ export async function writeOneParameter(param: Parameter): Promise<string> {
         res.push("'");
         res.push(await writeExtendedValue(param.value));
     } else {
-        res.push('"');
+        const anyNonToken =
+            stringFind(param.value, (chr) => !isTCHAR(chr)) !== undefined;
 
-        for (let i = 0; i < param.value.length; ++i) {
-            const char = param.value[i];
+        if (anyNonToken) {
+            res.push('"');
 
-            if (!isQuoteSafe(char)) {
-                res.push("\\");
+            for (let i = 0; i < param.value.length; ++i) {
+                const char = param.value[i];
+
+                if (!isQuoteSafe(char)) {
+                    res.push("\\");
+                }
+                res.push(char);
             }
-            res.push(char);
+            res.push('"');
+        } else {
+            res.push(param.value);
         }
-        res.push('"');
     }
 
     return res.join("");

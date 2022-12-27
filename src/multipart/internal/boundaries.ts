@@ -129,7 +129,7 @@ export function matchBoundary(
 
         if (dataOffset + 2 !== data.byteLength) {
             // This means we've hit the last boundary
-            // TODO: not sure what we're supposed to do
+            // TODO: not sure what we're supposed to do if there is more and/or if its not a CRLF
         }
     } else {
         isLast = false;
@@ -137,7 +137,7 @@ export function matchBoundary(
         if (isCRLF(data, dataOffset)) {
             dataOffset += 2;
         } else {
-            // According to https://www.rfc-editor.org/rfc/rfc2046#section-5.1.1
+            // TODO: According to https://www.rfc-editor.org/rfc/rfc2046#section-5.1.1
             // Any content after the boundary on a line should be ignored.
             throw new Error("TODO: we should consume to the next CRLF here");
         }

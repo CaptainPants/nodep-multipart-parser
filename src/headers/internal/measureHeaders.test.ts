@@ -1,18 +1,18 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { Header } from '../types.js';
-import { measureHeaders } from './measureHeaders.js';
+import { Header } from "../Header.js";
+import { measureHeaders } from "./measureHeaders.js";
 
 test("basic", () => {
     const headers: Header[] = [
-        // 12 + 1 + 10 + 2 = 25
-        { name: 'content-type', value: 'text/plain' },
-        // 14 + 1 + 3 + 2  = 20
-        { name: 'content-length', value: '100' }
+        // 12 + 2 + 10 + 2 = 26
+        new Header("Content-Type", "text/plain"),
+        // 14 + 2 + 3 + 2  = 21
+        new Header("Content-Length", "100"),
     ];
-    // +2 CRLF at the end = 47
+    // +2 CRLF at the end = 49
 
     const result = measureHeaders(headers);
 
-    expect(result).toEqual(47);
+    expect(result).toEqual(49);
 });

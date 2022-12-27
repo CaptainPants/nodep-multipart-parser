@@ -7,6 +7,7 @@ import { serializeContentType } from "../headers/serializeContentType.js";
 import { parseContentType } from "../headers/parseContentType.js";
 import { ContentType } from "../headers/types.js";
 import { arrayFind } from "../internal/util/arrayFind.js";
+import { Parameter } from "../headers/Parameter.js";
 
 /**
  * Nice promise-based interface to XMLHttpRequest. Tries to hide all the weirdness.
@@ -57,7 +58,10 @@ export class HttpClient {
             if (request.content) {
                 for (const header of request.content.headers) {
                     // Skip content-type (if a replacement is provided) as it has special handling to cater to multi-part content
-                    if (replacementContentTypeString && header.name == "content-type") {
+                    if (
+                        replacementContentTypeString &&
+                        header.name == "content-type"
+                    ) {
                         continue;
                     }
 
@@ -65,7 +69,10 @@ export class HttpClient {
                 }
 
                 if (replacementContentTypeString) {
-                    xhr.setRequestHeader("content-type", replacementContentTypeString);
+                    xhr.setRequestHeader(
+                        "Content-Type",
+                        replacementContentTypeString
+                    );
                 }
             }
 
@@ -142,7 +149,7 @@ export class HttpClient {
 
         if (isMultipartContent(content)) {
             const contentTypeString = content.headers.find(
-                (x) => x.name == "content-type"
+                (x) => x.lowerCaseName == "content-type"
             )?.value;
 
             let foundContentType: ContentType | undefined;
@@ -151,10 +158,13 @@ export class HttpClient {
             }
 
             // Ensure that we have a boundary string
-            const { replacementContentType, boundary } = prepareContentTypeForMultipart(foundContentType);
+            const { replacementContentType, boundary } =
+                prepareContentTypeForMultipart(foundContentType);
 
-            return { data: await content.toArrayBuffer(boundary), replacementContentType: replacementContentType };
-
+            return {
+                data: await content.toArrayBuffer(boundary),
+                replacementContentType: replacementContentType,
+            };
         } else {
             let data: Blob | ArrayBuffer | Blob | string | undefined;
 
@@ -187,12 +197,12 @@ function prepareContentTypeForMultipart(originalContentType?: ContentType): {
     if (originalContentType) {
         const foundBoundary = arrayFind(
             originalContentType.parameters,
-            (x) => x.name == "boundary"
+            (x) => x.lowerCaseName == "boundary"
         )?.value;
 
         if (foundBoundary) {
             return {
-                boundary: foundBoundary
+                boundary: foundBoundary,
             };
         }
 
@@ -201,10 +211,9 @@ function prepareContentTypeForMultipart(originalContentType?: ContentType): {
         // Copy existing content-type and add the new boundary to it
         const replacementContentType = {
             ...originalContentType,
-            parameters: originalContentType.parameters.concat({
-                name: "boundary",
-                value: boundary,
-            }),
+            parameters: originalContentType.parameters.concat(
+                new Parameter("boundary", boundary)
+            ),
         };
 
         return { replacementContentType, boundary };
@@ -214,7 +223,7 @@ function prepareContentTypeForMultipart(originalContentType?: ContentType): {
         const replacementContentType = {
             type: "multipart",
             subtype: "form-data",
-            parameters: [{ name: "boundary", value: boundary }],
+            parameters: [new Parameter("boundary", boundary)],
         };
 
         return { replacementContentType, boundary };

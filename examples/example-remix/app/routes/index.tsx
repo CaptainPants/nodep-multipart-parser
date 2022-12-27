@@ -1,8 +1,15 @@
 
-import { Data, HttpClient, SingularHttpContent, isMultipartContent, MultipartBuilder } from '@captainpants/zerodeps-multipart-parser';
+import { Data, HttpClient, SingularHttpContent, isMultipartContent, MultipartBuilder, Header } from '@captainpants/zerodeps-multipart-parser';
 import { type ReactNode, useState } from 'react';
+import { parseContentDisposition } from '../../../../dist/esm';
 
 type Test = (log: (...message: unknown[]) => void) => Promise<void>;
+
+function assert(condition: boolean, message: string) {
+    if (!condition) {
+        throw new Error(message);
+    }
+}
 
 const tests: Record<string, Test> = {
     downloadTextMultipart: async (log) => {
@@ -43,10 +50,10 @@ const tests: Record<string, Test> = {
         const input = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
 
         const requestContent = new SingularHttpContent(
-            [{
-                name: 'content-type', 
-                value: 'text/plain'
-            }],
+            [new Header (
+                'content-type', 
+                'text/plain'
+            )],
             new Data(
                 input, 
                 undefined,
@@ -83,31 +90,35 @@ const tests: Record<string, Test> = {
 
         const builder = new MultipartBuilder();
         builder.add({ 
-            content: input,
+            content: input + ' 1',
             name: 'test1'
         });
         builder.add({ 
-            content: input,
+            content: input + ' 2',
             name: 'test2'
         });
 
         const content = await builder.build();
 
-        const response = await client.request({ method: 'POST', url: `/test/receive-text-formdata`, content: content });
+        const response = await client.request({ method: 'POST', url: `/test/echo-formdata?reverse=true`, content: content });
 
-        if (isMultipartContent(response.content)) {
+        if (!isMultipartContent(response.content)) {
             throw new Error('Unexpected multipart data.');
         }
 
-        const responseContent = await response.content.data.string();
+        log(response.status);
 
-        log(response.status, ' ', responseContent);
-
-        const expected = JSON.stringify({ parts: [{ name: 'test1', content: input }, { name: 'test2', content: input }] });
-
-        if (responseContent !== expected) {
-            throw new Error(`Unexpected response ${responseContent} expected ${expected}.`);
+        if (response.content.parts.length !== 2) {
+            throw new Error(`Found ${response.content.parts.length} when expecting 2.`);
         }
+
+        const entries = [...response.content.entries()];
+
+        assert(entries[0].name == 'test2', `Incorrect content-disposition on part 1 - ${entries[0].name}`);
+        assert(entries[1].name == 'test1', `Incorrect content-disposition on part 2 - ${entries[1].name}`);
+
+        assert(await Data.isSame(entries[0].data, new Data(input + ' 2')), `Mismatched content in part 0`);
+        assert(await Data.isSame(entries[1].data, new Data(input + ' 1')), `Mismatched content in part 0`);
     }
 };
 

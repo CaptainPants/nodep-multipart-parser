@@ -44,7 +44,7 @@ export interface HttpRequest {
 
     optimisations?: {
         formData: boolean;
-    }
+    };
 }
 
 export interface HttpResponse {

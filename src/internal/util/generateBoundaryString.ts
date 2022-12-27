@@ -6,7 +6,7 @@
  * bchars        := bcharsnospace / " "
  */
 const boundaryCharacters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'()+_,-./:=?";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; //'()+_,-./:=?";
 
 export function generateBoundaryString(prefix = "BOUNDARY-", length = 69) {
     let str = prefix;
