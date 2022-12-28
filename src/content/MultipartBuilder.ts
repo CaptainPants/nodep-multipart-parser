@@ -12,7 +12,7 @@ import { MultipartHttpContent } from "./MultipartHttpContent.js";
 import { SingularHttpContent } from "./SingularHttpContent.js";
 
 export interface MultipartBuilderPart {
-    content: DataSource | Data;
+    data: DataSource | Data;
     name?: string;
     filename?: string;
     mediaType?: string;
@@ -24,7 +24,7 @@ export interface MultipartBuilderPart {
 }
 
 interface MultipartBuilderPartExtended {
-    content: Data;
+    data: Data;
     name?: string;
     filename?: string;
     mediaType?: string;
@@ -43,7 +43,7 @@ export class MultipartBuilder {
 
     public add(part: MultipartBuilderPart): void;
     public add({
-        content,
+        data,
         name,
         filename,
         mediaType,
@@ -51,23 +51,23 @@ export class MultipartBuilder {
     }: MultipartBuilderPart) {
         let size: number | undefined;
 
-        if (content instanceof Blob) {
+        if (data instanceof Blob) {
             if (!mediaType) {
-                mediaType = content.type;
+                mediaType = data.type;
             }
 
-            size = content.size;
+            size = data.size;
 
-            if (content instanceof File && !filename) {
-                filename = content.name;
+            if (data instanceof File && !filename) {
+                filename = data.name;
             }
         }
 
         this._input.push({
-            content:
-                content instanceof Data
-                    ? content
-                    : new Data(content, sourceEncoding, mediaType),
+            data:
+                data instanceof Data
+                    ? data
+                    : new Data(data, sourceEncoding, mediaType),
             name: name,
             filename: filename,
             size: size,
@@ -76,8 +76,7 @@ export class MultipartBuilder {
 
     public async build(): Promise<MultipartHttpContent> {
         const parts: SingularHttpContent[] = [];
-        for (const { content, filename, mediaType, name, size } of this
-            ._input) {
+        for (const { data, filename, mediaType, name, size } of this._input) {
             const partHeaders: Header[] = [];
 
             const contentDisposition: ContentDisposition = {
@@ -125,7 +124,7 @@ export class MultipartBuilder {
             }
 
             parts.push({
-                data: content,
+                data: data,
                 headers: partHeaders,
             });
         }
