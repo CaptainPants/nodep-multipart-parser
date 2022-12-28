@@ -30,6 +30,11 @@ export namespace HttpContent {
         return HttpContent.from(headers, response);
     }
 
+    /**
+     * @param headers
+     * @param content Note that an ArrayBuffer or DataView parameter here will avoid costly conversions.
+     * @returns
+     */
     export async function from(
         headers: Header[],
         content: DataSource
@@ -53,7 +58,7 @@ export namespace HttpContent {
             return new MultipartHttpContent(
                 headers,
                 parsed.parts.map((part) => {
-                    const [partMediaType, partCharset] = getCharsetAndMediaType(
+                    const [partCharset, partMediaType] = getCharsetAndMediaType(
                         part.headers
                     );
 

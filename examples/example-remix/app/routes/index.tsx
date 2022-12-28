@@ -91,12 +91,12 @@ const tests: Record<string, Test> = {
 
         const builder = new MultipartBuilder();
         builder.add({ 
-            content: inputString,
+            data: inputString,
             name: 'test1',
             filename: 'test1.txt'
         });
         builder.add({ 
-            content: inputArray,
+            data: inputArray,
             name: 'test2',
             filename: 'test2.bin'
         });
