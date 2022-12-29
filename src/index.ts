@@ -1,7 +1,7 @@
 // Note that typescript encourages you to omit 'index' and the file extension
 // But if you don't specify the filename and .js node/ts-node will object loudly
 // and it would be nice to be compatible with node and the web.
-export * from "./polyfills.js";
+export * from "./polyfills/index.js";
 export * from "./client/index.js";
 export * from "./content/index.js";
 export * from "./data/index.js";
