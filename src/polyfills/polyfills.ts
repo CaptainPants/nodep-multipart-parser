@@ -30,4 +30,10 @@ export namespace polyfills {
     export function minimum() {
         Promise();
     }
+
+    export function all() {
+        EventTarget();
+        AbortController();
+        Promise();
+    }
 }
