@@ -1,7 +1,23 @@
 const delimRegex = /^["(),/:;<=>?@[\]{}]$/;
+
 export function isDelimiter(char: string | undefined): char is string {
     if (!char) return false;
     return char.match(delimRegex) !== null;
+}
+
+export function isAscii(char: string) {
+    if (char.length !== 1)
+        throw new Error(`Expected string of length 1, instead found ${char}.`);
+    const res = char.charCodeAt(0);
+    return res >= 0 && res <= 127;
+}
+
+function getAscii(char: string) {
+    if (!isAscii(char))
+        throw new Error(
+            `Expected an ascii character, found instead '${char}'.`
+        );
+    return char.charCodeAt(0);
 }
 
 /**
@@ -27,7 +43,7 @@ export function isVCHAR(char: string): char is string {
         throw new TypeError(
             `Expected a single character or undefined, found instead ${char}`
         );
-    const codepoint = char.codePointAt(0);
+    const codepoint = getAscii(char);
     return codepoint !== undefined && codepoint >= 33 && codepoint < 127;
 }
 
@@ -69,7 +85,7 @@ export function isQDTEXT(char: string | undefined): char is string {
  *                         but including LWS>
  */
 export function isTEXT(char: string) {
-    const code = char.codePointAt(0);
+    const code = getAscii(char);
     if (typeof code === "undefined" || char.length != 1) {
         return false;
     }
@@ -83,7 +99,7 @@ export function isTEXT(char: string) {
  *                         (octets 0 - 31) and DEL (127)>
  */
 export function isCTL(char: string) {
-    const code = char.codePointAt(0);
+    const code = getAscii(char);
     if (typeof code === "undefined" || char.length != 1) {
         return false;
     }
@@ -119,8 +135,12 @@ export function isQuoteSafe(char: string) {
 export function isAttrChar(char: string) {
     if (char.length != 1) {
         throw new TypeError(
-            `Expected a single character, found instead ${char}`
+            `Expected a single character, found instead string of length ${char.length}: ${char}.`
         );
+    }
+
+    if (!isAscii(char)) {
+        return false;
     }
 
     return isTCHAR(char) && char != "*" && char != "'" && char != "%";

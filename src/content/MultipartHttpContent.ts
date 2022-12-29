@@ -31,7 +31,11 @@ export class MultipartHttpContent {
      * IE11 doesn't support generators
      */
     public entries() {
-        const res: {name: string, data: Data, filename: string | undefined }[] = [];
+        const res: {
+            name: string;
+            data: Data;
+            filename: string | undefined;
+        }[] = [];
         let partIndex = 0;
 
         for (const part of this.parts) {

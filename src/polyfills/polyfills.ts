@@ -1,4 +1,8 @@
-import { AbortControllerPolyfill, AbortSignalPolyfill, EventTargetPolyfill } from "./abort";
+import {
+    AbortControllerPolyfill,
+    AbortSignalPolyfill,
+    EventTargetPolyfill,
+} from "./abort";
 import { PromisePolyfill } from "./promise";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace -- grouping functions for a nicer API I.e. polyfills.x
