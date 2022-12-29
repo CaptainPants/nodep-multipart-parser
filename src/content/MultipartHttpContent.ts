@@ -1,3 +1,4 @@
+import { Data } from "../data/Data.js";
 import {
     ContentType,
     parseContentType,
@@ -27,21 +28,25 @@ export class MultipartHttpContent {
 
     /**
      * This is intended to mirror the FormData.entries() method.
+     * IE11 doesn't support generators
      */
-    public *entries() {
+    public entries() {
+        const res: {name: string, data: Data, filename: string | undefined }[] = [];
         let partIndex = 0;
 
         for (const part of this.parts) {
             const { name, filename } = getNameAndFilenameFromPart(part);
 
-            yield {
+            res.push({
                 name: name ?? `part_${partIndex}`,
                 data: part.data,
                 filename: filename,
-            };
+            });
 
             ++partIndex;
         }
+
+        return res;
     }
 
     public async toArrayBuffer(boundary: string): Promise<ArrayBuffer> {
