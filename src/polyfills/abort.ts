@@ -1,5 +1,5 @@
-import { arrayFind } from "./internal/util/arrayFind";
-import { arrayRemoveWhere } from "./internal/util/arrayRemoveWhere";
+import { arrayFind } from "../internal/util/arrayFind";
+import { arrayRemoveWhere } from "../internal/util/arrayRemoveWhere";
 
 function resolveAddEventListenerOptions(
     options?: boolean | AddEventListenerOptions
@@ -228,17 +228,3 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
         return res.signal;
     }
 }
-
-export const polyfills = {
-    AbortController() {
-        if (typeof AbortController === "undefined") {
-            window.AbortController = AbortControllerPolyfill;
-            window.AbortSignal = AbortSignalPolyfill;
-        }
-    },
-    EventTarget() {
-        if (typeof EventTarget === "undefined") {
-            window.EventTarget = EventTargetPolyfill;
-        }
-    },
-};

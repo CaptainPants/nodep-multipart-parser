@@ -1,6 +1,6 @@
 import { expect, test, describe } from "@jest/globals";
 
-import { AbortControllerPolyfill } from "./polyfills.js";
+import { AbortControllerPolyfill } from "./abort.js";
 
 test("AbortControllerPolyfill", () => {
     const controller = new AbortControllerPolyfill();

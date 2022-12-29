@@ -4,6 +4,7 @@ import { readForm, writeFormData } from './util';
 
 const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage, typeof http.ServerResponse>> = {
   "/": (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8')
     res.writeHead(200);
     res.end(`
       <!doctype html>
@@ -15,6 +16,8 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
           <button id="button">Test</button>
           <div id="log" style="white-space: pre;"></div>
           <script type="application/javascript">
+            zerodepsMultipartParser.polyfills.minimum();
+
             function assert(condition, message) {
                 if (!condition) {
                     throw new Error(message);
@@ -81,7 +84,7 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
                   }
                 )
                 .then(
-                  response => {
+                  function(response) {
                     if (!zerodepsMultipartParser.isMultipartContent(response.content)) {
                         throw new Error('Unexpected multipart data.');
                     }
@@ -98,7 +101,7 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
                   }
                 )
                 .then(
-                  resolved => {
+                  function(resolved) {
                     var response = resolved[0];
                     var isSame1 = resolved[1];
                     var isSame2 = resolved[2];
@@ -116,7 +119,7 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
                 )
                 .then(
                   undefined,
-                  err => {
+                  function(err) {
                     warn(err);
                   }
                 );
