@@ -3,14 +3,13 @@ type AllResult<T extends readonly unknown[] | []> = {
 };
 
 export class PromisePolyfill<T> {
-    private _state: "pending" | "resolved" | "rejected" = "pending";
-    private _result: T | undefined;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private _reason: any;
+    private _state:
+        | { label: "pending" }
+        | { label: "resolved"; result: T }
+        | { label: "rejected"; reason: unknown } = { label: "pending" };
 
     private _fulfilledListeners: ((result: T) => void)[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private _rejectedListeners: ((reason?: any) => void)[] = [];
+    private _rejectedListeners: ((reason?: unknown) => void)[] = [];
 
     constructor(
         callback: (
@@ -37,41 +36,45 @@ export class PromisePolyfill<T> {
         onrejected?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined
     ): PromisePolyfill<TResult1 | TResult2> {
-        switch (this._state) {
+        switch (this._state.label) {
             case "pending":
                 return new PromisePolyfill<TResult1 | TResult2>(
-                    (resolve, reject) =>
-                        later(() => {
-                            if (onfulfilled)
-                                this._fulfilledListeners.push((result) => {
-                                    processResult(
-                                        () => onfulfilled(result),
-                                        resolve,
-                                        reject
-                                    );
-                                });
-                            if (onrejected)
-                                this._rejectedListeners.push((reason) => {
-                                    processResult(
-                                        () => onrejected(reason),
-                                        resolve,
-                                        reject
-                                    );
-                                });
-                        })
+                    (resolve, reject) => {
+                        if (onfulfilled) {
+                            this._fulfilledListeners.push((result) => {
+                                processResult(
+                                    () => onfulfilled(result),
+                                    resolve,
+                                    reject
+                                );
+                            });
+                        }
+                        if (onrejected) {
+                            this._rejectedListeners.push((reason) => {
+                                processResult(
+                                    () => onrejected(reason),
+                                    resolve,
+                                    reject
+                                );
+                            });
+                        }
+                    }
                 );
 
-            case "rejected":
+            case "rejected": {
+                const state = this._state;
                 return new PromisePolyfill((resolve, reject) =>
                     later(() => {
-                        reject(onrejected?.(this._reason) ?? this._reason);
+                        reject(onrejected?.(state.reason) ?? state.reason);
                     })
                 );
+            }
 
             case "resolved": {
+                const state = this._state;
                 if (onfulfilled) {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Checked by _reject/_resolve
-                    const fulfilled = onfulfilled(this._result!);
+                    const fulfilled = onfulfilled(state.result!);
 
                     if (isPromiseLike(fulfilled)) {
                         return new PromisePolyfill((resolve, reject) =>
@@ -89,7 +92,7 @@ export class PromisePolyfill<T> {
                 } else {
                     return new PromisePolyfill((resolve) =>
                         later(() => {
-                            resolve(this._result as TResult1 | TResult2);
+                            resolve(state.result as TResult1 | TResult2);
                         })
                     );
                 }
@@ -99,9 +102,15 @@ export class PromisePolyfill<T> {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private _reject(reason?: any) {
-        if (this._state !== "pending") return;
-        this._state = "rejected";
-        this._reason = reason;
+        if (this._state.label !== "pending") return;
+        this._state = {
+            label: "rejected",
+            reason: reason,
+        };
+
+        for (const listener of this._rejectedListeners) {
+            listener(reason);
+        }
     }
 
     private _resolve(result: T | PromiseLike<T>) {
@@ -113,9 +122,15 @@ export class PromisePolyfill<T> {
             return;
         }
 
-        if (this._state !== "pending") return;
-        this._state = "resolved";
-        this._result = result;
+        if (this._state.label !== "pending") return;
+        this._state = {
+            label: "resolved",
+            result: result,
+        };
+
+        for (const listener of this._fulfilledListeners) {
+            listener(result);
+        }
     }
 
     public static resolve(): PromisePolyfill<void>;
@@ -194,7 +209,7 @@ export class PromisePolyfill<T> {
 }
 
 function isPromiseLike<T>(val: T | PromiseLike<T>): val is PromiseLike<T> {
-    return typeof (val as { then: () => void }).then === "function";
+    return val && typeof (val as { then: () => void }).then === "function";
 }
 
 function later(callback: () => void) {
