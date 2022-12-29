@@ -148,7 +148,8 @@ export class HttpClient {
         }
 
         if (isMultipartContent(content)) {
-            const contentTypeString = content.headers.find(
+            const contentTypeString = arrayFind(
+                content.headers,
                 (x) => x.lowerCaseName == "content-type"
             )?.value;
 
