@@ -13,13 +13,61 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
         </head>
         <body>
           <button id="button">Test</button>
-          <script>
+          <div id="log" style="white-space: pre;"></div>
+          <script type="application/javascript">
+            function assert(condition, message) {
+                if (!condition) {
+                    throw new Error(message);
+                }
+            }
+
+            function generateArrayBuffer(length) {
+                var content = new ArrayBuffer(length);
+                var array = new Uint8Array(content);
+
+                for (let i = 0; i < array.byteLength; ++i) {
+                    array.set(i, Math.floor(Math.random() * 255));
+                }
+
+                return content;
+            }
+
+            function doLog(parts, color) {
+              var ele = document.getElementById('log');
+              var holder = document.createElement('div');
+              ele.appendChild(holder);
+
+              if (color) {
+                holder.style.color = color;
+              }
+              for (var i = 0; i < parts.length; ++i) {
+                holder.appendChild(document.createTextNode(parts[i]))
+              }
+            }
+
+            function log() {
+              doLog(arguments);
+            }
+
+            function warn() {
+              doLog(arguments, 'red');
+            }
+
             function runTest() {
+              document.getElementById('log').innerHTML = '';
+
+              var inputString = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
+              var inputArray = generateArrayBuffer(1024);
               var builder = new zerodepsMultipartParser.MultipartBuilder();
-              builder.add({
+              builder.add({ 
+                data: inputString,
                 name: 'test1',
-                data: new zerodepsMultipartParser.Data('Test content'),
-                mediaType: 'text/plain'
+                filename: 'test1.txt'
+              });
+              builder.add({ 
+                  data: inputArray,
+                  name: 'test2',
+                  filename: 'test2.bin'
               });
               builder.build()
                 .then(
@@ -33,11 +81,43 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
                   }
                 )
                 .then(
-                  result => {
-                    alert(result);
-                  },
+                  response => {
+                    if (!zerodepsMultipartParser.isMultipartContent(response.content)) {
+                        throw new Error('Unexpected multipart data.');
+                    }
+
+                    log(response.status);
+
+                    var entries = response.content.entries();
+
+                    return Promise.all([
+                      Promise.resolve(response),
+                      zerodepsMultipartParser.Data.isSame(entries[0].data, new zerodepsMultipartParser.Data(inputString)),
+                      zerodepsMultipartParser.Data.isSame(entries[1].data, new zerodepsMultipartParser.Data(inputArray)),
+                    ]);
+                  }
+                )
+                .then(
+                  resolved => {
+                    var response = resolved[0];
+                    var isSame1 = resolved[1];
+                    var isSame2 = resolved[2];
+
+                    assert(response.content.parts.length === 2, 'Found ' + response.content.parts.length + ' when expecting 2.');
+
+                    var entries = response.content.entries();
+
+                    assert(entries[0].name == 'test1', 'Incorrect content-disposition on part 0 - ' + entries[0].name);
+                    assert(isSame1, 'Mismatched content in part 0');
+
+                    assert(entries[1].name == 'test2', 'Incorrect content-disposition on part 1 - ' + entries[1].name);
+                    assert(isSame2, 'Mismatched content in part 1');
+                  }
+                )
+                .then(
+                  undefined,
                   err => {
-                    alert(err);
+                    warn(err);
                   }
                 );
               }
@@ -56,7 +136,7 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
   "/echo": async (req, res) => {
     const parts = await readForm(req);
 
-    writeFormData(res, parts);
+    await writeFormData(res, parts);
 
     res.end();
   }

@@ -111,11 +111,9 @@ const tests: Record<string, Test> = {
 
         log(response.status);
 
-        if (response.content.parts.length !== 2) {
-            throw new Error(`Found ${response.content.parts.length} when expecting 2.`);
-        }
+        assert(response.content.parts.length === 2,`Found ${response.content.parts.length} when expecting 2.`);
 
-        const entries = [...response.content.entries()];
+        const entries = response.content.entries();
 
         assert(entries[0].name == 'test2', `Incorrect content-disposition on part 0 - ${entries[0].name}`);
         assert(await Data.isSame(entries[0].data, new Data(inputArray)), `Mismatched content in part 0`);
