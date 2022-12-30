@@ -33,8 +33,11 @@ export class PromisePolyfill<T> {
             | ((value: T) => TResult1 | PromiseLike<TResult1>)
             | null
             | undefined,
-        onrejected?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined
+        onrejected?:
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            | ((reason: any) => TResult2 | PromiseLike<TResult2>)
+            | null
+            | undefined
     ): PromisePolyfill<TResult1 | TResult2> {
         switch (this._state.label) {
             case "pending":
@@ -101,6 +104,34 @@ export class PromisePolyfill<T> {
         }
     }
 
+    catch<TResult = never>(
+        onrejected?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((reason: any) => TResult | PromiseLike<TResult>) | null | undefined
+    ): PromisePolyfill<T | TResult> {
+        return this.then(undefined, onrejected);
+    }
+
+    finally(onfinally?: (() => void) | null | undefined): PromisePolyfill<T> {
+        const handler = (): PromisePolyfill<T> => {
+            const res = onfinally?.() as unknown;
+            if (isPromiseLike(res)) {
+                return new PromisePolyfill<T>((resolve, reject) => {
+                    res.then(
+                        // MDN says that a returned value should be ignored and the original
+                        // result used. But a thrown error or returned rejected promise should
+                        // be honoured
+                        () => this.then(resolve, reject),
+                        reject
+                    );
+                });
+            } else {
+                return this;
+            }
+        };
+
+        return this.then(handler, handler);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private _reject(reason?: any) {
         if (this._state.label !== "pending") return;
@@ -109,6 +140,7 @@ export class PromisePolyfill<T> {
             reason: reason,
         };
 
+        // TODO: this is supposed to raise a global event when there's no listeners - check MDN
         for (const listener of this._rejectedListeners) {
             listener(reason);
         }
@@ -129,6 +161,7 @@ export class PromisePolyfill<T> {
             result: result,
         };
 
+        // TODO: this is supposed to raise a global event when there's no listeners - check MDN
         for (const listener of this._fulfilledListeners) {
             listener(result);
         }
