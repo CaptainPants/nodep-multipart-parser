@@ -59,20 +59,23 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
             function runTest() {
               document.getElementById('log').innerHTML = '';
 
-              var inputString = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
-              var inputArray = generateArrayBuffer(1024);
-              var builder = new zerodepsMultipartParser.MultipartBuilder();
-              builder.add({ 
-                data: inputString,
-                name: 'test1',
-                filename: 'test1.txt'
-              });
-              builder.add({ 
-                  data: inputArray,
-                  name: 'test2',
-                  filename: 'test2.bin'
-              });
-              builder.build()
+              Promise.resolve(void 0)
+                .then(function() {
+                  var inputString = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
+                  var inputArray = generateArrayBuffer(1024);
+                  var builder = new zerodepsMultipartParser.MultipartBuilder();
+                  builder.add({ 
+                    data: inputString,
+                    name: 'test1',
+                    filename: 'test1.txt'
+                  });
+                  builder.add({ 
+                      data: inputArray,
+                      name: 'test2',
+                      filename: 'test2.bin'
+                  });
+                  return builder.build();
+                })
                 .then(
                   function(content) {
                     var client = new zerodepsMultipartParser.HttpClient();
@@ -93,10 +96,13 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
 
                     var entries = response.content.entries();
 
+                    var isSamePromise1 = zerodepsMultipartParser.Data.isSame(entries[0].data, new zerodepsMultipartParser.Data(inputString));
+                    var isSamePromise2 = zerodepsMultipartParser.Data.isSame(entries[1].data, new zerodepsMultipartParser.Data(inputArray));
+
                     return Promise.all([
-                      Promise.resolve(response),
-                      zerodepsMultipartParser.Data.isSame(entries[0].data, new zerodepsMultipartParser.Data(inputString)),
-                      zerodepsMultipartParser.Data.isSame(entries[1].data, new zerodepsMultipartParser.Data(inputArray)),
+                      response,
+                      isSamePromise1,
+                      isSamePromise2
                     ]);
                   }
                 )

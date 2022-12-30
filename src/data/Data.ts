@@ -1,5 +1,6 @@
 import { blobToArrayBufferUsingFileReader } from "../internal/util/blobToArrayBufferUsingFileReader.js";
 import { blobToStringUsingFileReader } from "../internal/util/blobToStringUsingFileReader.js";
+import { createBlob } from "../internal/util/createBlob.js";
 import { expensiveCompatibleBlobSourceToString } from "../internal/util/expensiveCompatibleBlobSourceToString.js";
 import { isArrayBuffer } from "../internal/util/isArrayBuffer.js";
 import { stringToArrayBuffer } from "../internal/util/stringToArrayBuffer.js";
@@ -137,9 +138,10 @@ export class Data {
             // Blob constructor always converts to utf-8
             // https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
             return Promise.resolve({
-                value: new Blob([this.source], {
-                    type: this.sourceMediaType ?? mediaType,
-                }),
+                value: createBlob(
+                    this.source,
+                    this.sourceMediaType ?? mediaType
+                ),
                 encoding: "utf-8",
             });
         } else if (this.source instanceof DataView) {
@@ -147,15 +149,16 @@ export class Data {
             // const asTypedArray = new Uint8Array(this.source.buffer, this.source.byteOffset, this.source.byteLength);
             // return Promise.resolve({ value: new Blob([asTypedArray]), encoding: 'utf-8' });
             return Promise.resolve({
-                value: new Blob([this.source], {
-                    type: this.sourceMediaType ?? mediaType,
-                }),
+                value: createBlob(
+                    this.source,
+                    this.sourceMediaType ?? mediaType
+                ),
                 encoding: this.sourceEncoding,
             });
         } else {
             // Binary to binary retains source encoding
             return Promise.resolve({
-                value: new Blob([this.source], { type: this.sourceMediaType }),
+                value: createBlob(this.source, this.sourceMediaType),
                 encoding: this.sourceEncoding,
             });
         }

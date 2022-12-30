@@ -63,37 +63,38 @@ export class PromisePolyfill<T> {
 
             case "rejected": {
                 const state = this._state;
-                return new PromisePolyfill((resolve, reject) =>
-                    later(() => {
-                        reject(onrejected?.(state.reason) ?? state.reason);
-                    })
-                );
+                if (onrejected) {
+                    return new PromisePolyfill((resolve, reject) =>
+                        later(() => {
+                            processResult(
+                                () => onrejected(state.reason),
+                                resolve,
+                                reject
+                            );
+                        })
+                    );
+                } else {
+                    return PromisePolyfill.reject(state.reason);
+                }
+                // Potentially this could just be return this
             }
 
             case "resolved": {
                 const state = this._state;
                 if (onfulfilled) {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Checked by _reject/_resolve
-                    const fulfilled = onfulfilled(state.result!);
-
-                    if (isPromiseLike(fulfilled)) {
-                        return new PromisePolyfill((resolve, reject) =>
-                            later(() => {
-                                fulfilled.then(resolve, reject);
-                            })
-                        );
-                    } else {
-                        return new PromisePolyfill((resolve) =>
-                            later(() => {
-                                resolve(fulfilled);
-                            })
-                        );
-                    }
-                } else {
-                    return new PromisePolyfill((resolve) =>
+                    return new PromisePolyfill((resolve, reject) =>
                         later(() => {
-                            resolve(state.result as TResult1 | TResult2);
+                            processResult(
+                                () => onfulfilled(state.result),
+                                resolve,
+                                reject
+                            );
                         })
+                    );
+                } else {
+                    // Potentially this could just be return this
+                    return PromisePolyfill.resolve(
+                        state.result as TResult1 | TResult2
                     );
                 }
             }

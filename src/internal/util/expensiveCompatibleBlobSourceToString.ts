@@ -1,4 +1,5 @@
 import { blobToStringUsingFileReader } from "./blobToStringUsingFileReader.js";
+import { createBlob } from "./createBlob.js";
 
 /**
  * Convert from an ArrayBuffer or DataView to string via the Blob constructor (
@@ -15,5 +16,5 @@ export function expensiveCompatibleBlobSourceToString(
     value: ArrayBuffer | DataView,
     encoding: string | undefined
 ) {
-    return blobToStringUsingFileReader(new Blob([value]), encoding);
+    return blobToStringUsingFileReader(createBlob(value), encoding);
 }

@@ -12,6 +12,7 @@ function getBoundary(contentType: string | undefined) {
   }
 
   let str = match[0];
+  // string.prototype.startsWith not supported in IE11
   if (str.startsWith('"')) {
     str = str.substring(1, str.length - 2);
   }
