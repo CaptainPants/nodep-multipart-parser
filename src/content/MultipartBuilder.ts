@@ -71,6 +71,7 @@ export class MultipartBuilder {
             name: name,
             filename: filename,
             size: size,
+            mediaType: mediaType,
         });
     }
 
