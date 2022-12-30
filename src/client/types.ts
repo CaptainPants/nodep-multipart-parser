@@ -1,7 +1,4 @@
-import {
-    SingularHttpContent,
-    MultipartHttpContent,
-} from "../content/HttpContent.js";
+import { HttpContent } from "../content/HttpContent.js";
 
 /**
  * How the XHR should provide the response data. XHR supports additional options
@@ -19,7 +16,7 @@ export interface HttpRequest {
      * Content including headers to send as part of the request.
      * TODO: implement multipart writing
      */
-    content?: SingularHttpContent;
+    content?: HttpContent;
 
     onUploadProgress?: (evt: ProgressEvent) => void;
     onDownloadProgress?: (evt: ProgressEvent) => void;
@@ -38,17 +35,21 @@ export interface HttpRequest {
     timeout?: number;
 
     /*
-     * If this callback returns true, then the result is considered 
-     * a success and the promise will return. If the result from 
+     * If this callback returns true, then the result is considered
+     * a success and the promise will return. If the result from
      * this callback is false, then the promise will reject with
      * an HttpError.
      */
     isValidStatus?: (statusCode: number) => boolean;
+
+    optimisations?: {
+        formData: boolean;
+    };
 }
 
 export interface HttpResponse {
     status: number;
     statusText: string;
-    content: SingularHttpContent | MultipartHttpContent;
+    content: HttpContent;
     raw: XMLHttpRequest;
 }

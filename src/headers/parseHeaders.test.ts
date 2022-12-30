@@ -11,11 +11,11 @@ Content-Type: text/html\n\n`.replace(/\n/g, "\r\n");
         const res = parseHeaders({ headerString: headers }).headers;
 
         expect(res).toHaveLength(2);
-        expect(res[0]!.name).toEqual("content-disposition");
+        expect(res[0]!.name).toEqual("Content-Disposition");
         expect(res[0]!.value).toEqual(
             'form-data; name="file2"; filename="a.html"'
         );
-        expect(res[1]!.name).toEqual("content-type");
+        expect(res[1]!.name).toEqual("Content-Type");
         expect(res[1]!.value).toEqual("text/html");
     });
 });

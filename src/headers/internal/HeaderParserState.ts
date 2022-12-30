@@ -1,8 +1,5 @@
-
 export class HeaderParserState {
-    constructor(
-        string: string
-    ) {
+    constructor(string: string) {
         this._string = string;
         this._index = 0;
         this._end = string.length;
@@ -13,13 +10,13 @@ export class HeaderParserState {
     private _end: number;
 
     /**
-      * Get state as a plain object, mostly for unit testing.
-      */
+     * Get state as a plain object, mostly for unit testing.
+     */
     toObject() {
         return {
             string: this._string,
             index: this._index,
-            end: this._end
+            end: this._end,
         };
     }
 
@@ -56,15 +53,18 @@ export class HeaderParserState {
     }
 
     /**
-      * Is the next sequence of characters equal to that provided. Note that this is a case 
-      * insensitive comparison.
-      */
+     * Is the next sequence of characters equal to that provided. Note that this is a case
+     * insensitive comparison.
+     */
     isAt(str: string) {
         if (!this.hasRemaining(str.length)) {
             return false;
         }
 
-        return this.string.substring(this._index, this._index + str.length).toLowerCase() === str.toLowerCase();
+        return (
+            this.string
+                .substring(this._index, this._index + str.length)
+                .toLowerCase() === str.toLowerCase()
+        );
     }
 }
-

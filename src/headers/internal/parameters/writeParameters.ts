@@ -1,6 +1,7 @@
-
-import { Parameter, Parameters } from "../../types.js";
-import { isQuoteSafe } from "../is.js";
+import { stringFind } from "../../../internal/util/stringFind.js";
+import { Parameter } from "../../Parameter.js";
+import { Parameters } from "../../types.js";
+import { isQuoteSafe, isTCHAR } from "../is.js";
 import { writeExtendedValue } from "./writeExtendedValue.js";
 
 // Refer https://datatracker.ietf.org/doc/html/rfc8187#section-3.1
@@ -10,37 +11,45 @@ export async function writeOneParameter(param: Parameter): Promise<string> {
     const res: string[] = [];
 
     if (param.name.length < 1) {
-        throw new Error('Expected header name to have at least once character.');
+        throw new Error(
+            "Expected header name to have at least once character."
+        );
     }
 
     const lastLetter = param.name[param.name.length - 1];
-    const isExtended = lastLetter == '*';
+    const isExtended = lastLetter == "*";
 
-    res.push('; ');
+    res.push("; ");
     res.push(param.name);
-    res.push('=');
+    res.push("=");
 
     if (isExtended) {
         res.push("utf-8'");
         if (param.language) res.push(param.language);
         res.push("'");
         res.push(await writeExtendedValue(param.value));
-    }
-    else {
-        res.push('"');
+    } else {
+        const anyNonToken =
+            stringFind(param.value, (chr) => !isTCHAR(chr)) !== undefined;
 
-        for (let i = 0; i < param.value.length; ++i) {
-            const char = param.value[i];
+        if (anyNonToken) {
+            res.push('"');
 
-            if (!isQuoteSafe(char)) {
-                res.push('\\');
+            for (let i = 0; i < param.value.length; ++i) {
+                const char = param.value[i];
+
+                if (!isQuoteSafe(char)) {
+                    res.push("\\");
+                }
+                res.push(char);
             }
-            res.push(char);
+            res.push('"');
+        } else {
+            res.push(param.value);
         }
-        res.push('"');
     }
 
-    return res.join('');
+    return res.join("");
 }
 
 export async function writeParameters(parameters: Parameters): Promise<string> {
@@ -50,6 +59,5 @@ export async function writeParameters(parameters: Parameters): Promise<string> {
         res.push(await writeOneParameter(param));
     }
 
-    return res.join('');
+    return res.join("");
 }
-

@@ -1,5 +1,6 @@
 import { ParseError } from "../../../errors/ParseError.js";
-import { Parameter, Parameters } from "../../types.js";
+import { Parameter } from "../../Parameter.js";
+import { Parameters } from "../../types.js";
 import { HeaderParserState } from "../HeaderParserState.js";
 import { isQuoteSafe } from "../is.js";
 import { readOptionalWhitespace } from "../readOptionalWhitespace.js";
@@ -8,12 +9,11 @@ import { readOptionalToken, readToken } from "../readToken.js";
 import { readPercentEncoded } from "./readPercentEncoded.js";
 
 /**
-  * https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.6
-  */
+ * https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.6
+ */
 export function readOneParameter(
     state: HeaderParserState
 ): Parameter | undefined {
-
     // sitting just after the previous parameter
     readOptionalWhitespace(state);
 
@@ -47,7 +47,7 @@ export function readOneParameter(
     }
 
     const lastChar = parameterName[parameterName.length - 1];
-    const isExtended = lastChar == '*';
+    const isExtended = lastChar == "*";
 
     // No whitespace is allowed
     // https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.6
@@ -74,9 +74,8 @@ export function readOneParameter(
     if (isExtended) {
         const { value, language, charset } = readExtendedValue(state);
 
-        return { name: parameterName, value: value, language: language, charset: charset };
-    }
-    else {
+        return new Parameter(parameterName, value, language, charset);
+    } else {
         let value: string;
 
         if (state.current() === '"') {
@@ -85,22 +84,27 @@ export function readOneParameter(
             value = readToken(state);
         }
 
-        return { name: parameterName, value: value };
+        return new Parameter(parameterName, value);
     }
 }
 
 /**
-  * See syntax https://datatracker.ietf.org/doc/html/rfc8187#section-3.2.1
-  * Language tag is defined here https://datatracker.ietf.org/doc/html/rfc5646#section-2.1
-  */
-function readExtendedValue(state: HeaderParserState): { value: string, language: string, charset: string } {
+ * See syntax https://datatracker.ietf.org/doc/html/rfc8187#section-3.2.1
+ * Language tag is defined here https://datatracker.ietf.org/doc/html/rfc5646#section-2.1
+ */
+function readExtendedValue(state: HeaderParserState): {
+    value: string;
+    language: string;
+    charset: string;
+} {
     // 'charset', current this MUST be utf-8 with possibility for future charsets
-    if (!state.isAt('utf-8')) {
+    if (!state.isAt("utf-8")) {
         throw new Error(`Unexpected ${state.current()}, expected token utf-8.`);
     }
     state.move(5);
 
-    if (state.current() !== "'") throw new Error(`Unexpected ${state.current()}, expected token '.`);
+    if (state.current() !== "'")
+        throw new Error(`Unexpected ${state.current()}, expected token '.`);
 
     state.moveNext(); // Move past the '
 
@@ -115,14 +119,17 @@ function readExtendedValue(state: HeaderParserState): { value: string, language:
         throw new Error(`Unexpected EOF, expected part of language.`);
     }
 
-    const language = state.string.substring(startOfLanguageIndex, state.index());
+    const language = state.string.substring(
+        startOfLanguageIndex,
+        state.index()
+    );
 
     state.moveNext(); // Move past the '
 
     const partsOfValue: string[] = [];
 
     // Read to the end
-    for (; ;) {
+    for (;;) {
         const current = state.current();
 
         if (current === undefined) {
@@ -136,8 +143,10 @@ function readExtendedValue(state: HeaderParserState): { value: string, language:
         }
 
         const read = readPercentEncoded(state);
-        if (typeof read === 'undefined') {
-            throw new Error(`Unexpected ${current}, expected a quote safe char or a percent encoded value.`);
+        if (typeof read === "undefined") {
+            throw new Error(
+                `Unexpected ${current}, expected a quote safe char or a percent encoded value.`
+            );
         }
 
         partsOfValue.push(read);
@@ -145,9 +154,9 @@ function readExtendedValue(state: HeaderParserState): { value: string, language:
     }
 
     return {
-        charset: 'utf-8',
+        charset: "utf-8",
         language: language,
-        value: partsOfValue.join('')
+        value: partsOfValue.join(""),
     };
 }
 
@@ -161,16 +170,14 @@ export function processParametersIfPresent(
 ): Parameters {
     const res: Parameters = [];
 
-    for (; ;) {
-
+    for (;;) {
         // then a parameter
         const parameter = readOneParameter(state);
 
         if (!parameter) {
             if (!state.isFinished()) {
                 throw new ParseError(
-                    `Unexpected '${state.current()
-                    }' when expecting parameter or EOF.`
+                    `Unexpected '${state.current()}' when expecting parameter or EOF.`
                 );
             }
             break; // technically a violation of the standard but we'll allow it

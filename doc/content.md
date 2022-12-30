@@ -4,24 +4,29 @@ The HttpContent classes provide simplified access to single and multi-part HTTP 
 
 Using HttpContent with HttpClient:
 ```typescript
-import { HttpClient } from '@captainpants/zerodeps-multipart-parser';
+import { HttpClient, isMultipartContent } from '@captainpants/zerodeps-multipart-parser';
 
 const client = new HttpClient();
 
 const response = await client.request({
     method: 'GET',
     url: 'https://google.com',
-    responseType: 'text' // or 'blob' or 'arraybuffer'
+    responseType: 'arraybuffer' // 'text' or 'blob' or 'arraybuffer'
 });
 
-// now response is either a SingularHttpContaent or MultipartHttpContent, and you can check which with a simple instanceof check
+// now response is either a SingularHttpContent or MultipartHttpContent, and you can check which with a simple instanceof check, or check for the presence of the 'parts' property
 
-if (response instanceof MultipartHttpResponse) {
+if (isMultipartContent(response)) {
     let i = 1;
     for (const part of response.parts) {
         console.log(`Part ${i}: ${await part.data.string()}`);
 
         ++i;
+    }
+
+    // alternatively 
+    for (const { name, filename, data } of response.entries()) {
+        // The entries method is modelled on the structure of FormData.prototype.entries()
     }
 }
 else {
@@ -32,7 +37,7 @@ else {
 This is most easily used with HttpClient, but can also be used directly with XMLHttpRequest as per the below example:
 
 ```typescript
-import { HttpContent, MultipartHttpContent, SingularHttpContent } from '@captainpants/zerodeps-multipart-parser';
+import { HttpContent, isMultipartContent } from '@captainpants/zerodeps-multipart-parser';
 
 const xhr = new XMLHttpRequest();
 // To handle multipart responses you will need to specify responseType = 'arraybuffer'
@@ -46,7 +51,7 @@ async function reqListener() {
     // run the XML request and wait for result
     const content = HttpContent.fromXHRResponse(xhr);
 
-    if (content instanceof MultipartHttpContent) {
+    if (isMultipartContent(content)) {
         // This is multipart content
         for (const part of content.parts) {
             /*
@@ -55,6 +60,11 @@ async function reqListener() {
             which internally is a DataView to the bytes of that segment.
             */
             const asString = await part.data.string();
+        }
+
+        // alternatively 
+        for (const { name, filename, data } of response.entries()) {
+            // The entries method is modelled on the structure of FormData.prototype.entries()
         }
     }
     else {
@@ -69,3 +79,24 @@ async function reqListener() {
     }
 }
 ```
+
+# MultipartBuilder
+You can use the **MultipartBuilder** class to easily create multipart content for requests:
+```typescript
+import { MultipartBuilder } from '@captainpants/zerodeps-multipart-parser';
+
+const builder = new MultipartBuilder();
+builder.append({
+    name: part,
+    mediaType: 'application/json',
+    data: JSON.stringify({ test: 1 }),
+    filename: 'file.json'
+});
+const content = await builder.build();
+
+// Now either pass to HttpClient.request
+const client = new HttpClient();
+const result = await client.request({ method: 'POST', url: '/something', content: content });
+
+// or create an array buffer for XMLHttpRequest:
+const arrayBuffer = await content.toArrayBuffer('BOUNARY-STRING');

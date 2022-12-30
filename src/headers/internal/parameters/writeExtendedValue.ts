@@ -1,10 +1,11 @@
 import { blobToArrayBufferUsingFileReader } from "../../../internal/util/blobToArrayBufferUsingFileReader.js";
+import { createBlob } from "../../../internal/util/createBlob.js";
 import { isAttrChar } from "../is.js";
 
 export async function writeExtendedValue(value: string): Promise<string> {
     const res: string[] = [];
 
-    for (let currentIndex = 0; currentIndex < value.length;) {
+    for (let currentIndex = 0; currentIndex < value.length; ) {
         const startOfRunIndex = currentIndex;
 
         const charAtStartOfRun = value[currentIndex];
@@ -12,26 +13,27 @@ export async function writeExtendedValue(value: string): Promise<string> {
         if (isAttrChar(charAtStartOfRun)) {
             res.push(charAtStartOfRun);
             ++currentIndex;
-        }
-        else {
+        } else {
             // Try to handle runs of characters requiring encoding together as the IE11 fallback of string -> blob -> FileReader -> ArrayBuffer has a lot of overhead
             do {
                 ++currentIndex;
-            }
-            while (!isAttrChar(value[currentIndex]));
+            } while (!isAttrChar(value[currentIndex]));
 
-            res.push(await percentEncodeCharacters(value.substring(startOfRunIndex, currentIndex)));
+            res.push(
+                await percentEncodeCharacters(
+                    value.substring(startOfRunIndex, currentIndex)
+                )
+            );
         }
     }
 
-    return res.join('');
+    return res.join("");
 }
 
 function percentEncodeCharacters(str: string): Promise<string> {
-    if (typeof TextEncoder === 'undefined') {
+    if (typeof TextEncoder === "undefined") {
         return slowCompatiblePercentEncodeCharactersBlobConstructor(str);
-    }
-    else {
+    } else {
         return Promise.resolve(percentEncodeCharactersUsingTextEncoder(str));
     }
 }
@@ -39,13 +41,14 @@ function percentEncodeCharacters(str: string): Promise<string> {
 function hex(byte: number) {
     let hexEncoded = byte.toString(16).toUpperCase();
     while (hexEncoded.length < 2) {
-        hexEncoded = '0' + hexEncoded;
+        hexEncoded = "0" + hexEncoded;
     }
-    return '%' + hexEncoded;
+    return "%" + hexEncoded;
 }
 
-
-const bufferForPercentEncodeCharactersUsingTextEncoder = new Uint8Array(new ArrayBuffer(30));
+const bufferForPercentEncodeCharactersUsingTextEncoder = new Uint8Array(
+    new ArrayBuffer(30)
+);
 
 export function percentEncodeCharactersUsingTextEncoder(str: string): string {
     const encoder = new TextEncoder();
@@ -54,13 +57,18 @@ export function percentEncodeCharactersUsingTextEncoder(str: string): string {
 
     let offset = 0;
 
-    for (; ;) {
+    for (;;) {
         const substr = offset === 0 ? str : str.substring(offset);
 
-        const { read, written } = encoder.encodeInto(substr, bufferForPercentEncodeCharactersUsingTextEncoder);
+        const { read, written } = encoder.encodeInto(
+            substr,
+            bufferForPercentEncodeCharactersUsingTextEncoder
+        );
 
-        if (typeof read === 'undefined' || typeof written == 'undefined') {
-            throw new Error('Unexpected read == undefined or written == undefined.');
+        if (typeof read === "undefined" || typeof written == "undefined") {
+            throw new Error(
+                "Unexpected read == undefined or written == undefined."
+            );
         }
 
         for (let i = 0; i < written; ++i) {
@@ -76,15 +84,17 @@ export function percentEncodeCharactersUsingTextEncoder(str: string): string {
         }
     }
 
-    return res.join('');
+    return res.join("");
 }
 
 /**
-  * This is _probably_ horribly slow, but it will work anywhere that has Blob constructor and FileReader whish is 
-  * pretty much any browser.
-  */
-export async function slowCompatiblePercentEncodeCharactersBlobConstructor(str: string): Promise<string> {
-    const blob = new Blob([str]);
+ * This is _probably_ horribly slow, but it will work anywhere that has Blob constructor and FileReader whish is
+ * pretty much any browser.
+ */
+export async function slowCompatiblePercentEncodeCharactersBlobConstructor(
+    str: string
+): Promise<string> {
+    const blob = createBlob(str);
 
     const arrayBuffer = await blobToArrayBufferUsingFileReader(blob);
     const uint8ArrayIntoArrayBuffer = new Uint8Array(arrayBuffer);
@@ -97,5 +107,5 @@ export async function slowCompatiblePercentEncodeCharactersBlobConstructor(str: 
         res.push(hex(current));
     }
 
-    return res.join('');
+    return res.join("");
 }

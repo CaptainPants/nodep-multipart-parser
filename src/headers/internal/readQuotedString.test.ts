@@ -2,7 +2,7 @@ import { describe, expect, test } from "@jest/globals";
 
 import { HeaderParserState } from "./HeaderParserState.js";
 
-import { readQuotedString } from './readQuotedString.js';
+import { readQuotedString } from "./readQuotedString.js";
 
 describe("readQuoted", () => {
     test('"hello there \\x1 \\" "', () => {

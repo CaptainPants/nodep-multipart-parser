@@ -1,20 +1,18 @@
+import { expect, test, describe } from "@jest/globals";
 
+import { arrayRemoveWhere } from "./arrayRemoveWhere.js";
 
-import { expect, test, describe } from '@jest/globals';
-
-import { arrayRemoveWhere } from './arrayRemoveWhere.js';
-
-test('by value', () => {
+test("by value", () => {
     const list = [1, 2, 3, 4];
 
-    const res = arrayRemoveWhere(list, x => x > 2);
+    const res = arrayRemoveWhere(list, (x) => x > 2);
 
     expect(list).toBe(res);
 
     expect(list).toStrictEqual([1, 2]);
 });
 
-test('by index', () => {
+test("by index", () => {
     const list = [1, 2, 3, 4];
 
     const res = arrayRemoveWhere(list, (x, index) => index == 2);
@@ -24,7 +22,7 @@ test('by index', () => {
     expect(list).toStrictEqual([1, 2, 4]);
 });
 
-test('none', () => {
+test("none", () => {
     const list = [1, 2, 3, 4];
 
     const res = arrayRemoveWhere(list, (x, index) => false);
@@ -34,7 +32,7 @@ test('none', () => {
     expect(list).toStrictEqual([1, 2, 3, 4]);
 });
 
-test('all', () => {
+test("all", () => {
     const list = [1, 2, 3, 4];
 
     const res = arrayRemoveWhere(list, (x, index) => true);

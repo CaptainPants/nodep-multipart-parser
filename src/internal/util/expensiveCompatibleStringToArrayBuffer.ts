@@ -1,4 +1,5 @@
 import { blobToArrayBufferUsingFileReader } from "./blobToArrayBufferUsingFileReader.js";
+import { createBlob } from "./createBlob.js";
 
 /**
  * Use the Blob constructor to convert from string to binary (
@@ -11,5 +12,5 @@ export function expensiveCompatibleStringToArrayBuffer(
     value: string
 ): Promise<ArrayBuffer> {
     // MDN says the blob constructor uses utf-8
-    return blobToArrayBufferUsingFileReader(new Blob([value]));
+    return blobToArrayBufferUsingFileReader(createBlob(value));
 }
