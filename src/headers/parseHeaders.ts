@@ -3,6 +3,7 @@ import { HeaderParserState } from "./internal/HeaderParserState.js";
 import { readFieldContent } from "./internal/readFieldContent.js";
 import { readOptionalWhitespace } from "./internal/readOptionalWhitespace.js";
 import { readToken } from "./internal/readToken.js";
+import { Header } from "./Header.js";
 
 export interface ParseHeadersParameters {
     headerString: string;
@@ -10,11 +11,6 @@ export interface ParseHeadersParameters {
 
 export interface ParseHeadersResult {
     headers: Header[];
-}
-
-export interface Header {
-    name: string;
-    value: string;
 }
 
 /**
@@ -84,7 +80,7 @@ export function parseHeaders(
         //    "Each header field consists of a case-insensitive field name followed
         //     by a colon (":"), optional leading whitespace, the field value, and
         //     optional trailing whitespace."
-        headers.push({ name: headerName.toLowerCase(), value: value });
+        headers.push(new Header(headerName, value));
     }
 
     return {

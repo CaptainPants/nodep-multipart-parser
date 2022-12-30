@@ -7,6 +7,8 @@
 // - https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.6 and https://datatracker.ietf.org/doc/html/rfc8187#section-3.1
 
 export * from "./types.js";
+export * from "./Parameter.js";
+export * from "./Header.js";
 export * from "./parseContentDisposition.js";
 export * from "./parseContentType.js";
 export * from "./parseHeaders.js";

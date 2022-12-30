@@ -1,8 +1,13 @@
-import { HttpContent } from "../content/HttpContent.js";
+import { HttpContent, isMultipartContent } from "../content/index.js";
 import { HttpError } from "./HttpError.js";
 import { HttpRequest, HttpResponse, HttpResponseDataType } from "./types.js";
-import { SingularHttpContent } from "../content/index.js";
 import { isArrayBuffer } from "../internal/util/isArrayBuffer.js";
+import { generateBoundaryString } from "../internal/util/generateBoundaryString.js";
+import { serializeContentType } from "../headers/serializeContentType.js";
+import { parseContentType } from "../headers/parseContentType.js";
+import { ContentType } from "../headers/types.js";
+import { arrayFind } from "../internal/util/arrayFind.js";
+import { Parameter } from "../headers/Parameter.js";
 
 /**
  * Nice promise-based interface to XMLHttpRequest. Tries to hide all the weirdness.
@@ -12,7 +17,7 @@ export class HttpClient {
         // Refer to standard: https://xhr.spec.whatwg.org/
         const xhr = new XMLHttpRequest();
 
-        if (typeof request.timeout !== 'undefined') {
+        if (typeof request.timeout !== "undefined") {
             xhr.timeout = request.timeout;
         }
 
@@ -38,18 +43,39 @@ export class HttpClient {
 
         const responseType = request.responseType ?? "arraybuffer";
 
-        const data = await this._prepareData(request.content, responseType);
+        const { data, replacementContentType } = await this._prepareData(
+            request.content,
+            responseType
+        );
+
+        const replacementContentTypeString = replacementContentType
+            ? await serializeContentType(replacementContentType)
+            : undefined;
 
         await this._wrapInPromise(xhr, () => {
             xhr.open(request.method, request.url);
 
             if (request.content) {
                 for (const header of request.content.headers) {
+                    // Skip content-type (if a replacement is provided) as it has special handling to cater to multi-part content
+                    if (
+                        replacementContentTypeString &&
+                        header.name == "content-type"
+                    ) {
+                        continue;
+                    }
+
                     xhr.setRequestHeader(header.name, header.value);
+                }
+
+                if (replacementContentTypeString) {
+                    xhr.setRequestHeader(
+                        "Content-Type",
+                        replacementContentTypeString
+                    );
                 }
             }
 
-            // TODO add content type header if not in headers list
             xhr.responseType = responseType;
 
             xhr.send(data);
@@ -105,30 +131,102 @@ export class HttpClient {
                 reject(new DOMException("Aborted", "AbortError"));
             });
 
+            // Do not await this as it will deadlock
             openAndSend();
         });
     }
 
     async _prepareData(
-        content: SingularHttpContent | undefined,
+        content: HttpContent | undefined,
         type: HttpResponseDataType
-    ): Promise<Blob | ArrayBuffer | Blob | string | undefined> {
-        if (!content || !content.data || content.data.isEmpty()) {
-            return undefined;
+    ): Promise<{
+        data: Blob | ArrayBuffer | Blob | string | undefined;
+        replacementContentType?: ContentType;
+    }> {
+        if (!content) {
+            return { data: undefined };
         }
 
-        // TODO: Multipart and optimisation to use FormData if no additional headers provided
-        if (type === "text") {
-            return await content.data.string();
-        } else {
-            if (
-                content.data.source instanceof Blob ||
-                isArrayBuffer(content.data.source)
-            ) {
-                return content.data.source;
-            } else {
-                return (await content.data.arrayBuffer()).value;
+        if (isMultipartContent(content)) {
+            const contentTypeString = arrayFind(
+                content.headers,
+                (x) => x.lowerCaseName == "content-type"
+            )?.value;
+
+            let foundContentType: ContentType | undefined;
+            if (contentTypeString) {
+                foundContentType = parseContentType(contentTypeString);
             }
+
+            // Ensure that we have a boundary string
+            const { replacementContentType, boundary } =
+                prepareContentTypeForMultipart(foundContentType);
+
+            return {
+                data: await content.toArrayBuffer(boundary),
+                replacementContentType: replacementContentType,
+            };
+        } else {
+            let data: Blob | ArrayBuffer | Blob | string | undefined;
+
+            if (!content.data || content.data.isEmpty()) {
+                data = undefined;
+            }
+
+            if (type === "text") {
+                data = await content.data.string();
+            } else {
+                if (
+                    content.data.source instanceof Blob ||
+                    isArrayBuffer(content.data.source)
+                ) {
+                    data = content.data.source;
+                } else {
+                    data = (await content.data.arrayBuffer()).value;
+                }
+            }
+
+            return { data };
         }
+    }
+}
+
+function prepareContentTypeForMultipart(originalContentType?: ContentType): {
+    replacementContentType?: ContentType;
+    boundary: string;
+} {
+    if (originalContentType) {
+        const foundBoundary = arrayFind(
+            originalContentType.parameters,
+            (x) => x.lowerCaseName == "boundary"
+        )?.value;
+
+        if (foundBoundary) {
+            return {
+                boundary: foundBoundary,
+            };
+        }
+
+        const boundary = generateBoundaryString();
+
+        // Copy existing content-type and add the new boundary to it
+        const replacementContentType = {
+            ...originalContentType,
+            parameters: originalContentType.parameters.concat(
+                new Parameter("boundary", boundary)
+            ),
+        };
+
+        return { replacementContentType, boundary };
+    } else {
+        const boundary = generateBoundaryString();
+
+        const replacementContentType = {
+            type: "multipart",
+            subtype: "form-data",
+            parameters: [new Parameter("boundary", boundary)],
+        };
+
+        return { replacementContentType, boundary };
     }
 }

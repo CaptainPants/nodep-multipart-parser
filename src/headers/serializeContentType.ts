@@ -1,7 +1,7 @@
 import { writeParameters } from "./internal/parameters/writeParameters.js";
 import { ContentType } from "./types.js";
 
-export async function serializeContentDisposition(
+export async function serializeContentType(
     contentType: ContentType
 ): Promise<string> {
     const res: string[] = [`${contentType.type}/${contentType.subtype}`];

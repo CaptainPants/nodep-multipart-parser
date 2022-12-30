@@ -3,7 +3,7 @@ import { ParseError } from "../../errors/index.js";
 export const chars = {
     cr: 13,
     lf: 10,
-    hyphen: '-'.charCodeAt(0)
+    hyphen: "-".charCodeAt(0),
 } as const;
 
 export function isDoubleCRLF(data: DataView, offset: number) {
@@ -11,10 +11,12 @@ export function isDoubleCRLF(data: DataView, offset: number) {
         return false;
     }
 
-    return data.getUint8(offset) == chars.cr &&
+    return (
+        data.getUint8(offset) == chars.cr &&
         data.getUint8(offset + 1) == chars.lf &&
         data.getUint8(offset + 2) == chars.cr &&
-        data.getUint8(offset + 3) == chars.lf;
+        data.getUint8(offset + 3) == chars.lf
+    );
 }
 
 export function isCRLF(data: DataView, offset: number) {
@@ -37,16 +39,17 @@ export function isDoubleHyphen(data: DataView, offset: number) {
     return first == chars.hyphen && second == chars.hyphen;
 }
 
-
 /**
-  * ASCII/ISO-8859-1 (should be a subset)
-  */
+ * ASCII/ISO-8859-1 (should be a subset)
+ */
 export function getCharCodesForString(str: string) {
     const res: number[] = [];
     for (let i = 0; i < str.length; ++i) {
         const code = str.charCodeAt(i);
         if (code > 255) {
-            throw new ParseError('Boundary characters must be ISO-8859-1 values from 0-255.');
+            throw new ParseError(
+                "Boundary characters must be ISO-8859-1 values from 0-255."
+            );
         }
         res.push(code);
     }

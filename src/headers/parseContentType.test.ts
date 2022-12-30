@@ -1,5 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import { ParseError } from "../errors/index.js";
+import { Parameter } from "./Parameter.js";
 
 import { parseContentType } from "./parseContentType";
 
@@ -20,7 +21,7 @@ describe("parseContentType", () => {
 
         expect(res.type).toEqual("text");
         expect(res.subtype).toEqual("json");
-        expect(res.parameters).toEqual([{ name: "encoding", value: "utf-8" }]);
+        expect(res.parameters).toEqual([new Parameter("encoding", "utf-8")]);
     });
 
     test('text/json; charset=utf-8 ; boundary="ham sandwich \\"1\\" 1234 "', () => {
@@ -31,8 +32,8 @@ describe("parseContentType", () => {
         expect(res.type).toEqual("text");
         expect(res.subtype).toEqual("json");
         expect(res.parameters).toEqual([
-            { name: "charset", value: "utf-8" },
-            { name: "boundary", value: 'ham sandwich "1" 1234 ' },
+            new Parameter("charset", "utf-8"),
+            new Parameter("boundary", 'ham sandwich "1" 1234 '),
         ]);
     });
 
@@ -41,13 +42,13 @@ describe("parseContentType", () => {
 
         expect(res.type).toEqual("text");
         expect(res.subtype).toEqual("json");
-        expect(res.parameters).toEqual([{ name: "charset", value: "utf-8" }]);
+        expect(res.parameters).toEqual([new Parameter("charset", "utf-8")]);
     });
     test('text/json; charset="UTF-8"', () => {
         const res = parseContentType('text/json; charset="UTF-8"');
 
         expect(res.type).toEqual("text");
         expect(res.subtype).toEqual("json");
-        expect(res.parameters).toEqual([{ name: "charset", value: "UTF-8" }]);
+        expect(res.parameters).toEqual([new Parameter("charset", "UTF-8")]);
     });
 });

@@ -3,26 +3,25 @@ import { HeaderParserState } from "./HeaderParserState.js";
 import { isFieldVCHAR, isSPOrVTAB } from "./is.js";
 
 export function readFieldContent(state: HeaderParserState): string {
-
     const startIndex = state.index();
 
     const first = state.current();
 
     // Must start with a field-char
-    if (typeof first !== 'undefined' && !isFieldVCHAR(first)) {
+    if (typeof first !== "undefined" && !isFieldVCHAR(first)) {
         throw new ParseError(`Expected a field-vchar, found instead ${first}.`);
     }
 
     const parts: string[] = [];
 
     // Characters except first and last are field-char | SP | VTAB
-    for (; ;) {
+    for (;;) {
         const current = state.current();
 
-        if (typeof current === 'undefined') { // EOF
+        if (typeof current === "undefined") {
+            // EOF
             break;
-        }
-        else if (!isFieldVCHAR(current) && !isSPOrVTAB(current)) {
+        } else if (!isFieldVCHAR(current) && !isSPOrVTAB(current)) {
             break;
         }
 
@@ -30,7 +29,7 @@ export function readFieldContent(state: HeaderParserState): string {
         state.moveNext();
     }
 
-    let asString = parts.join('');
+    let asString = parts.join("");
 
     // Roll back trailing whitespaces (SP | VTAB)
     // TODO: this is not necessarily super fast

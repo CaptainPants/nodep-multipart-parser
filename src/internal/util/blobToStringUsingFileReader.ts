@@ -10,7 +10,7 @@
  */
 export function blobToStringUsingFileReader(
     blob: Blob,
-    sourceEncoding: string | undefined
+    sourceEncoding?: string | undefined
 ): Promise<string> {
     return new Promise<string>((resolve, reject) => {
         const reader = new FileReader();

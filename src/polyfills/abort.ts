@@ -1,11 +1,13 @@
-import { arrayFind } from "./internal/util/arrayFind";
-import { arrayRemoveWhere } from "./internal/util/arrayRemoveWhere";
+import { arrayFind } from "../internal/util/arrayFind";
+import { arrayRemoveWhere } from "../internal/util/arrayRemoveWhere";
 
-function resolveAddEventListenerOptions(options?: boolean | AddEventListenerOptions): Readonly<AddEventListenerOptions> {
-    if (typeof options !== 'undefined') {
-        if (typeof options === 'boolean') {
+function resolveAddEventListenerOptions(
+    options?: boolean | AddEventListenerOptions
+): Readonly<AddEventListenerOptions> {
+    if (typeof options !== "undefined") {
+        if (typeof options === "boolean") {
             return {
-                capture: options
+                capture: options,
             };
         } else {
             return options;
@@ -15,11 +17,13 @@ function resolveAddEventListenerOptions(options?: boolean | AddEventListenerOpti
     return {};
 }
 
-function resolveEventListenerOptions(options?: boolean | EventListenerOptions): Readonly<EventListenerOptions> {
-    if (typeof options !== 'undefined') {
-        if (typeof options === 'boolean') {
+function resolveEventListenerOptions(
+    options?: boolean | EventListenerOptions
+): Readonly<EventListenerOptions> {
+    if (typeof options !== "undefined") {
+        if (typeof options === "boolean") {
             return {
-                capture: options
+                capture: options,
             };
         } else {
             return options;
@@ -40,9 +44,9 @@ interface Handlers {
 }
 
 // IE doesn't support AbortController at all
-// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener there is a bunch of 
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener there is a bunch of
 // options that we are supposed to consider
-export class EventTargetPolyfill implements EventTarget {
+export class EventTargetPolyfill {
     private __EventTarget_private_byType: Map<string, Handlers> = new Map();
 
     public addEventListener(
@@ -50,7 +54,6 @@ export class EventTargetPolyfill implements EventTarget {
         callback: EventListenerOrEventListenerObject | null,
         options?: boolean | AddEventListenerOptions
     ): void {
-
         if (callback === null) {
             return; // Not sure why this is allowed
         }
@@ -61,26 +64,27 @@ export class EventTargetPolyfill implements EventTarget {
         if (!handlers) {
             handlers = {
                 capturing: [],
-                bubbling: []
+                bubbling: [],
             };
             this.__EventTarget_private_byType.set(type, handlers);
         }
 
-        const list = resolvedOptions.capture ? handlers.capturing : handlers.bubbling;
+        const list = resolvedOptions.capture
+            ? handlers.capturing
+            : handlers.bubbling;
 
-        const foundExisting = arrayFind(list, x => x.callback === callback);
+        const foundExisting = arrayFind(list, (x) => x.callback === callback);
         if (foundExisting) {
             foundExisting.options = resolvedOptions;
-        }
-        else {
+        } else {
             list.push({
                 callback: callback,
-                options: resolvedOptions
+                options: resolvedOptions,
             });
         }
 
         if (resolvedOptions.signal) {
-            resolvedOptions.signal.addEventListener('abort', () => {
+            resolvedOptions.signal.addEventListener("abort", () => {
                 this.removeEventListener(type, callback, options);
             });
         }
@@ -91,7 +95,6 @@ export class EventTargetPolyfill implements EventTarget {
         callback: EventListenerOrEventListenerObject | null,
         options?: boolean | EventListenerOptions
     ): void {
-
         if (callback === null) {
             return;
         }
@@ -103,9 +106,11 @@ export class EventTargetPolyfill implements EventTarget {
 
         const resolvedOptions = resolveEventListenerOptions(options);
 
-        const list = resolvedOptions.capture ? handlers.capturing : handlers.bubbling;
+        const list = resolvedOptions.capture
+            ? handlers.capturing
+            : handlers.bubbling;
 
-        arrayRemoveWhere(list, x => x.callback === callback);
+        arrayRemoveWhere(list, (x) => x.callback === callback);
     }
 
     public dispatchEvent(event: Event): boolean {
@@ -115,29 +120,31 @@ export class EventTargetPolyfill implements EventTarget {
             return false;
         }
 
-        handlers.capturing.forEach(item => {
-            if (typeof item.callback === 'function') {
+        handlers.capturing.forEach((item) => {
+            if (typeof item.callback === "function") {
                 item.callback(event);
-            }
-            else {
+            } else {
                 item.callback.handleEvent(event);
             }
 
             if (item.options.once) {
-                this.removeEventListener(event.type, item.callback, { capture: true });
+                this.removeEventListener(event.type, item.callback, {
+                    capture: true,
+                });
             }
         });
 
-        handlers.bubbling.forEach(item => {
-            if (typeof item.callback === 'function') {
+        handlers.bubbling.forEach((item) => {
+            if (typeof item.callback === "function") {
                 item.callback(event);
-            }
-            else {
+            } else {
                 item.callback.handleEvent(event);
             }
 
             if (item.options.once) {
-                this.removeEventListener(event.type, item.callback, { capture: false });
+                this.removeEventListener(event.type, item.callback, {
+                    capture: false,
+                });
             }
         });
 
@@ -167,9 +174,9 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
     __AbortSignalPolyfill_private_abortReason: any = undefined;
 
     /**
-      * This should be private but there is no other way in userland to trigger the signal, so
-      * has to be an internal public api.
-      */
+     * This should be private but there is no other way in userland to trigger the signal, so
+     * has to be an internal public api.
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- The standard specifies any
     public _abort(reason: any) {
         if (this.__AbortSignalPolyfill_private_aborted) return;
@@ -177,11 +184,11 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
         this.__AbortSignalPolyfill_private_aborted = true;
 
         if (reason === undefined) {
-            reason = new DOMException('Aborted', 'AbortError');
+            reason = new DOMException("Aborted", "AbortError");
         }
         this.__AbortSignalPolyfill_private_abortReason = reason;
 
-        const evt = new Event('aborted');
+        const evt = new Event("aborted");
         this.dispatchEvent(evt);
         if (this.onabort) {
             this.onabort(evt);
@@ -196,8 +203,12 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
 
     public onabort: ((evt: Event) => void) | null = null;
 
-    public get aborted() { return this.__AbortSignalPolyfill_private_aborted; }
-    public get reason() { return this.__AbortSignalPolyfill_private_abortReason; }
+    public get aborted() {
+        return this.__AbortSignalPolyfill_private_aborted;
+    }
+    public get reason() {
+        return this.__AbortSignalPolyfill_private_abortReason;
+    }
 
     public static abort(): AbortSignal {
         const res = new AbortControllerPolyfill();
@@ -211,23 +222,9 @@ export class AbortSignalPolyfill extends EventTargetPolyfill {
         // not sure if that is poly-fillable
         const res = new AbortControllerPolyfill();
         setTimeout(() => {
-            const ex = new DOMException('Timeout', 'TimeoutError');
+            const ex = new DOMException("Timeout", "TimeoutError");
             res.abort(ex);
         }, timeout);
         return res.signal;
     }
 }
-
-export const polyfills = {
-    AbortController() {
-        if (typeof AbortController === 'undefined') {
-            window.AbortController = AbortControllerPolyfill;
-            window.AbortSignal = AbortSignalPolyfill;
-        }
-    },
-    EventTarget() {
-        if (typeof EventTarget === 'undefined') {
-            window.EventTarget = EventTargetPolyfill;
-        }
-    }
-};

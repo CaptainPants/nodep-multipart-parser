@@ -1,7 +1,9 @@
+import { startsWith } from "../internal/util/startsWith.js";
+
 export function isTextMediaType(mediaType: string | undefined) {
     if (mediaType === undefined) {
         return false;
-    } else if (mediaType.startsWith("text/")) {
+    } else if (startsWith(mediaType, "text/")) {
         return true;
     } else if (mediaType.match(/^application\/(?:[^+]+\+)?(json|xml)/)) {
         return true;
@@ -15,5 +17,5 @@ export function isMultipartMediaType(mediaType: string | undefined) {
         return false;
     }
 
-    return mediaType.startsWith("multipart/");
+    return startsWith(mediaType, "multipart/");
 }
