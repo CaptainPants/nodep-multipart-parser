@@ -144,17 +144,6 @@ export class Data {
                 ),
                 encoding: "utf-8",
             });
-        } else if (this.source instanceof DataView) {
-            // Using a DataView directly was failing in jests node environment (zero length blob) so we were working around it by using a TypedArray instead to pass the test.
-            // const asTypedArray = new Uint8Array(this.source.buffer, this.source.byteOffset, this.source.byteLength);
-            // return Promise.resolve({ value: new Blob([asTypedArray]), encoding: 'utf-8' });
-            return Promise.resolve({
-                value: createBlob(
-                    this.source,
-                    this.sourceMediaType ?? mediaType
-                ),
-                encoding: this.sourceEncoding,
-            });
         } else {
             // Binary to binary retains source encoding
             return Promise.resolve({
