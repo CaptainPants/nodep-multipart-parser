@@ -8,7 +8,7 @@
 const boundaryCharacters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; //'()+_,-./:=?";
 
-export function generateBoundaryString(prefix = "BOUNDARY-", length = 69) {
+export function generateBoundaryString(prefix = "BOUNDARY-", length = 70) {
     let str = prefix;
 
     while (str.length < length) {

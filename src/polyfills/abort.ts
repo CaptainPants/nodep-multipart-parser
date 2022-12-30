@@ -46,7 +46,7 @@ interface Handlers {
 // IE doesn't support AbortController at all
 // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener there is a bunch of
 // options that we are supposed to consider
-export class EventTargetPolyfill implements EventTarget {
+export class EventTargetPolyfill {
     private __EventTarget_private_byType: Map<string, Handlers> = new Map();
 
     public addEventListener(
