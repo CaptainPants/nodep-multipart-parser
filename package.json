@@ -31,7 +31,7 @@
         "compile:umd": "tsc --project ./src/tsconfig.json --outDir ./temp/umd --target es5",
         "lint": "npx eslint --config src/.eslintrc.json --ignore-path src/.eslintignore src/**/*.{ts,js}",
         "lint-fix": "npx eslint --config src/.eslintrc.json --ignore-path src/.eslintignore src/**/*.{ts,js} --fix",
-        "test": "jest --config ./src/jest.config.js",
+        "test": "jest --config ./src/jest.config.js --silent=false",
         "verify": "yarn run lint && yarn run test",
         "test-publish": "npm publish --dry-run",
         "pretty": "npx prettier src/**/*.ts --write"

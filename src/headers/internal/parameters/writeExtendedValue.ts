@@ -1,4 +1,5 @@
 import { blobToArrayBufferUsingFileReader } from "../../../internal/util/blobToArrayBufferUsingFileReader.js";
+import { createBlob } from "../../../internal/util/createBlob.js";
 import { isAttrChar } from "../is.js";
 
 export async function writeExtendedValue(value: string): Promise<string> {
@@ -93,7 +94,7 @@ export function percentEncodeCharactersUsingTextEncoder(str: string): string {
 export async function slowCompatiblePercentEncodeCharactersBlobConstructor(
     str: string
 ): Promise<string> {
-    const blob = new Blob([str]);
+    const blob = createBlob(str);
 
     const arrayBuffer = await blobToArrayBufferUsingFileReader(blob);
     const uint8ArrayIntoArrayBuffer = new Uint8Array(arrayBuffer);
