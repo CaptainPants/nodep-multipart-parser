@@ -58,11 +58,12 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
 
             function runTest() {
               document.getElementById('log').innerHTML = '';
+              
+              var inputString = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
+              var inputArray = generateArrayBuffer(1024);
 
-              Promise.resolve(void 0)
+              Promise.resolve()
                 .then(function() {
-                  var inputString = 'The quick brown fox jumped over the lazy dog. Σὲ γνωρίζω ἀπὸ τὴν κόψη';
-                  var inputArray = generateArrayBuffer(1024);
                   var builder = new zerodepsMultipartParser.MultipartBuilder();
                   builder.add({ 
                     data: inputString,
