@@ -17,12 +17,14 @@ export function createBlob(
     // so using its special 'MSBlobBuilder'
     if (
         source instanceof DataView &&
-        typeof window.MSBlobBuilder !== 'undefined'
+        typeof window.MSBlobBuilder !== "undefined"
     ) {
         const builder = new window.MSBlobBuilder();
         // Make a Uint8Array around the dataview bytes, as otherwise you end up with [Object object]
         // in the blob
-        builder.append(new Uint8Array(source.buffer, source.byteOffset, source.byteLength));
+        builder.append(
+            new Uint8Array(source.buffer, source.byteOffset, source.byteLength)
+        );
         return builder.getBlob(type);
     }
 
