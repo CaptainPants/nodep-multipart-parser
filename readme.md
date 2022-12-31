@@ -65,5 +65,5 @@ We bundle as an esm module with typescript bindings, and also a umd module.
 You can find us on npm: [@captainpants/zerodeps-multipart-parser](https://www.npmjs.com/package/@captainpants/zerodeps-multipart-parser)
 
 To use our umd module you can access it from unpkg:
-- https://unpkg.com/@captainpants/zerodeps-multipart-parser@latest/dist/umd/zerodeps-multipart-parser.js
-- And minified https://unpkg.com/@captainpants/zerodeps-multipart-parser@latest/dist/umd/zerodeps-multipart-parser.min.js
+- https://unpkg.com/@captainpants/zerodeps-multipart-parser@latest/dist/umd.js
+- And minified https://unpkg.com/@captainpants/zerodeps-multipart-parser@latest/dist/umd.min.js
