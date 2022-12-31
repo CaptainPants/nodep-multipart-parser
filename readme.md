@@ -14,8 +14,9 @@ As a natural progression from this, this library also provides a number of tools
 * Convenient conversion between **string**, **Blob**, **ArrayBuffer**, and **DataView** via the [Data](doc/data.md) class. This class is similar to the modern **Response** class, but supports older browsers.
 * Some [header utilities](doc/headers.md) for dealing with raw headers, content-type and content-disposition headers (including extended parameters).
 * A light-weight [HttpClient](doc/httpclient.md) that brings a promise-based interface and more comprehensive interfaces to HTTP content over the top of XMLHttpRequest.
-* [Polyfill](doc/polyfills.md) for Promises - you will need a polyfill for Promise in order to use the library with IE11, you can use the included polyfill or another.
-* Optional [polyfill](doc/polyfills.md) for AbortController to support aborting Http requests for HttpClient. _We recommend considering using core-js if appropriate to your use case, as these polyfills are only intended to fill functionality required for this library._
+* [Polyfills](doc/polyfills.md) - *You may wish to use the polyfills included, but in larger projects we recommend using core-js or other more fully featured (and tested) polyfill packages.*
+  * Promises - Required to use the library with IE11
+  * AbortController - (Optional) to support aborting Http requests for HttpClient.
 
 
 
