@@ -14,17 +14,18 @@ As a natural progression from this, this library also provides a number of tools
 * Convenient conversion between **string**, **Blob**, **ArrayBuffer**, and **DataView** via the [Data](doc/data.md) class. This class is similar to the modern **Response** class, but supports older browsers.
 * Some [header utilities](doc/headers.md) for dealing with raw headers, content-type and content-disposition headers (including extended parameters).
 * A light-weight [HttpClient](doc/httpclient.md) that brings a promise-based interface and more comprehensive interfaces to HTTP content over the top of XMLHttpRequest.
-* [Polyfills](doc/polyfills.md) - *You may wish to use the polyfills included, but in larger projects we recommend using core-js or other more fully featured (and tested) polyfill packages.*
-  * Promises - Required to use the library with IE11
-  * AbortController - (Optional) to support aborting Http requests for HttpClient.
 
+Some modern browser functionality has been [polyfilled](doc/polyfills.md) to support IE11. You may opt to use core-js or similar more fully feature (and tested) polyfill packages instead of the ones bundled.
+
+* Promises - Required to use the library with IE11
+* AbortController - (Optional) Required to support aborting Http requests for HttpClient in IE11.
 
 
 We hope to support as wide array of old browsers as possible, but in reality as a small open source project our testing resources are limited. As such our main compatibility goal is continued support for IE11 which will hopefully bring along with it other legacy browser versions. We will accept tickets for old browsers where possible and see if there is a practical was to implement support.
 
 Where possible we will use newer browser features to provider better performance.
 
-This is a small example showing these in action:
+This is a small example showing the library in action:
 
 ```typescript
 import { HttpClient, isMultipartContent, MultipartHttpResponse } from '@captainpants/zerodeps-multipart-parser';
