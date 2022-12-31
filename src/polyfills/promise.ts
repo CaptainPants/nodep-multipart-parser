@@ -33,11 +33,8 @@ export class PromisePolyfill<T> {
             | ((value: T) => TResult1 | PromiseLike<TResult1>)
             | null
             | undefined,
-        onrejected?:
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            | ((reason: any) => TResult2 | PromiseLike<TResult2>)
-            | null
-            | undefined
+        onrejected?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined
     ): PromisePolyfill<TResult1 | TResult2> {
         switch (this._state.label) {
             case "pending":

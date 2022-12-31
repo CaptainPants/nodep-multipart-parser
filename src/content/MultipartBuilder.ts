@@ -4,6 +4,7 @@ import {
     ContentType,
     Header,
     Parameter,
+    sanitizeNonExtendedParameterValue,
     serializeContentDisposition,
     serializeContentType,
 } from "../headers/index.js";
@@ -93,8 +94,17 @@ export class MultipartBuilder {
                 }
                 if (filename) {
                     contentDisposition.parameters.push(
-                        new Parameter("filename", filename)
+                        new Parameter("filename*", filename)
                     );
+
+                    const nonExtendedFilename =
+                        sanitizeNonExtendedParameterValue(filename);
+
+                    if (nonExtendedFilename.length > 0) {
+                        contentDisposition.parameters.push(
+                            new Parameter("filename", filename)
+                        );
+                    }
                 }
             }
 

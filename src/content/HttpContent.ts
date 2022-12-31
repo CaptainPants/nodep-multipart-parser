@@ -39,7 +39,8 @@ export namespace HttpContent {
         headers: Header[],
         content: DataSource
     ): Promise<HttpContent> {
-        const [charset, mediaType, boundary] = getCharsetAndMediaType(headers);
+        const { charset, mediaType, boundary } =
+            getCharsetAndMediaType(headers);
 
         const data = new Data(content, charset, mediaType);
 
@@ -58,9 +59,8 @@ export namespace HttpContent {
             return new MultipartHttpContent(
                 headers,
                 parsed.parts.map((part) => {
-                    const [partCharset, partMediaType] = getCharsetAndMediaType(
-                        part.headers
-                    );
+                    const { charset: partCharset, mediaType: partMediaType } =
+                        getCharsetAndMediaType(part.headers);
 
                     return new SingularHttpContent(
                         part.headers,

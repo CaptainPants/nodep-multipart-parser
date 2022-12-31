@@ -42,7 +42,7 @@ export interface HttpRequest {
      */
     isValidStatus?: (statusCode: number) => boolean;
 
-    optimisations?: {
+    optimizations?: {
         formData: boolean;
     };
 }
