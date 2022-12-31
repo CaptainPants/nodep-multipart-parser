@@ -1,13 +1,13 @@
 import { Header, parseContentType } from "../../headers/index.js";
 import { arrayFind } from "../../internal/util/arrayFind.js";
 
-export function getCharsetAndMediaType(
-    headers: Header[]
-): [
-    charset: string | undefined,
-    mediaType: string | undefined,
-    boundary: string | undefined
-] {
+export function getCharsetAndMediaType(headers: Header[]): {
+    charset?: string;
+    mediaType?: string;
+    type?: string;
+    subtype?: string;
+    boundary?: string;
+} {
     const contentTypeRaw = arrayFind(
         headers,
         (x) => x.name.toLowerCase() == "content-type"
@@ -18,7 +18,7 @@ export function getCharsetAndMediaType(
         : undefined;
 
     if (!contentType) {
-        return [undefined, undefined, undefined];
+        return {};
     }
 
     const lookup: Record<string, string> = {};
@@ -27,5 +27,11 @@ export function getCharsetAndMediaType(
     const charset = lookup["charset"];
     const boundary = lookup["boundary"];
 
-    return [charset, `${contentType.type}/${contentType.subtype}`, boundary];
+    return {
+        charset,
+        mediaType: `${contentType.type}/${contentType.subtype}`,
+        type: contentType.type,
+        subtype: contentType.subtype,
+        boundary,
+    };
 }

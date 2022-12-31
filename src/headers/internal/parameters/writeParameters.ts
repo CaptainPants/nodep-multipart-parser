@@ -24,6 +24,10 @@ export async function writeOneParameter(param: Parameter): Promise<string> {
     res.push("=");
 
     if (isExtended) {
+        // note that param.charset is ignored as only utf-8 is supported
+        if (param.charset !== undefined && param.charset !== "utf-8") {
+            throw new Error(`Charset ${param.charset} not supported.`);
+        }
         res.push("utf-8'");
         if (param.language) res.push(param.language);
         res.push("'");

@@ -14,6 +14,10 @@ import { Parameter } from "../headers/Parameter.js";
  */
 export class HttpClient {
     async request(request: HttpRequest): Promise<HttpResponse> {
+        const { formData: formDataOptimization } = request.optimizations ?? {
+            formData: false,
+        };
+
         // Refer to standard: https://xhr.spec.whatwg.org/
         const xhr = new XMLHttpRequest();
 
@@ -45,7 +49,8 @@ export class HttpClient {
 
         const { data, replacementContentType } = await this._prepareData(
             request.content,
-            responseType
+            responseType,
+            formDataOptimization
         );
 
         const replacementContentTypeString = replacementContentType
@@ -138,9 +143,10 @@ export class HttpClient {
 
     async _prepareData(
         content: HttpContent | undefined,
-        type: HttpResponseDataType
+        type: HttpResponseDataType,
+        formDataOptimization: boolean
     ): Promise<{
-        data: Blob | ArrayBuffer | Blob | string | undefined;
+        data: FormData | Blob | ArrayBuffer | string | undefined;
         replacementContentType?: ContentType;
     }> {
         if (!content) {
@@ -162,8 +168,16 @@ export class HttpClient {
             const { replacementContentType, boundary } =
                 prepareContentTypeForMultipart(foundContentType);
 
+            let data: ArrayBuffer | FormData;
+
+            if (formDataOptimization) {
+                data = await content.toFormData();
+            } else {
+                data = await content.toArrayBuffer(boundary);
+            }
+
             return {
-                data: await content.toArrayBuffer(boundary),
+                data: data,
                 replacementContentType: replacementContentType,
             };
         } else {

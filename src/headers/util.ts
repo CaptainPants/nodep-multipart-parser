@@ -1,4 +1,5 @@
 import { startsWith } from "../internal/util/startsWith.js";
+import { isAttrChar } from "./internal/is.js";
 
 export function isTextMediaType(mediaType: string | undefined) {
     if (mediaType === undefined) {
@@ -18,4 +19,24 @@ export function isMultipartMediaType(mediaType: string | undefined) {
     }
 
     return startsWith(mediaType, "multipart/");
+}
+
+export function isValidParameterValue(value: string) {
+    for (let i = 0; i < value.length; ++i) {
+        if (!isAttrChar(value[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+export function sanitizeNonExtendedParameterValue(value: string) {
+    const res: string[] = [];
+    for (let i = 0; i < value.length; ++i) {
+        const current = value[i];
+        if (isAttrChar(current)) {
+            res.push(current);
+        }
+    }
+    return res.join("");
 }

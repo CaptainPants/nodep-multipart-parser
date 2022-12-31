@@ -1,3 +1,8 @@
+import { Parameter } from "../headers/Parameter.js";
+import { parseContentType } from "../headers/parseContentType.js";
+import { serializeContentType } from "../headers/serializeContentType.js";
+import { ContentType } from "../headers/types.js";
+import { arrayFind } from "../internal/util/arrayFind.js";
 import { blobToArrayBufferUsingFileReader } from "../internal/util/blobToArrayBufferUsingFileReader.js";
 import { blobToStringUsingFileReader } from "../internal/util/blobToStringUsingFileReader.js";
 import { createBlob } from "../internal/util/createBlob.js";
@@ -44,6 +49,44 @@ export class Data {
      */
     public static empty(): Data {
         return new Data(null);
+    }
+
+    private async _getBlobType(
+        parameterType: string | undefined,
+        parameterCharset?: string | undefined,
+        defaultType?: string | undefined,
+        defaultSubtype?: string | undefined
+    ): Promise<string | undefined> {
+        const contentTypeString = this.sourceMediaType ?? parameterType;
+
+        let contentType: ContentType;
+
+        if (contentTypeString) {
+            contentType = parseContentType(contentTypeString);
+        } else {
+            contentType = {
+                type: defaultType ?? "application",
+                subtype: defaultSubtype ?? "x-unknown",
+                parameters: [],
+            };
+        }
+
+        const charset = parameterCharset ?? this.sourceEncoding;
+
+        if (charset) {
+            let parameter = arrayFind(
+                contentType.parameters,
+                (item) => item.name === "charset"
+            );
+            if (parameter) {
+                parameter.value = charset;
+            } else {
+                parameter = new Parameter("charset", charset);
+                contentType.parameters.push(parameter);
+            }
+        }
+
+        return await serializeContentType(contentType);
     }
 
     public isEmpty() {
@@ -117,39 +160,48 @@ export class Data {
 
     /**
      * Note that if the source is already a blob the mediatype will not be updated.
-     * @param mediaType
+     * @param contentType
      * @returns
      */
-    public blob(mediaType?: string): Promise<BinaryResult<Blob>> {
+    public async blob(contentType?: string): Promise<BinaryResult<Blob>> {
         if (this.source === null) {
-            return Promise.resolve({
+            return {
                 value: new Blob([], {
-                    type: this.sourceMediaType ?? mediaType,
+                    // charset doesn't matter
+                    type: contentType ?? this.sourceMediaType,
                 }),
                 encoding: undefined,
-            });
+            };
         } else if (this.source instanceof Blob) {
             // Binary to binary retains source encoding
-            return Promise.resolve({
+            return {
                 value: this.source,
                 encoding: this.sourceEncoding,
-            });
+            };
         } else if (typeof this.source === "string") {
             // Blob constructor always converts to utf-8
             // https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
-            return Promise.resolve({
+            return {
                 value: createBlob(
                     this.source,
-                    this.sourceMediaType ?? mediaType
+                    await this._getBlobType(
+                        contentType,
+                        "utf-8",
+                        "text",
+                        "plain"
+                    )
                 ),
                 encoding: "utf-8",
-            });
+            };
         } else {
             // Binary to binary retains source encoding
-            return Promise.resolve({
-                value: createBlob(this.source, this.sourceMediaType),
+            return {
+                value: createBlob(
+                    this.source,
+                    await this._getBlobType(contentType)
+                ),
                 encoding: this.sourceEncoding,
-            });
+            };
         }
     }
 
