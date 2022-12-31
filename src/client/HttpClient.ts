@@ -8,6 +8,7 @@ import { parseContentType } from "../headers/parseContentType.js";
 import { ContentType } from "../headers/types.js";
 import { arrayFind } from "../internal/util/arrayFind.js";
 import { Parameter } from "../headers/Parameter.js";
+import { Header } from "../headers/Header.js";
 
 /**
  * Nice promise-based interface to XMLHttpRequest. Tries to hide all the weirdness.
@@ -47,37 +48,21 @@ export class HttpClient {
 
         const responseType = request.responseType ?? "arraybuffer";
 
-        const { data, replacementContentType } = await this._prepareData(
+        const { data, replacementHeaders } = await this._prepareData(
             request.content,
             responseType,
-            formDataOptimization
+            formDataOptimization,
+            request.content?.headers ?? []
         );
 
-        const replacementContentTypeString = replacementContentType
-            ? await serializeContentType(replacementContentType)
-            : undefined;
+        const headersToUse = replacementHeaders ?? request.content?.headers ?? [];
 
         await this._wrapInPromise(xhr, () => {
             xhr.open(request.method, request.url);
 
             if (request.content) {
-                for (const header of request.content.headers) {
-                    // Skip content-type (if a replacement is provided) as it has special handling to cater to multi-part content
-                    if (
-                        replacementContentTypeString &&
-                        header.name == "content-type"
-                    ) {
-                        continue;
-                    }
-
+                for (const header of headersToUse) {
                     xhr.setRequestHeader(header.name, header.value);
-                }
-
-                if (replacementContentTypeString) {
-                    xhr.setRequestHeader(
-                        "Content-Type",
-                        replacementContentTypeString
-                    );
                 }
             }
 
@@ -144,16 +129,23 @@ export class HttpClient {
     async _prepareData(
         content: HttpContent | undefined,
         type: HttpResponseDataType,
-        formDataOptimization: boolean
+        formDataOptimization: boolean,
+        headers: Header[]
     ): Promise<{
         data: FormData | Blob | ArrayBuffer | string | undefined;
-        replacementContentType?: ContentType;
+        replacementHeaders?: Header[];
     }> {
         if (!content) {
             return { data: undefined };
         }
 
         if (isMultipartContent(content)) {
+            if (formDataOptimization) {
+                const data = await content.toFormData();
+
+                return { data, replacementHeaders: headers.filter(item => item.lowerCaseName !== 'content-type') };
+            }
+
             const contentTypeString = arrayFind(
                 content.headers,
                 (x) => x.lowerCaseName == "content-type"
@@ -168,17 +160,18 @@ export class HttpClient {
             const { replacementContentType, boundary } =
                 prepareContentTypeForMultipart(foundContentType);
 
-            let data: ArrayBuffer | FormData;
+            const data = await content.toArrayBuffer(boundary);
 
-            if (formDataOptimization) {
-                data = await content.toFormData();
-            } else {
-                data = await content.toArrayBuffer(boundary);
+            let replacementHeaders: Header[] | undefined = undefined;
+            if (replacementContentType) {
+                replacementHeaders = headers
+                    .filter(item => item.lowerCaseName !== 'content-type')
+                    .concat(new Header('Content-Type', await serializeContentType(replacementContentType)));
             }
 
             return {
                 data: data,
-                replacementContentType: replacementContentType,
+                replacementHeaders: replacementHeaders,
             };
         } else {
             let data: Blob | ArrayBuffer | Blob | string | undefined;
