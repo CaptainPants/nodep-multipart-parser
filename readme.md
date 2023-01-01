@@ -1,4 +1,4 @@
-# Zero-Dependency High-Compatibility Multipart HTTP Parser and Toolkit (Alpha)
+# Zero-Dependency High-Compatibility Multipart HTTP Parser and Toolkit (Beta)
 See NPM package: [@captainpants/zerodeps-multipart-parser](https://www.npmjs.com/package/@captainpants/zerodeps-multipart-parser)
 
 This project's focus is a parser for multi-part HTTP content coming from XMLHttpRequest responses.
