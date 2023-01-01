@@ -20,11 +20,11 @@ describe("readOneParameter", () => {
         expect(res).toEqual(new Parameter("boundary", 'ham sandwich" test'));
     });
 
-    test("; filename*=utf-8'en'£20.txt", () => {
+    test("; filename*=utf-8'en'%C2%A320.txt", () => {
         const expected = new Parameter("filename*", "£20.txt", "en", "utf-8");
 
         const res = readOneParameter(
-            new HeaderParserState("; filename*=utf-8'en'£20.txt")
+            new HeaderParserState("; filename*=utf-8'en'%C2%A320.txt")
         );
 
         expect(res).toEqual(expected);

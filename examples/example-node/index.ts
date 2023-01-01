@@ -1,6 +1,7 @@
 import http from 'http';
 import file from 'fs/promises';
 import { readForm, writeFormData } from './util';
+import path from 'path';
 
 const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage, typeof http.ServerResponse>> = {
   "/": (req, res) => {
@@ -138,7 +139,8 @@ const handlers: Record<string, http.RequestListener<typeof http.IncomingMessage,
     `);
   },
   "/script.js": async (req, res) => {
-    const content = await file.readFile('../../dist/umd/zerodeps-multipart-parser.js');
+    const filename = require.resolve('@captainpants/zerodeps-multipart-parser/umd.js');
+    const content = await file.readFile(filename);
     res.setHeader('Content-Type', 'text/javascript');
     res.writeHead(200);
     res.end(content);

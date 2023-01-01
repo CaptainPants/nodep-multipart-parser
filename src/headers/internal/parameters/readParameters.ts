@@ -2,7 +2,7 @@ import { ParseError } from "../../../errors/ParseError.js";
 import { Parameter } from "../../Parameter.js";
 import { Parameters } from "../../types.js";
 import { HeaderParserState } from "../HeaderParserState.js";
-import { isQuoteSafe } from "../is.js";
+import { isAttrChar } from "../is.js";
 import { readOptionalWhitespace } from "../readOptionalWhitespace.js";
 import { readQuotedString } from "../readQuotedString.js";
 import { readOptionalToken, readToken } from "../readToken.js";
@@ -99,12 +99,16 @@ function readExtendedValue(state: HeaderParserState): {
 } {
     // 'charset', current this MUST be utf-8 with possibility for future charsets
     if (!state.isAt("utf-8")) {
-        throw new Error(`Unexpected ${state.current()}, expected token utf-8.`);
+        throw new ParseError(
+            `Unexpected ${state.current()}, expected token utf-8.`
+        );
     }
     state.move(5);
 
     if (state.current() !== "'")
-        throw new Error(`Unexpected ${state.current()}, expected token '.`);
+        throw new ParseError(
+            `Unexpected ${state.current()}, expected token '.`
+        );
 
     state.moveNext(); // Move past the '
 
@@ -116,7 +120,7 @@ function readExtendedValue(state: HeaderParserState): {
     }
 
     if (state.isFinished()) {
-        throw new Error(`Unexpected EOF, expected part of language.`);
+        throw new ParseError(`Unexpected EOF, expected part of language.`);
     }
 
     const language = state.string.substring(
@@ -124,6 +128,9 @@ function readExtendedValue(state: HeaderParserState): {
         state.index()
     );
 
+    if (state.current() != "'") {
+        throw new ParseError(`Unexpected ${state.current()}, expecting '.`);
+    }
     state.moveNext(); // Move past the '
 
     const partsOfValue: string[] = [];
@@ -132,25 +139,26 @@ function readExtendedValue(state: HeaderParserState): {
     for (;;) {
         const current = state.current();
 
+        // EOF
         if (current === undefined) {
             break; // finished
         }
 
-        if (isQuoteSafe(current)) {
+        if (isAttrChar(current)) {
             partsOfValue.push(current);
             state.moveNext();
             continue;
         }
 
+        // read a sequence of percent encoded characters
         const read = readPercentEncoded(state);
-        if (typeof read === "undefined") {
-            throw new Error(
-                `Unexpected ${current}, expected a quote safe char or a percent encoded value.`
-            );
+        if (typeof read !== "undefined") {
+            partsOfValue.push(read);
+            // Note that readPercentEncoded alread moved the state forward
+            continue;
         }
 
-        partsOfValue.push(read);
-        state.move(read.length);
+        break;
     }
 
     return {
