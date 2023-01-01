@@ -9,7 +9,7 @@ Project goals:
 - Compatibility with IE11
 
 As a natural progression from this, this library also provides a number of tools to make dealing with HTTP data simpler, including: 
-* Easy to use interface to HTTP single part and multipart content via the [HttpContent](doc/content.md) class. This includes writing multipart requests, and reading multipar responses.
+* Easy to use interface to HTTP single part and multipart content via the [HttpContent](doc/content.md) class. This includes writing multipart requests, and reading multipart responses.
 * The multipart parsing class [MultipartParser](doc/multipart.md) which will take a **DataView** (wrapping an **ArrayBuffer**) and break it into parts according to a given boundary string.
 * Convenient conversion between **string**, **Blob**, **ArrayBuffer**, and **DataView** via the [Data](doc/data.md) class. This class is similar to the modern **Response** class, but supports older browsers.
 * Some [header utilities](doc/headers.md) for dealing with raw headers, content-type and content-disposition headers (including extended parameters).
