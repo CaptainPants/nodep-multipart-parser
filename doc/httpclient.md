@@ -4,28 +4,46 @@ HttpClient is a promise-based wrapper around XMLHttpRequest, using HttpContent t
 
 Using HttpContent with HttpClient:
 ```typescript
-import { HttpClient, MultipartHttpResponse } from '@captainpants/zerodeps-multipart-parser';
+import { HttpClient, isMultipartContent, MultipartHttpResponse, MultipartBuilder } from '@captainpants/zerodeps-multipart-parser';
+
+const builder = new MultipartBuilder();
+builder.add({ 
+    data: 'The quick brown fox jumped over the lazy dog.',
+    name: 'test1',
+    filename: 'test1.txt'
+});
+builder.add({ 
+    data: 'Another example file.',
+    name: 'test2',
+    filename: 'test2.txt'
+});
 
 const client = new HttpClient();
 
 const response = await client.request({
-    method: 'GET',
-    url: 'https://google.com',
-    responseType: 'text' // or 'blob' or 'arraybuffer'
+    method: 'POST',
+    url: 'https://test.com',
+    responseType: 'arraybuffer', // 'text' or 'blob' or 'arraybuffer'
+    content: await builder.build()
 });
 
-// now response is either a SingularHttpContaent or MultipartHttpContent, and you can check which with a simple instanceof check
+// now response is either a SingularHttpContent or MultipartHttpContent, and you can check which with a simple instanceof check, or check for the presence of the 'parts' property
 
-if (response instanceof MultipartHttpResponse) {
+if (isMultipartContent(response)) { // or response instanceof MultipartHttpResponse
     let i = 1;
-    for (const part of response.parts) {
-        console.log(`Part ${i}: ${await part.data.string()}`);
+    for (const { data } of response.parts) {
+        console.log(`Part ${i}: ${await data.string()}`);
 
         ++i;
     }
+
+    // alternatively 
+    for (const { name, filename, data } of response.entries()) {
+        // The entries method is modelled on the structure of FormData.prototype.entries()
+    }
 }
 else {
-    // otherwise its a SingularHttpResponse
+    // otherwise its a SingularHttpContent
 }
 ```
 

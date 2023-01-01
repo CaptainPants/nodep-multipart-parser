@@ -28,7 +28,7 @@ Where possible we will use newer browser features to provider better performance
 This is a small example showing the library in action:
 
 ```typescript
-import { HttpClient, isMultipartContent, MultipartHttpResponse, builder } from '@captainpants/zerodeps-multipart-parser';
+import { HttpClient, isMultipartContent, MultipartHttpResponse, MultipartBuilder } from '@captainpants/zerodeps-multipart-parser';
 
 const builder = new MultipartBuilder();
 builder.add({ 

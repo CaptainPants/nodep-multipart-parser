@@ -4,7 +4,7 @@ The HttpContent classes provide simplified access to single and multi-part HTTP 
 
 Using HttpContent with HttpClient:
 ```typescript
-import { HttpClient, isMultipartContent, MultipartHttpResponse, builder } from '@captainpants/zerodeps-multipart-parser';
+import { HttpClient, isMultipartContent, MultipartHttpResponse, MultipartBuilder } from '@captainpants/zerodeps-multipart-parser';
 
 const builder = new MultipartBuilder();
 builder.add({ 
