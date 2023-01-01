@@ -103,23 +103,25 @@ const tests: Record<string, Test> = {
 
         const content = await builder.build();
 
-        const response = await client.request({ method: 'POST', url: `/test/echo-formdata?reverse=true`, content: content });
+        for (const formOptimization of [true, false]) {
+            const response = await client.request({ method: 'POST', url: `/test/echo-formdata?reverse=true`, content: content, optimizations: { formData: formOptimization } });
 
-        if (!isMultipartContent(response.content)) {
-            throw new Error('Unexpected multipart data.');
+            if (!isMultipartContent(response.content)) {
+                throw new Error('Unexpected multipart data.');
+            }
+
+            log(response.status);
+
+            assert(response.content.parts.length === 2,`Found ${response.content.parts.length} when expecting 2.`);
+
+            const entries = response.content.entries();
+
+            assert(entries[0].name == 'test2', `Incorrect content-disposition on part 0 - ${entries[0].name}`);
+            assert(await Data.isSame(entries[0].data, new Data(inputArray)), `Mismatched content in part 0`);
+
+            assert(entries[1].name == 'test1', `Incorrect content-disposition on part 1 - ${entries[1].name}`);
+            assert(await Data.isSame(entries[1].data, new Data(inputString)), `Mismatched content in part 1`);
         }
-
-        log(response.status);
-
-        assert(response.content.parts.length === 2,`Found ${response.content.parts.length} when expecting 2.`);
-
-        const entries = response.content.entries();
-
-        assert(entries[0].name == 'test2', `Incorrect content-disposition on part 0 - ${entries[0].name}`);
-        assert(await Data.isSame(entries[0].data, new Data(inputArray)), `Mismatched content in part 0`);
-
-        assert(entries[1].name == 'test1', `Incorrect content-disposition on part 1 - ${entries[1].name}`);
-        assert(await Data.isSame(entries[1].data, new Data(inputString)), `Mismatched content in part 1`);
     }
 };
 
