@@ -9,7 +9,7 @@ Project goals:
 - Compatibility with IE11
 
 As a natural progression from this, this library also provides a number of tools to make dealing with HTTP data simpler, including: 
-* Easy to use interface to HTTP single part and multipart content via the [HttpContent](doc/content.md) class.
+* Easy to use interface to HTTP single part and multipart content via the [HttpContent](doc/content.md) class. This includes writing multipart requests, and reading multipart responses.
 * The multipart parsing class [MultipartParser](doc/multipart.md) which will take a **DataView** (wrapping an **ArrayBuffer**) and break it into parts according to a given boundary string.
 * Convenient conversion between **string**, **Blob**, **ArrayBuffer**, and **DataView** via the [Data](doc/data.md) class. This class is similar to the modern **Response** class, but supports older browsers.
 * Some [header utilities](doc/headers.md) for dealing with raw headers, content-type and content-disposition headers (including extended parameters).
@@ -28,22 +28,35 @@ Where possible we will use newer browser features to provider better performance
 This is a small example showing the library in action:
 
 ```typescript
-import { HttpClient, isMultipartContent, MultipartHttpResponse } from '@captainpants/zerodeps-multipart-parser';
+import { HttpClient, isMultipartContent, MultipartHttpResponse, MultipartBuilder } from '@captainpants/zerodeps-multipart-parser';
+
+const builder = new MultipartBuilder();
+builder.add({ 
+    data: 'The quick brown fox jumped over the lazy dog.',
+    name: 'test1',
+    filename: 'test1.txt'
+});
+builder.add({ 
+    data: 'Another example file.',
+    name: 'test2',
+    filename: 'test2.txt'
+});
 
 const client = new HttpClient();
 
 const response = await client.request({
-    method: 'GET',
-    url: 'https://google.com',
-    responseType: 'arraybuffer' // 'text' or 'blob' or 'arraybuffer'
+    method: 'POST',
+    url: 'https://test.com',
+    responseType: 'arraybuffer', // 'text' or 'blob' or 'arraybuffer'
+    content: await builder.build()
 });
 
 // now response is either a SingularHttpContent or MultipartHttpContent, and you can check which with a simple instanceof check, or check for the presence of the 'parts' property
 
 if (isMultipartContent(response)) { // or response instanceof MultipartHttpResponse
     let i = 1;
-    for (const part of response.parts) {
-        console.log(`Part ${i}: ${await part.data.string()}`);
+    for (const { data } of response.parts) {
+        console.log(`Part ${i}: ${await data.string()}`);
 
         ++i;
     }
@@ -54,9 +67,13 @@ if (isMultipartContent(response)) { // or response instanceof MultipartHttpRespo
     }
 }
 else {
-    // otherwise its a SingularHttpResponse
+    // otherwise its a SingularHttpContent
 }
 ```
+# Examples
+There are some small examples in the examples folder, in order to use them with a cloned repo you will need to first:
+- Open a command line in the root project folder, and run npm link
+- Open a command line in the example folder, and run npm link @captainpants/zerodeps-multipart-parser
 
 # Packaging
 
