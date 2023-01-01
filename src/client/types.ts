@@ -1,3 +1,4 @@
+import { FormDataRequestHttpContent } from "../content/FormDataRequestHttpContent.js";
 import { HttpContent } from "../content/HttpContent.js";
 
 /**
@@ -16,7 +17,7 @@ export interface HttpRequest {
      * Content including headers to send as part of the request.
      * TODO: implement multipart writing
      */
-    content?: HttpContent;
+    content?: HttpContent | FormDataRequestHttpContent;
 
     onUploadProgress?: (evt: ProgressEvent) => void;
     onDownloadProgress?: (evt: ProgressEvent) => void;
@@ -42,7 +43,7 @@ export interface HttpRequest {
      */
     isValidStatus?: (statusCode: number) => boolean;
 
-    optimisations?: {
+    optimizations?: {
         formData: boolean;
     };
 }

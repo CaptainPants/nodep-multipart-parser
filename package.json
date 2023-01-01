@@ -13,22 +13,22 @@
         "url": "https://github.com/CaptainPants/zerodeps-multipart-parser"
     },
     "keywords": "multipart parsing",
-    "main": "./dist/esm/index.js",
-    "types": "./dist/esm/index.d.ts",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "exports": {
-        ".": {
-            "default": "./dist/esm/index.js"
-        }
+        ".": "./dist/index.js",
+        "./umd.js": "./dist/umd.js",
+        "./umd.min.js": "./dist/umd.min.js"
     },
     "scripts": {
         "prepublishOnly": "yarn build",
         "clean": "npx rimraf ./dist && npx rimraf ./temp",
-        "build": "yarn run verify && yarn run compile && yarn run rollup && yarn run rollup-minify",
-        "rollup": "npx rollup --file ./dist/umd/zerodeps-multipart-parser.js --format umd --name zerodepsMultipartParser --sourcemap --input ./temp/umd/index.js --context this",
-        "rollup-minify": "npx rollup --file ./dist/umd/zerodeps-multipart-parser.min.js --format umd --name zerodepsMultipartParser --sourcemap --input ./temp/umd/index.js --plugin @lopatnov/rollup-plugin-uglify --context this",
-        "compile": "yarn run clean && yarn run compile:esm && yarn compile:umd",
+        "build": "yarn run verify && yarn run compile:all && yarn run rollup:umd && yarn run rollup:umd-minified",
+        "compile:all": "yarn run clean && yarn run compile:esm && yarn compile:umd-temp",
         "compile:esm": "tsc --project ./src/tsconfig.json",
-        "compile:umd": "tsc --project ./src/tsconfig.json --outDir ./temp/umd --target es5",
+        "compile:umd-temp": "tsc --project ./src/tsconfig.json --outDir ./temp/umd --target es5",
+        "rollup:umd": "npx rollup --file ./dist/umd.js --format umd --name zerodepsMultipartParser --sourcemap --input ./temp/umd/index.js --context this",
+        "rollup:umd-minified": "npx rollup --file ./dist/umd.min.js --format umd --name zerodepsMultipartParser --sourcemap --input ./temp/umd/index.js --plugin @lopatnov/rollup-plugin-uglify --context this",
         "lint": "npx eslint --config src/.eslintrc.json --ignore-path src/.eslintignore src/**/*.{ts,js}",
         "lint-fix": "npx eslint --config src/.eslintrc.json --ignore-path src/.eslintignore src/**/*.{ts,js} --fix",
         "test": "jest --config ./src/jest.config.js --silent=false",

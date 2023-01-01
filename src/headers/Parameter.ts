@@ -37,7 +37,8 @@ export class Parameter {
     language?: string;
 
     /**
-     * For extended parameters
+     * For extended parameters.
+     * Ignored on write as only utf-8 is supported.
      */
     charset?: string;
 }

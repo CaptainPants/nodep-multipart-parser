@@ -29,4 +29,16 @@ describe("parseContentDisposition", () => {
             new Parameter("filename", "example-filename-1"),
         ]);
     });
+
+    test("form-data; name=example-name-1 ; filename=example-filename-1", () => {
+        const res = parseContentDisposition(
+            "form-data; filename*=utf-8'en'filename1.txt; filename=filename2.txt"
+        );
+
+        expect(res.type).toEqual("form-data");
+        expect(res.parameters).toEqual([
+            new Parameter("filename*", "filename1.txt", "en", "utf-8"),
+            new Parameter("filename", "filename2.txt"),
+        ]);
+    });
 });

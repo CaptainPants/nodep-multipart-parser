@@ -1,4 +1,8 @@
-import { HttpContent, isMultipartContent } from "../content/index.js";
+import {
+    HttpContent,
+    isMultipartContent,
+    SingularHttpContent,
+} from "../content/index.js";
 import { HttpError } from "./HttpError.js";
 import { HttpRequest, HttpResponse, HttpResponseDataType } from "./types.js";
 import { isArrayBuffer } from "../internal/util/isArrayBuffer.js";
@@ -8,12 +12,18 @@ import { parseContentType } from "../headers/parseContentType.js";
 import { ContentType } from "../headers/types.js";
 import { arrayFind } from "../internal/util/arrayFind.js";
 import { Parameter } from "../headers/Parameter.js";
+import { Header } from "../headers/Header.js";
+import { FormDataRequestHttpContent } from "../content/FormDataRequestHttpContent.js";
 
 /**
  * Nice promise-based interface to XMLHttpRequest. Tries to hide all the weirdness.
  */
 export class HttpClient {
     async request(request: HttpRequest): Promise<HttpResponse> {
+        const { formData: formDataOptimization } = request.optimizations ?? {
+            formData: false,
+        };
+
         // Refer to standard: https://xhr.spec.whatwg.org/
         const xhr = new XMLHttpRequest();
 
@@ -43,36 +53,22 @@ export class HttpClient {
 
         const responseType = request.responseType ?? "arraybuffer";
 
-        const { data, replacementContentType } = await this._prepareData(
+        const { data, replacementHeaders } = await this._prepareData(
             request.content,
-            responseType
+            responseType,
+            formDataOptimization,
+            request.content?.headers ?? []
         );
 
-        const replacementContentTypeString = replacementContentType
-            ? await serializeContentType(replacementContentType)
-            : undefined;
+        const headersToUse =
+            replacementHeaders ?? request.content?.headers ?? [];
 
         await this._wrapInPromise(xhr, () => {
             xhr.open(request.method, request.url);
 
             if (request.content) {
-                for (const header of request.content.headers) {
-                    // Skip content-type (if a replacement is provided) as it has special handling to cater to multi-part content
-                    if (
-                        replacementContentTypeString &&
-                        header.name == "content-type"
-                    ) {
-                        continue;
-                    }
-
+                for (const header of headersToUse) {
                     xhr.setRequestHeader(header.name, header.value);
-                }
-
-                if (replacementContentTypeString) {
-                    xhr.setRequestHeader(
-                        "Content-Type",
-                        replacementContentTypeString
-                    );
                 }
             }
 
@@ -137,17 +133,47 @@ export class HttpClient {
     }
 
     async _prepareData(
-        content: HttpContent | undefined,
-        type: HttpResponseDataType
+        content: HttpContent | FormDataRequestHttpContent | undefined,
+        type: HttpResponseDataType,
+        formDataOptimization: boolean,
+        headers: Header[]
     ): Promise<{
-        data: Blob | ArrayBuffer | Blob | string | undefined;
-        replacementContentType?: ContentType;
+        data: FormData | Blob | ArrayBuffer | string | undefined;
+        replacementHeaders?: Header[];
     }> {
         if (!content) {
             return { data: undefined };
         }
 
+        if (content instanceof FormDataRequestHttpContent) {
+            const replacementHeaders = headers.filter(
+                (item) => item.lowerCaseName !== "content-type"
+            );
+
+            return {
+                data: content.formData,
+                replacementHeaders: replacementHeaders,
+            };
+        }
+
         if (isMultipartContent(content)) {
+            if (
+                formDataOptimization &&
+                isSafeForFormDataOptimization(content.parts)
+            ) {
+                const data = await content.toFormData();
+
+                return {
+                    data,
+                    // Relying on XMLHttpRequest to generate the Content-Type header with the right boundary
+                    // there's no way to detect what boundary it uses so generating it ourselves will not
+                    // work.
+                    replacementHeaders: headers.filter(
+                        (item) => item.lowerCaseName !== "content-type"
+                    ),
+                };
+            }
+
             const contentTypeString = arrayFind(
                 content.headers,
                 (x) => x.lowerCaseName == "content-type"
@@ -162,33 +188,62 @@ export class HttpClient {
             const { replacementContentType, boundary } =
                 prepareContentTypeForMultipart(foundContentType);
 
+            const data = await content.toArrayBuffer(boundary);
+
+            let replacementHeaders: Header[] | undefined = undefined;
+            if (replacementContentType) {
+                replacementHeaders = headers
+                    .filter((item) => item.lowerCaseName !== "content-type")
+                    .concat(
+                        new Header(
+                            "Content-Type",
+                            await serializeContentType(replacementContentType)
+                        )
+                    );
+            }
+
             return {
-                data: await content.toArrayBuffer(boundary),
-                replacementContentType: replacementContentType,
+                data: data,
+                replacementHeaders: replacementHeaders,
             };
-        } else {
-            let data: Blob | ArrayBuffer | Blob | string | undefined;
-
-            if (!content.data || content.data.isEmpty()) {
-                data = undefined;
-            }
-
-            if (type === "text") {
-                data = await content.data.string();
-            } else {
-                if (
-                    content.data.source instanceof Blob ||
-                    isArrayBuffer(content.data.source)
-                ) {
-                    data = content.data.source;
-                } else {
-                    data = (await content.data.arrayBuffer()).value;
-                }
-            }
-
-            return { data };
         }
+
+        let data: Blob | ArrayBuffer | Blob | string | undefined;
+
+        if (!content.data || content.data.isEmpty()) {
+            data = undefined;
+        }
+
+        if (type === "text") {
+            data = await content.data.string();
+        } else {
+            if (
+                content.data.source instanceof Blob ||
+                isArrayBuffer(content.data.source)
+            ) {
+                data = content.data.source;
+            } else {
+                data = (await content.data.arrayBuffer()).value;
+            }
+        }
+
+        return { data };
     }
+}
+
+function isSafeForFormDataOptimization(parts: SingularHttpContent[]) {
+    return parts.reduce((previous, part) => {
+        // Any other headers make the optimisation 'unsafe' so its skipped
+        return (
+            previous &&
+            !arrayFind(
+                part.headers,
+                (x) =>
+                    x.lowerCaseName !== "content-disposition" &&
+                    x.lowerCaseName !== "content-type"
+            )
+        );
+    }, true);
 }
 
 function prepareContentTypeForMultipart(originalContentType?: ContentType): {

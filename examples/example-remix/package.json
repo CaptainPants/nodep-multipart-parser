@@ -8,7 +8,7 @@
     "typecheck": "tsc -b",
     "lint": "npx eslint **/*.{ts,tsx}",
     "lint-fix": "npx eslint **/*.{ts,tsx} --fix",
-    "do-link": "cd ../.. && yarn link && cd examples/example/remix && yarn link @captainpants/zerodeps-multipart-parser"
+    "do-link": "yarn link @captainpants/zerodeps-multipart-parser"
   },
   "dependencies": {
     "@captainpants/zerodeps-multipart-parser": "*",
