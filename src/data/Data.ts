@@ -52,21 +52,29 @@ export class Data {
     }
 
     private async _getBlobType(
-        parameterType: string | undefined,
+        parameterContentType: string | undefined,
         parameterCharset?: string | undefined,
-        defaultType?: string | undefined,
-        defaultSubtype?: string | undefined
+        defaultMediatType?: string | undefined
     ): Promise<string | undefined> {
-        const contentTypeString = this.sourceMediaType ?? parameterType;
+        const contentTypeString = this.sourceMediaType ?? parameterContentType;
+
+        // If no charset we don't need to modify the content-type
+        // this also covers the case that both are undefined
+        if (!parameterCharset) {
+            return contentTypeString;
+        }
 
         let contentType: ContentType;
 
         if (contentTypeString) {
             contentType = parseContentType(contentTypeString);
         } else {
+            const [type, subtype] = (
+                defaultMediatType ?? "application/octet-stream"
+            ).split("/");
             contentType = {
-                type: defaultType ?? "application",
-                subtype: defaultSubtype ?? "x-unknown",
+                type: type,
+                subtype: subtype,
                 parameters: [],
             };
         }
@@ -187,8 +195,7 @@ export class Data {
                     await this._getBlobType(
                         contentType,
                         "utf-8",
-                        "text",
-                        "plain"
+                        "text/plain"
                     )
                 ),
                 encoding: "utf-8",
