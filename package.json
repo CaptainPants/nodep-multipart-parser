@@ -1,6 +1,6 @@
 {
     "name": "@captainpants/zerodeps-multipart-parser",
-    "version": "0.0.12",
+    "version": "0.1.0",
     "type": "module",
     "description": "A zero dependency, high compatibility, multipart HTTP multipart content parser",
     "license": "MIT",
@@ -12,7 +12,7 @@
         "type": "git",
         "url": "https://github.com/CaptainPants/zerodeps-multipart-parser"
     },
-    "keywords": "multipart parsing",
+    "keywords": ["multipart", "parsing"],
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
